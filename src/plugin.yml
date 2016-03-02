@@ -1,0 +1,7 @@
+name: MPMG-Framework
+main: com.minepile.mpmgfw.MPMGFramework
+version: 0.1
+description: MinePile MiniGame Framework
+author: Robert Andrew Brown
+website: http://www.minepile.com/
+commands:
