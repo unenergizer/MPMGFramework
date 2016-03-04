@@ -87,6 +87,8 @@ public class GameManager {
         }.runTaskTimer(PLUGIN, 0, 20);
 	}
 	
+	
+	
 	/**
 	 * This will start the loaded plugin game.
 	 */
@@ -96,7 +98,7 @@ public class GameManager {
 		
 		//Teleport Players
 		for(Player players: Bukkit.getOnlinePlayers()) {
-			World world = PLUGIN.getMinigamePluginManager().getMinigame().getWorld();
+			World world = PLUGIN.getMinigamePluginManager().getWorldDupe().getMiniGameWorld();
 			Location tempLoc = new Location(world, 0, 90, 0);
 			
 			players.teleport(tempLoc);

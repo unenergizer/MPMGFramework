@@ -11,6 +11,7 @@ import com.minepile.mpmgfw.api.MinigamePlugin;
 import com.minepile.mpmgfw.core.constants.GameState;
 import com.minepile.mpmgfw.core.plugins.PluginFinder;
 import com.minepile.mpmgfw.core.plugins.PluginLoader;
+import com.minepile.mpmgfw.core.worlds.WorldDuplicator;
 
 public class MinigamePluginManager {
 
@@ -22,9 +23,13 @@ public class MinigamePluginManager {
 	private ArrayList<File> gamePlugins;
 	private Integer gamePluginIndex;
 	
+	private WorldDuplicator worldDupe;
+	
 	public MinigamePluginManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		PLUGIN_LOADER = new PluginLoader();
+		
+		worldDupe = new WorldDuplicator();
 		
 		//On first load, load 
 		loadNextGamePlugin();
@@ -62,6 +67,9 @@ public class MinigamePluginManager {
 		//Try loading the plugin.
 		tryLoad(PLUGIN_LOADER.getLoadedGamePlugin());
 		
+		//Now load the game assets.
+		loadGameAssets();
+		
 		//The game plugin is loaded. Lets begin waiting on players.
 		PLUGIN.getGameManager().setGameState(GameState.LOBBY_WAITING);
 	}
@@ -84,7 +92,33 @@ public class MinigamePluginManager {
 	 * This will disable the current game plugin that is loaded.
 	 */
 	public void disableCurrentGamePlugin() {
+		//First lets unload the game plugins assets.
+		disableGameAssets();
+		
+		//Now disable the game plugin.
 		PLUGIN_LOADER.disablePlugin();
+	}
+	
+	/**
+	 * Loads the needed assets from the minigame plugin.
+	 */
+	private void loadGameAssets() {
+		
+		//Load the map into memory
+		String worldName = minigame.getWorldName();
+		worldDupe.loadWorld(worldName);
+		
+		//Cleanup any map entities.
+		worldDupe.clearEntities();
+	}
+	
+	/**
+	 * Disables the games loaded assets.
+	 */
+	private void disableGameAssets() {
+		
+		//Unload the current game map from memory.
+		worldDupe.unloadWorld();
 	}
 
 	/**
@@ -122,5 +156,9 @@ public class MinigamePluginManager {
 		} else {
 			this.gamePluginIndex = gamePluginIndex;
 		}
+	}
+
+	public WorldDuplicator getWorldDupe() {
+		return worldDupe;
 	}
 }

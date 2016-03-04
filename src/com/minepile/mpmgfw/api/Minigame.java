@@ -1,8 +1,5 @@
 package com.minepile.mpmgfw.api;
 
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 public abstract class Minigame {
     protected final String name;
     protected final String worldName;
@@ -16,7 +13,7 @@ public abstract class Minigame {
         return name;
     }
 
-    public World getWorld() {
-        return Bukkit.getWorld(worldName);
+    public String getWorldName() {
+        return worldName;
     }
 }
