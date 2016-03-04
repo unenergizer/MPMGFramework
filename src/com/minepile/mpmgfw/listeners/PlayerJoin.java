@@ -24,21 +24,32 @@ public class PlayerJoin implements Listener {
 		
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
+		Location lobbySpawn = gameManager.getLobbySpawn();
 		
+		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {
 			//TODO: teleport the new player to the game world as a spectator.
 			
 		} else {
+			
+			//If the game has enough players to start, lets do that now.
 			if (gameManager.shouldMinigameStart()) {
 				gameManager.startCountdown();
-				teleport(player, PLUGIN.getGameManager().getLobbySpawn());
+				teleport(player, lobbySpawn);
 				
 			} else {
-				teleport(player, PLUGIN.getGameManager().getLobbySpawn());
+				//The game does not have enough players.
+				teleport(player, lobbySpawn);
 			}
 		}
 	}
 	
+	/**
+	 * Waits X amount of ticks to teleport player to the designated spawn location.
+	 * 
+	 * @param player The player to teleport.
+	 * @param location The location to teleport the player to.
+	 */
 	private void teleport(final Player player, final Location location) {
 		new BukkitRunnable() {
             @Override

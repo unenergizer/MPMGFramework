@@ -65,27 +65,13 @@ public class MinigamePluginManager {
 		PLUGIN_LOADER.loadPlugin(gamePlugins.get(gamePluginIndex));
 		
 		//Try loading the plugin.
-		tryLoad(PLUGIN_LOADER.getLoadedGamePlugin());
+		getGamePluginInstance(PLUGIN_LOADER.getLoadedGamePlugin());
 		
 		//Now load the game assets.
 		loadGameAssets();
 		
 		//The game plugin is loaded. Lets begin waiting on players.
 		PLUGIN.getGameManager().setGameState(GameState.LOBBY_WAITING);
-	}
-	
-	/**
-	 * This will try to load the API contents of the loaded plugin.
-	 * 
-	 * @param plugin The Minigame plugin that is currently loaded.
-	 */
-	public void tryLoad(final Plugin plugin) {
-		
-		if (plugin instanceof MinigamePlugin) {
-            final Minigame minigamePlugin = ((MinigamePlugin) plugin).getMinigame();
-
-            minigame = minigamePlugin;
-        }
 	}
 	
 	/**
@@ -129,6 +115,20 @@ public class MinigamePluginManager {
 	public Minigame getMinigame() {
 		return minigame;
 	}
+
+	/**
+	 * This will get the game plugins instance for grabbing .
+	 * 
+	 * @param plugin The Minigame plugin that is currently loaded.
+	 */
+	private void getGamePluginInstance(final Plugin plugin) {
+		
+		if (plugin instanceof MinigamePlugin) {
+            final Minigame minigamePlugin = ((MinigamePlugin) plugin).getMinigame();
+
+            minigame = minigamePlugin;
+        }
+	}
 	
 	/**
 	 * Gets the current game index of the total games loaded.
@@ -158,6 +158,11 @@ public class MinigamePluginManager {
 		}
 	}
 
+	/**
+	 * Returns and instance of the world duplicator.
+	 * 
+	 * @return An instance of the world duplicator.
+	 */
 	public WorldDuplicator getWorldDupe() {
 		return worldDupe;
 	}

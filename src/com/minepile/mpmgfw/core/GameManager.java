@@ -21,10 +21,12 @@ public class GameManager {
 	private final int MIN_PLAYERS = 1;
 	private final Location lobbySpawn;
 	
+	private String lobbyWorld = "mg-lobby";
+	
 	public GameManager(MPMGFramework plugin) {
 		this.PLUGIN = plugin;
 		gameState = GameState.lOBBY_RESETTING;
-		lobbySpawn = new Location(Bukkit.getWorlds().get(0), 0.5, 76, 0.5);
+		lobbySpawn = new Location(Bukkit.getWorld(lobbyWorld), 0.5, 76, 0.5);
 		
 		//On first load, begin lobby setup.
 		initLobby();
@@ -48,6 +50,11 @@ public class GameManager {
             }
         }
         
+        //Spawn players in the lobby.
+        for (Player players: Bukkit.getOnlinePlayers()) {
+        	tpToLobbySpawn(players);
+        }
+        
         //TODO: Kit Selection
         //TODO: Team Selection
         //TODO: Scoreboard
@@ -55,6 +62,15 @@ public class GameManager {
         
         //The lobby is setup, lets change the game state.
         gameState = GameState.LOBBY_WAITING;
+	}
+	
+	/**
+	 * Teleports a player to the lobby spawn pad.
+	 * 
+	 * @param player The player to teleport to lobby spawn.
+	 */
+	public void tpToLobbySpawn(Player player) {
+		player.teleport(lobbySpawn);
 	}
 	
 	/**
@@ -96,7 +112,7 @@ public class GameManager {
 		//Debug Message
 		Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + ">> START GAME <<");
 		
-		//Teleport Players
+		//Teleport players to the game world.
 		for(Player players: Bukkit.getOnlinePlayers()) {
 			World world = PLUGIN.getMinigamePluginManager().getWorldDupe().getMiniGameWorld();
 			Location tempLoc = new Location(world, 0, 90, 0);
@@ -180,5 +196,13 @@ public class GameManager {
 	 */
 	public Location getLobbySpawn() {
 		return lobbySpawn;
+	}
+
+	/**
+	 * Gets the lobby's world name.
+	 * @return The name of the lobby world.
+	 */
+	public String getLobbyWorld() {
+		return lobbyWorld;
 	}
 }

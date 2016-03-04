@@ -16,8 +16,12 @@ import org.bukkit.entity.Player;
 public class WorldDuplicator {
 
 	private World minigameWorld;
-
-	// Load a world directory into memory for use.
+	
+	/**
+	 * Load a world directory into memory for use.
+	 * 
+	 * @param worldName The name of the world you want to load into memory.
+	 */
 	public void loadWorld(String worldName) {
 
 		if (worldName.equalsIgnoreCase("world")) {
@@ -49,7 +53,9 @@ public class WorldDuplicator {
 		clearEntities();
 	}
 	
-	//Removes entities from the world.
+	/**
+	 * Removes entities from the loaded game world.
+	 */
 	public void clearEntities(){
 		// Despawn any animals or monsters.
 		for (Entity entity : this.minigameWorld.getEntities()) {
@@ -59,13 +65,20 @@ public class WorldDuplicator {
 		}
 	}
 	
-	// Remove a world from memory.
+	/**
+	 * Remove the loaded game world from memory.
+	 */
 	public void unloadWorld() {
 		Bukkit.getServer().unloadWorld(this.minigameWorld, true);
 	}
 	
 
-	// This will allow the safe replacement of worlds.
+	/**
+	 * This will allow the safe replacement of worlds.
+	 * 
+	 * @param worldName
+	 * @param backupWorldName
+	 */
 	public void replaceWorld(String worldName, String backupWorldName) {
 
 		World world = Bukkit.getServer().getWorld(worldName);
@@ -97,13 +110,19 @@ public class WorldDuplicator {
 			} catch (IOException e) {}
 
 		} else {
-			Bukkit.getServer().getLogger()
-			.info("[MPMG-Framework] Failed to replace " + worldName + "!");
+			Bukkit.getServer()
+				.getLogger()
+				.info("[MPMG-Framework] Failed to replace " + worldName + "!");
 		}
 
 	}
 
-	// Delete's a file directory.
+	/**
+	 * Delete's a file directory.
+	 * 
+	 * @param file The file or folder that will be deleted.
+	 * @throws IOException
+	 */
 	private void deleteFile(File file) throws IOException {
 
 		if (file.isDirectory()) {
@@ -138,7 +157,13 @@ public class WorldDuplicator {
 		}
 	}
 
-	// Copies a world directory to another directory.
+	/**
+	 * Copies a world directory to another directory.
+	 * 
+	 * @param src The source destination of the folder to copy.
+	 * @param dest The end destination to copy the folder to.
+	 * @throws IOException
+	 */
 	private void copyFolder(File src, File dest) throws IOException {
 
 		if (src.isDirectory()) {
@@ -178,7 +203,10 @@ public class WorldDuplicator {
 		}
 	}
 
-	// Get world instance.
+	/**
+	 *  Get world instance.
+	 * @return Returns an instance of the game world.
+	 */
 	public World getMiniGameWorld() {
 		return minigameWorld;
 	}

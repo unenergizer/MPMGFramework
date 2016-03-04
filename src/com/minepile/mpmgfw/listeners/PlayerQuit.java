@@ -21,7 +21,9 @@ public class PlayerQuit implements Listener {
 		
 		GameManager gameManager = PLUGIN.getGameManager();
 		
+		//Check to see if the game should end.
 		if (gameManager.shouldMinigameEnd()) {
+			
 			//End the game!
 			gameManager.endGame();
 		}

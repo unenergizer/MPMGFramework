@@ -6,8 +6,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.minepile.mpmgfw.core.GameManager;
 import com.minepile.mpmgfw.core.MinigamePluginManager;
+import com.minepile.mpmgfw.listeners.EntityDamage;
 import com.minepile.mpmgfw.listeners.PlayerJoin;
 import com.minepile.mpmgfw.listeners.PlayerQuit;
+import com.minepile.mpmgfw.listeners.WeatherChange;
 
 public class MPMGFramework extends JavaPlugin {
 	
@@ -29,10 +31,16 @@ public class MPMGFramework extends JavaPlugin {
 		//TODO
 	}
 	
+	/**
+	 * Register Spigot/Bukkit event listeners.
+	 */
 	private void registerListeners() {
 		PluginManager pm = Bukkit.getPluginManager();
+		
+		pm.registerEvents(new EntityDamage(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);
+		pm.registerEvents(new WeatherChange(this), this);
 	}
 	
 	/**
