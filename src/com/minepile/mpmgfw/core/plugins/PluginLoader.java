@@ -52,4 +52,12 @@ public class PluginLoader {
 		pm.disablePlugin(loadedGamePlugin);
 		loadedGamePlugin = null;
 	}
+	
+	/**
+	 * Gets the currently loaded minigame plugin.
+	 * @return
+	 */
+	public Plugin getLoadedGamePlugin() {
+		return loadedGamePlugin;
+	}
 }

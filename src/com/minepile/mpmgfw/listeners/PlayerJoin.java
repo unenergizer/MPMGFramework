@@ -25,11 +25,11 @@ public class PlayerJoin implements Listener {
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
 		
-		if (gameManager.isGameRunning()) {
+		if (gameManager.isMinigameRunning()) {
 			//TODO: teleport the new player to the game world as a spectator.
 			
 		} else {
-			if (gameManager.shouldStart()) {
+			if (gameManager.shouldMinigameStart()) {
 				gameManager.startCountdown();
 				teleport(player, PLUGIN.getGameManager().getLobbySpawn());
 				
