@@ -64,13 +64,14 @@ public class GameManager {
 		//TODO: Scoreboard
 		//TODO: Bossbar Announcer
 
+
+		//Set game state.
+		gameState = GameState.LOBBY_WAITING;
+		
 		//Check if game needs to start.
 		if (shouldMinigameStart()) {
 			startCountdown();
 		}
-
-		//Set game state.
-		gameState = GameState.LOBBY_WAITING;
 	}
 
 	/**
@@ -137,8 +138,7 @@ public class GameManager {
 	 * This will start the game countdown.
 	 */
 	public void startCountdown() {
-		gameState = GameState.GAME_STARTING;
-
+		
 		new BukkitRunnable() {
 			int countdown = 30;
 
@@ -152,10 +152,12 @@ public class GameManager {
 					countdown--;
 				} else {
 					cancel();
-
-					if (gameState == GameState.GAME_STARTING && isMinimumPlayersMet()) {
+					
+					if (shouldMinigameStart()) {
+						Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Starting Game");
 						startGame();
 					} else {
+						Bukkit.broadcastMessage(ChatColor.GREEN + "Lobby set to waiting. GameState: " + gameState.toString());
 						gameState = GameState.LOBBY_WAITING;
 					}
 				}
@@ -201,7 +203,7 @@ public class GameManager {
 	 * @return True if the game should start.
 	 */
 	public boolean shouldMinigameStart() {
-		return isMinimumPlayersMet();
+		return isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_WAITING);
 	}
 
 	/**

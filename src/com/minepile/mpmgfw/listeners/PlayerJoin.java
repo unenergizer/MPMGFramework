@@ -33,15 +33,13 @@ public class PlayerJoin implements Listener {
 			//TODO: teleport the new player to the game world as a spectator.
 
 		} else {
-
+			
+			//Teleport the player to the lobby.
+			teleport(player, lobbySpawn);
+			
 			//If the game has enough players to start, lets do that now.
 			if (gameManager.shouldMinigameStart()) {
 				gameManager.startCountdown();
-				teleport(player, lobbySpawn);
-
-			} else {
-				//The game does not have enough players.
-				teleport(player, lobbySpawn);
 			}
 		}
 	}
