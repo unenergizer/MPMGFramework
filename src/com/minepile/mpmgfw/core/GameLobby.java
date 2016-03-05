@@ -11,12 +11,12 @@ public class GameLobby {
 
 	private final String lobbyWorldName;
 	private final Location lobbySpawn;
-	
+
 	public GameLobby() {
 		lobbyWorldName = "mg-lobby";
 		lobbySpawn = new Location(Bukkit.getWorld(lobbyWorldName), 0.5, 76, 0.5);
 	}
-	
+
 	/**
 	 * Initialize (setup) the minigame lobby.
 	 */

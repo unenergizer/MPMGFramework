@@ -24,12 +24,12 @@ public class WorldDuplicator {
 	 * @param worldName The name of the world you want to load into memory.
 	 */
 	public void loadWorld(String worldName) {
-		
+
 		//If a world instance exists, then unload it first.
 		if (minigameWorld != null) {
 			unloadWorld();
 		}
-		
+
 		// Replace the game world to be loaded.
 		replaceWorld(worldName, worldName.concat("_backup"));
 

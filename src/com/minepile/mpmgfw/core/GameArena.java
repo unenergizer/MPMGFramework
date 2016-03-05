@@ -10,34 +10,34 @@ public class GameArena {
 
 	private final MPMGFramework PLUGIN;
 	private final WorldDuplicator worldDupe;
-	
+
 	public GameArena(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		worldDupe = new WorldDuplicator();
 	}
-	
+
 	/**
 	 * Loads the needed assets from the minigame plugin.
 	 */
 	public void loadGameWorld() {
 		String worldName = PLUGIN.getMinigamePluginManager().getMinigame().getWorldName();
-		
+
 		//Load the map into memory
 		worldDupe.loadWorld(worldName);
-		
+
 		//Cleanup any map entities.
 		worldDupe.clearEntities();
 	}
-	
+
 	/**
 	 * Disables the games loaded assets.
 	 */
 	public void unloadGameWorld() {
-		
+
 		//Unload the current game map from memory.
 		worldDupe.unloadWorld();
 	}
-	
+
 	/**
 	 * Teleports a player to the game arena.
 	 * 

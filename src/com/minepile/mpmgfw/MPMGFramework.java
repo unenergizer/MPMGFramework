@@ -14,42 +14,42 @@ import com.minepile.mpmgfw.listeners.PlayerQuit;
 import com.minepile.mpmgfw.listeners.WeatherChange;
 
 public class MPMGFramework extends JavaPlugin {
-	
+
 	private GameManager gameManager;
 	private MinigamePluginManager minigamePluginManager;
 	private GameLobby lobby;
 	private GameArena arena;
-	
+
 	@Override
 	public void onEnable() {
-		
+
 		minigamePluginManager = new MinigamePluginManager();
 		lobby = new GameLobby();
 		arena = new GameArena(this);
 		gameManager = new GameManager(this);
-		
-        //Register Event listeners
-        registerListeners();
+
+		//Register Event listeners
+		registerListeners();
 	}
-	
+
 	@Override 
 	public void onDisable() {
 		//Clean up
 		gameManager.endGame(false);
 	}
-	
+
 	/**
 	 * Register Spigot/Bukkit event listeners.
 	 */
 	private void registerListeners() {
 		PluginManager pm = Bukkit.getPluginManager();
-		
+
 		pm.registerEvents(new EntityDamage(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);
 		pm.registerEvents(new WeatherChange(this), this);
 	}
-	
+
 	/**
 	 * Grabs the GameManager instance.
 	 * @return Returns a GameManager instance.
@@ -71,7 +71,7 @@ public class MPMGFramework extends JavaPlugin {
 	 * Grabs the LobbyManager instance.
 	 * @return Returns a LobbyManager instance.
 	 */
-	public GameLobby getLobbyManager() {
+	public GameLobby getGameLobby() {
 		return lobby;
 	}
 
@@ -80,7 +80,7 @@ public class MPMGFramework extends JavaPlugin {
 	 * Grabs the ArenaManager instance.
 	 * @return Returns a ArenaManager instance.
 	 */
-	public GameArena getArenaManager() {
+	public GameArena getGameArena() {
 		return arena;
 	}
 }

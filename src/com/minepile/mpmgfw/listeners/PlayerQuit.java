@@ -8,22 +8,22 @@ import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.GameManager;
 
 public class PlayerQuit implements Listener {
-	
+
 	private final MPMGFramework PLUGIN;
-	
+
 	public PlayerQuit(MPMGFramework plugin) {
 		PLUGIN = plugin;
 	}
-	
+
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
 		event.setQuitMessage(null);
-		
+
 		GameManager gameManager = PLUGIN.getGameManager();
-		
+
 		//Check to see if the game should end.
 		if (gameManager.shouldMinigameEnd()) {
-			
+
 			//End the game!
 			gameManager.endGame(true);
 		}

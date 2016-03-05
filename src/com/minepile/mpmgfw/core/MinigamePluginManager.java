@@ -14,16 +14,16 @@ public class MinigamePluginManager {
 
 	private final PluginLoader PLUGIN_LOADER;
 	private final String FILE_PATH;
-	
+
 	private Minigame minigame;
 	private ArrayList<File> gamePlugins;
 	private Integer gamePluginIndex;
-	
+
 	public MinigamePluginManager() {
 		PLUGIN_LOADER = new PluginLoader();
 		FILE_PATH = "plugins/MPMGFramework/games";
 	}
-	
+
 	/**
 	 * Loads the next plugin in the gamePlugins array list.
 	 */
@@ -33,30 +33,30 @@ public class MinigamePluginManager {
 			PluginFinder pf = new PluginFinder(FILE_PATH);
 			gamePlugins = pf.getPlugins();
 		}
-		
+
 		//Track which game to pick next.
 		if (gamePluginIndex == null) {
 			//This is going to be the first game we load.
 			//Pick the first game from the gamePlugins list.
 			gamePluginIndex = 0;
-			
+
 		} else {
 			//Pick the next game from the gamePlugins list.
 			gamePluginIndex++;
-			
+
 			//Make sure our array will not go out of bounds.
 			if(gamePluginIndex > gamePlugins.size() - 1) {
 				gamePluginIndex = 0;
 			}
 		}
-		
+
 		//Load the game plugin.
 		PLUGIN_LOADER.loadPlugin(gamePlugins.get(gamePluginIndex));
-		
+
 		//Try loading the plugin.
 		setMinigamePluginInstance(PLUGIN_LOADER.getLoadedGamePlugin());
 	}
-	
+
 	/**
 	 * This will disable the current game plugin that is loaded.
 	 */
@@ -80,14 +80,14 @@ public class MinigamePluginManager {
 	 * @param plugin The Minigame plugin that is currently loaded.
 	 */
 	private void setMinigamePluginInstance(final Plugin plugin) {
-		
-		if (plugin instanceof MinigamePlugin) {
-            final Minigame minigamePlugin = ((MinigamePlugin) plugin).getMinigame();
 
-            minigame = minigamePlugin;
-        }
+		if (plugin instanceof MinigamePlugin) {
+			final Minigame minigamePlugin = ((MinigamePlugin) plugin).getMinigame();
+
+			minigame = minigamePlugin;
+		}
 	}
-	
+
 	/**
 	 * Gets the current game index of the total games loaded.
 	 * <p>
@@ -100,7 +100,7 @@ public class MinigamePluginManager {
 	public Integer getGamePluginIndex() {
 		return gamePluginIndex;
 	}
-	
+
 	/**
 	 * This will set the gamePluginIndex which will decide what
 	 * game will be played next.  If an index above the array

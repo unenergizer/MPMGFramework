@@ -10,23 +10,23 @@ import java.util.ArrayList;
  * 
  */
 public class PluginFinder {
-	
+
 	private final String FILE_PATH;
 	private ArrayList<File> plugins = new ArrayList<>();
-	
+
 	public PluginFinder(String filePath) {
 		this.FILE_PATH = filePath;
 		findPlugins();
 	}
 
-	
+
 	/**
 	 * This will find plugins in the games directory.
 	 */
 	private void findPlugins() {
 		File dir = new File(FILE_PATH);
 		File[] files = dir.listFiles();
-		
+
 		//Loop through files in directory and add them to plugins array.
 		for (File gameFile : files) {
 			if(!plugins.contains(gameFile)) {

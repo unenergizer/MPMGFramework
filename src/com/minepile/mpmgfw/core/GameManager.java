@@ -11,10 +11,10 @@ import net.md_5.bungee.api.ChatColor;
 
 public class GameManager {
 
-	private GameState gameState;
-
 	private final MPMGFramework PLUGIN;
 	private final int MIN_PLAYERS = 1;
+
+	private GameState gameState;
 
 	public GameManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
@@ -23,7 +23,7 @@ public class GameManager {
 		setupGame();
 	}
 
-	/*
+	/**
 	 * This will load the minigame plugin and setup the game world.
 	 */
 	private void setupGame() {
@@ -35,7 +35,7 @@ public class GameManager {
 		mpm.loadNextGamePlugin();
 
 		//Load game world.
-		GameArena gameArena = PLUGIN.getArenaManager();
+		GameArena gameArena = PLUGIN.getGameArena();
 		gameArena.loadGameWorld();
 
 		//Setup game lobby.
@@ -46,7 +46,7 @@ public class GameManager {
 	 * This will setup our game lobby.
 	 */
 	private void setupLobby() {
-		GameLobby gameLobby = PLUGIN.getLobbyManager();
+		GameLobby gameLobby = PLUGIN.getGameLobby();
 
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
@@ -68,6 +68,9 @@ public class GameManager {
 		if (shouldMinigameStart()) {
 			startCountdown();
 		}
+
+		//Set game state.
+		gameState = GameState.LOBBY_WAITING;
 	}
 
 	/**
@@ -75,7 +78,7 @@ public class GameManager {
 	 * Thus starting the game.
 	 */
 	private void startGame() {
-		GameArena gameArena = PLUGIN.getArenaManager();
+		GameArena gameArena = PLUGIN.getGameArena();
 
 		//Set game state.
 		gameState = GameState.GAME_STARTING;
@@ -106,14 +109,14 @@ public class GameManager {
 	 * This will also unload the current minigame plugin.
 	 */
 	public void endGame(boolean setupNextGame) {
-		GameArena gameArena = PLUGIN.getArenaManager();
+		GameArena gameArena = PLUGIN.getGameArena();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 
 		gameState = GameState.GAME_ENDING;
 
 		//If players are still connected, lets show them some scores.
 		if (Bukkit.getOnlinePlayers().size() > 0) {
-			//TODO: Set scores
+			//TODO: Show scores
 		}
 
 		//TODO: Save Scores (MySQL)

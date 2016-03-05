@@ -12,9 +12,9 @@ import com.minepile.mpmgfw.core.GameManager;
 import com.minepile.mpmgfw.core.GameLobby;
 
 public class PlayerJoin implements Listener {
-	
+
 	private final MPMGFramework PLUGIN;
-	
+
 	public PlayerJoin(MPMGFramework plugin) {
 		PLUGIN = plugin;
 	}
@@ -22,30 +22,30 @@ public class PlayerJoin implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		event.setJoinMessage(null);
-		
+
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameLobby lobby = PLUGIN.getLobbyManager();
+		GameLobby lobby = PLUGIN.getGameLobby();
 		Location lobbySpawn = lobby.getLobbySpawn();
-		
+
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {
 			//TODO: teleport the new player to the game world as a spectator.
-			
+
 		} else {
-			
+
 			//If the game has enough players to start, lets do that now.
 			if (gameManager.shouldMinigameStart()) {
 				gameManager.startCountdown();
 				teleport(player, lobbySpawn);
-				
+
 			} else {
 				//The game does not have enough players.
 				teleport(player, lobbySpawn);
 			}
 		}
 	}
-	
+
 	/**
 	 * Waits X amount of ticks to teleport player to the designated spawn location.
 	 * 
@@ -54,10 +54,10 @@ public class PlayerJoin implements Listener {
 	 */
 	private void teleport(final Player player, final Location location) {
 		new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.teleport(location);
-            }
-        }.runTaskLater(PLUGIN, 10);
+			@Override
+			public void run() {
+				player.teleport(location);
+			}
+		}.runTaskLater(PLUGIN, 10);
 	}
 }
