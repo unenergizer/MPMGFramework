@@ -4,7 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.minepile.mpmgfw.core.GameArena;
 import com.minepile.mpmgfw.core.GameManager;
+import com.minepile.mpmgfw.core.GameLobby;
 import com.minepile.mpmgfw.core.MinigamePluginManager;
 import com.minepile.mpmgfw.listeners.EntityDamage;
 import com.minepile.mpmgfw.listeners.PlayerJoin;
@@ -15,12 +17,16 @@ public class MPMGFramework extends JavaPlugin {
 	
 	private GameManager gameManager;
 	private MinigamePluginManager minigamePluginManager;
+	private GameLobby lobby;
+	private GameArena arena;
 	
 	@Override
 	public void onEnable() {
 		
+		minigamePluginManager = new MinigamePluginManager();
+		lobby = new GameLobby();
+		arena = new GameArena(this);
 		gameManager = new GameManager(this);
-		minigamePluginManager = new MinigamePluginManager(this);
 		
         //Register Event listeners
         registerListeners();
@@ -28,7 +34,8 @@ public class MPMGFramework extends JavaPlugin {
 	
 	@Override 
 	public void onDisable() {
-		//TODO
+		//Clean up
+		gameManager.endGame(false);
 	}
 	
 	/**
@@ -57,5 +64,23 @@ public class MPMGFramework extends JavaPlugin {
 	 */
 	public MinigamePluginManager getMinigamePluginManager() {
 		return minigamePluginManager;
+	}
+
+
+	/**
+	 * Grabs the LobbyManager instance.
+	 * @return Returns a LobbyManager instance.
+	 */
+	public GameLobby getLobbyManager() {
+		return lobby;
+	}
+
+
+	/**
+	 * Grabs the ArenaManager instance.
+	 * @return Returns a ArenaManager instance.
+	 */
+	public GameArena getArenaManager() {
+		return arena;
 	}
 }

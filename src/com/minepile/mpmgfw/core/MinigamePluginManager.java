@@ -5,34 +5,23 @@ import java.util.ArrayList;
 
 import org.bukkit.plugin.Plugin;
 
-import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.api.Minigame;
 import com.minepile.mpmgfw.api.MinigamePlugin;
-import com.minepile.mpmgfw.core.constants.GameState;
 import com.minepile.mpmgfw.core.plugins.PluginFinder;
 import com.minepile.mpmgfw.core.plugins.PluginLoader;
-import com.minepile.mpmgfw.core.worlds.WorldDuplicator;
 
 public class MinigamePluginManager {
 
-	private final MPMGFramework PLUGIN;
 	private final PluginLoader PLUGIN_LOADER;
-	private final String FILE_PATH = "plugins/MPMGFramework/games";
+	private final String FILE_PATH;
 	
 	private Minigame minigame;
 	private ArrayList<File> gamePlugins;
 	private Integer gamePluginIndex;
 	
-	private final WorldDuplicator worldDupe;
-	
-	public MinigamePluginManager(MPMGFramework plugin) {
-		PLUGIN = plugin;
+	public MinigamePluginManager() {
 		PLUGIN_LOADER = new PluginLoader();
-		
-		worldDupe = new WorldDuplicator();
-		
-		//On first load, load 
-		loadNextGamePlugin();
+		FILE_PATH = "plugins/MPMGFramework/games";
 	}
 	
 	/**
@@ -65,46 +54,15 @@ public class MinigamePluginManager {
 		PLUGIN_LOADER.loadPlugin(gamePlugins.get(gamePluginIndex));
 		
 		//Try loading the plugin.
-		getGamePluginInstance(PLUGIN_LOADER.getLoadedGamePlugin());
-		
-		//Now load the game assets.
-		loadGameAssets();
-		
-		//The game plugin is loaded. Lets begin waiting on players.
-		PLUGIN.getGameManager().setGameState(GameState.LOBBY_WAITING);
+		setMinigamePluginInstance(PLUGIN_LOADER.getLoadedGamePlugin());
 	}
 	
 	/**
 	 * This will disable the current game plugin that is loaded.
 	 */
 	public void disableCurrentGamePlugin() {
-		//First lets unload the game plugins assets.
-		disableGameAssets();
-		
 		//Now disable the game plugin.
 		PLUGIN_LOADER.disablePlugin();
-	}
-	
-	/**
-	 * Loads the needed assets from the minigame plugin.
-	 */
-	private void loadGameAssets() {
-		
-		//Load the map into memory
-		String worldName = minigame.getWorldName();
-		worldDupe.loadWorld(worldName);
-		
-		//Cleanup any map entities.
-		worldDupe.clearEntities();
-	}
-	
-	/**
-	 * Disables the games loaded assets.
-	 */
-	private void disableGameAssets() {
-		
-		//Unload the current game map from memory.
-		worldDupe.unloadWorld();
 	}
 
 	/**
@@ -121,7 +79,7 @@ public class MinigamePluginManager {
 	 * 
 	 * @param plugin The Minigame plugin that is currently loaded.
 	 */
-	private void getGamePluginInstance(final Plugin plugin) {
+	private void setMinigamePluginInstance(final Plugin plugin) {
 		
 		if (plugin instanceof MinigamePlugin) {
             final Minigame minigamePlugin = ((MinigamePlugin) plugin).getMinigame();
@@ -151,19 +109,10 @@ public class MinigamePluginManager {
 	 * @param gamePluginIndex Sets the next game to be tested.
 	 */
 	public void setGamePluginIndex(Integer gamePluginIndex) {
-		if(gamePluginIndex > gamePlugins.size()) {
+		if(gamePluginIndex > gamePlugins.size() - 1) {
 			return;
 		} else {
 			this.gamePluginIndex = gamePluginIndex;
 		}
-	}
-
-	/**
-	 * Returns and instance of the world duplicator.
-	 * 
-	 * @return An instance of the world duplicator.
-	 */
-	public WorldDuplicator getWorldDupe() {
-		return worldDupe;
 	}
 }

@@ -25,7 +25,7 @@ public class PlayerQuit implements Listener {
 		if (gameManager.shouldMinigameEnd()) {
 			
 			//End the game!
-			gameManager.endGame();
+			gameManager.endGame(true);
 		}
 	}
 }

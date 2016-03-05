@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.GameManager;
+import com.minepile.mpmgfw.core.GameLobby;
 
 public class PlayerJoin implements Listener {
 	
@@ -24,7 +25,8 @@ public class PlayerJoin implements Listener {
 		
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
-		Location lobbySpawn = gameManager.getLobbySpawn();
+		GameLobby lobby = PLUGIN.getLobbyManager();
+		Location lobbySpawn = lobby.getLobbySpawn();
 		
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {

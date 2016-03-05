@@ -1,9 +1,10 @@
 package com.minepile.mpmgfw.core.constants;
 
 public enum GameState {
-	lOBBY_RESETTING,	//Load external game plugin and assets
-	LOBBY_WAITING,		//Wait for players and countdown timer
-	GAME_STARTING,		//Game is starting, go to game world and give player game instructions.
-	GAME_RUNNING,		//Game is running.
-	GAME_ENDING			//Game is over, show player scores. Go back to lobby world.
+	SETUP_GAME,			//The game plugin is being loaded.
+	SETUP_LOBBY,		//The game lobby is being setup.
+	LOBBY_WAITING,		//The game is ready to be played.
+	GAME_STARTING,		//The game countdown has started (still in lobby).
+	GAME_RUNNING,		//The players have been moved to game world.
+	GAME_ENDING			//The game is over. Unload the plugin.
 }

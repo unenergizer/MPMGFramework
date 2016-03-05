@@ -8,7 +8,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.minepile.mpmgfw.MPMGFramework;
-import com.minepile.mpmgfw.core.GameManager;
+import com.minepile.mpmgfw.core.GameLobby;
 
 public class EntityDamage implements Listener {
 
@@ -21,8 +21,8 @@ public class EntityDamage implements Listener {
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
 		
-		GameManager gameManager = PLUGIN.getGameManager();
-		String lobbyWorld = gameManager.getLobbyWorld();
+		GameLobby lobby = PLUGIN.getLobbyManager();
+		String lobbyWorld = lobby.getLobbyWorldName();
 		
 		//Check to see if the entity was a player entity.
 		if (event.getEntity() instanceof Player) {
@@ -36,7 +36,7 @@ public class EntityDamage implements Listener {
 				
 				//If the player falls into the void, tp them to the lobby spawn.
 				if (event.getCause().equals(DamageCause.VOID)) {
-					gameManager.tpToLobbySpawn(player);
+					lobby.tpToLobbySpawn(player);
 				}
 			}
 		}

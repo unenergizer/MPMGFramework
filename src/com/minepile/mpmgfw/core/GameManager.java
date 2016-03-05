@@ -1,10 +1,6 @@
 package com.minepile.mpmgfw.core;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -19,40 +15,48 @@ public class GameManager {
 
 	private final MPMGFramework PLUGIN;
 	private final int MIN_PLAYERS = 1;
-	private final Location lobbySpawn;
-
-	private String lobbyWorld = "mg-lobby";
 
 	public GameManager(MPMGFramework plugin) {
-		this.PLUGIN = plugin;
-		gameState = GameState.lOBBY_RESETTING;
-		lobbySpawn = new Location(Bukkit.getWorld(lobbyWorld), 0.5, 76, 0.5);
+		PLUGIN = plugin;
 
-		//On first load, begin lobby setup.
-		initLobby();
+		//On first load, lets begin with setting up the game.
+		setupGame();
+	}
+
+	/*
+	 * This will load the minigame plugin and setup the game world.
+	 */
+	private void setupGame() {
+		//Set game state.
+		gameState = GameState.SETUP_GAME;
+
+		//Load game plugin.
+		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
+		mpm.loadNextGamePlugin();
+
+		//Load game world.
+		GameArena gameArena = PLUGIN.getArenaManager();
+		gameArena.loadGameWorld();
+
+		//Setup game lobby.
+		setupLobby();
 	}
 
 	/**
-	 * Initialize (setup) the minigame lobby.
+	 * This will setup our game lobby.
 	 */
-	private void initLobby() {
+	private void setupLobby() {
+		GameLobby gameLobby = PLUGIN.getLobbyManager();
 
-		//Edit world properties.
-		Bukkit.setSpawnRadius(0);
-		World world = Bukkit.getWorlds().get(0);
-		world.setSpawnFlags(false, false);
-		world.setGameRuleValue("doMobSpawning", "false");
+		//Set game state.
+		gameState = GameState.SETUP_LOBBY;
 
-		//Remove entities from the world.
-		for (Entity entity : world.getEntities()) {
-			if (!(entity instanceof Player) && entity instanceof LivingEntity) {
-				entity.remove();
-			}
-		}
+		//Setup lobby world
+		gameLobby.loadLobbyWorld();
 
-		//Spawn players in the lobby.
+		//Get all players and teleport them to the lobby world.
 		for (Player players: Bukkit.getOnlinePlayers()) {
-			tpToLobbySpawn(players);
+			gameLobby.tpToLobbySpawn(players);
 		}
 
 		//TODO: Kit Selection
@@ -60,23 +64,70 @@ public class GameManager {
 		//TODO: Scoreboard
 		//TODO: Bossbar Announcer
 
-		//The lobby is setup, lets change the game state.
-		gameState = GameState.LOBBY_WAITING;
-		
-		//Check to see if the game should start.
-		//Check needed for server reloads.
+		//Check if game needs to start.
 		if (shouldMinigameStart()) {
 			startCountdown();
 		}
 	}
 
 	/**
-	 * Teleports a player to the lobby spawn pad.
-	 * 
-	 * @param player The player to teleport to lobby spawn.
+	 * This will move players out of the lobby and into the game map.
+	 * Thus starting the game.
 	 */
-	public void tpToLobbySpawn(Player player) {
-		player.teleport(lobbySpawn);
+	private void startGame() {
+		GameArena gameArena = PLUGIN.getArenaManager();
+
+		//Set game state.
+		gameState = GameState.GAME_STARTING;
+
+		//Get all players and teleport them to the game world.
+		for (Player players: Bukkit.getOnlinePlayers()) {
+
+			//Teleport to temp location.
+			gameArena.tpToGameWorld(players, 0, 90, 0);
+		}
+
+		//TODO: Kit Selection
+		//TODO: Team Selection
+		//TODO: Scoreboard
+		//TODO: Bossbar Announcer
+		//TODO: Show Game Description
+
+		//Let the plugin know to start the game.
+		PLUGIN.getMinigamePluginManager().getMinigame().startGame();
+
+		//Start the async check to see if the game is over.
+		pollForGameOver();
+
+	}
+
+	/**
+	 * The game has ended, so now we will show scores and do some cleanup.
+	 * This will also unload the current minigame plugin.
+	 */
+	public void endGame(boolean setupNextGame) {
+		GameArena gameArena = PLUGIN.getArenaManager();
+		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
+
+		gameState = GameState.GAME_ENDING;
+
+		//If players are still connected, lets show them some scores.
+		if (Bukkit.getOnlinePlayers().size() > 0) {
+			//TODO: Set scores
+		}
+
+		//TODO: Save Scores (MySQL)
+
+		//Unload the game world.
+		gameArena.unloadGameWorld();
+
+		//Unload the game plugin.
+		mpm.disableCurrentGamePlugin();
+
+		//Setup the next game.
+		if (setupNextGame) {
+			setupGame();
+		}
 	}
 
 	/**
@@ -109,51 +160,29 @@ public class GameManager {
 		}.runTaskTimer(PLUGIN, 0, 20);
 	}
 
-
-
 	/**
-	 * This will start the loaded plugin game.
+	 * Continuously polls the loaded minigame to check if it has ended.
 	 */
-	private void startGame() {
-		//Debug Message
-		Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + ">> START GAME <<");
+	public void pollForGameOver() {
 
-		//Teleport players to the game world.
-		for(Player players: Bukkit.getOnlinePlayers()) {
-			World world = PLUGIN.getMinigamePluginManager().getWorldDupe().getMiniGameWorld();
-			Location tempLoc = new Location(world, 0, 90, 0);
+		MinigamePluginManager mgpm = PLUGIN.getMinigamePluginManager();
 
-			players.teleport(tempLoc);
-		}
-		
-		//Let the plugin know to start the game.
-		PLUGIN.getMinigamePluginManager().getMinigame().startGame();
-		
-		//Start the async check to see if the game is over.
-		pollForGameOver();
-		
-		//Set the game state as now running.
-		gameState = GameState.GAME_RUNNING;
-	}
+		new BukkitRunnable() {
 
-	/**
-	 * This will end the current game plugin.
-	 * 
-	 */
-	public void endGame() {
-		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
-		
-		//Do closing game tasks.
-		gameState = GameState.GAME_ENDING;
+			@Override
+			public void run() {
+				boolean isGameOver = mgpm.getMinigame().isGameOver();
 
-		//Finally disable the loaded game plugin.
-		mpm.disableCurrentGamePlugin();
-		
-		//Load the next minigame plugin.
-		mpm.loadNextGamePlugin();
-		
-		//Game is done, setup the lobby again.
-		initLobby();
+				//Continuously poll to see if the minigame is over.
+				if (isGameOver) {
+					//Stop the thread first.
+					cancel();
+
+					//Then end the thread.
+					endGame(true);
+				}
+			}
+		}.runTaskTimer(PLUGIN, 0, 20);
 	}
 
 	/**
@@ -169,7 +198,7 @@ public class GameManager {
 	 * @return True if the game should start.
 	 */
 	public boolean shouldMinigameStart() {
-		return (gameState.equals(GameState.LOBBY_WAITING) && isMinimumPlayersMet());
+		return isMinimumPlayersMet();
 	}
 
 	/**
@@ -196,31 +225,6 @@ public class GameManager {
 	}
 
 	/**
-	 * Continuously polls the loaded minigame to check if it has ended.
-	 */
-	public void pollForGameOver() {
-		
-		MinigamePluginManager mgpm = PLUGIN.getMinigamePluginManager();
-		
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				boolean isGameOver = mgpm.getMinigame().isGameOver();
-				
-				//Continuously poll to see if the minigame is over.
-				if (isGameOver) {
-					//Stop the thread first.
-					cancel();
-					
-					//Then end the thread.
-					endGame();
-				}
-			}
-		}.runTaskTimer(PLUGIN, 0, 20);
-	}
-
-	/**
 	 * Gets the current state of the game manager.
 	 * @return The state of the game manager.
 	 */
@@ -234,21 +238,5 @@ public class GameManager {
 	 */
 	public void setGameState(GameState state) {
 		this.gameState = state;
-	}
-
-	/**
-	 * Gets the main lobby's spawn point!
-	 * @return A location with the lobby's spawn point.
-	 */
-	public Location getLobbySpawn() {
-		return lobbySpawn;
-	}
-
-	/**
-	 * Gets the lobby's world name.
-	 * @return The name of the lobby world.
-	 */
-	public String getLobbyWorld() {
-		return lobbyWorld;
 	}
 }
