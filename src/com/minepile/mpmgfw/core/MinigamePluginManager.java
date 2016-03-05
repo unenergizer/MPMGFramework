@@ -23,7 +23,7 @@ public class MinigamePluginManager {
 	private ArrayList<File> gamePlugins;
 	private Integer gamePluginIndex;
 	
-	private WorldDuplicator worldDupe;
+	private final WorldDuplicator worldDupe;
 	
 	public MinigamePluginManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
@@ -56,7 +56,7 @@ public class MinigamePluginManager {
 			gamePluginIndex++;
 			
 			//Make sure our array will not go out of bounds.
-			if(gamePluginIndex > gamePlugins.size()) {
+			if(gamePluginIndex > gamePlugins.size() - 1) {
 				gamePluginIndex = 0;
 			}
 		}

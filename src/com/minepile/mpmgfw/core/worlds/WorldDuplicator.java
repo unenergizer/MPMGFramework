@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Entity;
@@ -16,62 +17,66 @@ import org.bukkit.entity.Player;
 public class WorldDuplicator {
 
 	private World minigameWorld;
-	
+
 	/**
 	 * Load a world directory into memory for use.
 	 * 
 	 * @param worldName The name of the world you want to load into memory.
 	 */
 	public void loadWorld(String worldName) {
-
-		if (worldName.equalsIgnoreCase("world")) {
-			//"world" should be the lobby world with kit selection.
-			// World settings
-			minigameWorld = Bukkit.getWorld(worldName);
-		} else {
-			// Replace the game world to be loaded.
-			replaceWorld(worldName, worldName.concat("_backup"));
-			
-			//Load world into memory.
-			WorldCreator wc = new WorldCreator(worldName);
-			wc.createWorld();
-			
-			//World settings
-			minigameWorld = Bukkit.getWorld(worldName);
+		
+		//If a world instance exists, then unload it first.
+		if (minigameWorld != null) {
+			unloadWorld();
 		}
+		
+		// Replace the game world to be loaded.
+		replaceWorld(worldName, worldName.concat("_backup"));
+
+		//Load world into memory.
+		WorldCreator wc = new WorldCreator(worldName);
+		wc.createWorld();
+
+		//World settings
+		minigameWorld = Bukkit.getWorld(worldName);
+
 	}
 
 	public void setWorldProperties(boolean setPVP, boolean setStorm,
 			int setMonsterSpawnLimit, int setAnimalSpawnLimit, int time) {
 		// Set world properties.
-		this.minigameWorld.setPVP(setPVP);
-		this.minigameWorld.setSpawnFlags(false, false);
-		this.minigameWorld.setStorm(setStorm);
-		this.minigameWorld.setTime(time);
+		minigameWorld.setPVP(setPVP);
+		minigameWorld.setSpawnFlags(false, false);
+		minigameWorld.setStorm(setStorm);
+		minigameWorld.setTime(time);
 
 		// Despawn any animals or monsters.
 		clearEntities();
 	}
-	
+
 	/**
 	 * Removes entities from the loaded game world.
 	 */
 	public void clearEntities(){
 		// Despawn any animals or monsters.
-		for (Entity entity : this.minigameWorld.getEntities()) {
+		for (Entity entity : minigameWorld.getEntities()) {
 			if (!(entity instanceof Player)) {
 				entity.remove();
 			}
 		}
 	}
-	
+
 	/**
 	 * Remove the loaded game world from memory.
 	 */
 	public void unloadWorld() {
-		Bukkit.getServer().unloadWorld(this.minigameWorld, true);
+		//Unload the world and do not save it.
+		Bukkit.getServer().unloadWorld(minigameWorld, false);
+
+		//Set the world reference to null.
+		minigameWorld = null;
 	}
-	
+
 
 	/**
 	 * This will allow the safe replacement of worlds.
@@ -81,10 +86,10 @@ public class WorldDuplicator {
 	 */
 	public void replaceWorld(String worldName, String backupWorldName) {
 
-		World world = Bukkit.getServer().getWorld(worldName);
+		Server server = Bukkit.getServer();
+		World world = server.getWorld(worldName);
 
-		if (Bukkit.getServer().unloadWorld(world, false)
-				|| !Bukkit.getServer().getWorlds().contains(worldName)) {
+		if (server.unloadWorld(world, false) || !server.getWorlds().contains(worldName)) {
 
 			File backup = new File(Bukkit.getServer().getWorldContainer()
 					+ File.separator + "worlds" + File.separator
@@ -96,23 +101,23 @@ public class WorldDuplicator {
 			try {
 				deleteFile(folder);
 				Bukkit.getServer()
-						.getLogger()
-						.info("[MPMG-Framework] World directory: " + worldName + " deleted.");
+				.getLogger()
+				.info("[MPMG-Framework] World directory: " + worldName + " deleted.");
 			} catch (IOException e1) {}
 
 			// Copy world from backup.
 			try {
 				copyFolder(backup, folder);
 				Bukkit.getServer()
-						.getLogger()
-						.info("[MPMG-Framework] World directory: " + worldName
-								+ " copied from " + backupWorldName + ".");
+				.getLogger()
+				.info("[MPMG-Framework] World directory: " + worldName
+						+ " copied from " + backupWorldName + ".");
 			} catch (IOException e) {}
 
 		} else {
 			Bukkit.getServer()
-				.getLogger()
-				.info("[MPMG-Framework] Failed to replace " + worldName + "!");
+			.getLogger()
+			.info("[MPMG-Framework] Failed to replace " + worldName + "!");
 		}
 
 	}
