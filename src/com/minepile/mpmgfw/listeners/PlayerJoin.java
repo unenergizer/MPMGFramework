@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.GameManager;
+import com.minepile.mpmgfw.core.GameArena;
 import com.minepile.mpmgfw.core.GameLobby;
 
 public class PlayerJoin implements Listener {
@@ -25,15 +26,18 @@ public class PlayerJoin implements Listener {
 
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
+		GameArena gameArena = PLUGIN.getGameArena();
 		GameLobby lobby = PLUGIN.getGameLobby();
 		Location lobbySpawn = lobby.getLobbySpawn();
 
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {
-			//TODO: teleport the new player to the game world as a spectator.
-
-		} else {
 			
+			//Teleport the player to a spectator spawn in the game world.
+			//TODO: Get a real spectator spawn point from the minigame plugin.
+			gameArena.tpToGameWorld(player, 0, 100, 0);
+			
+		} else {
 			//Teleport the player to the lobby.
 			teleport(player, lobbySpawn);
 			

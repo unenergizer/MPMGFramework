@@ -128,37 +128,46 @@ public class WorldDuplicator {
 	 * @param file The file or folder that will be deleted.
 	 * @throws IOException
 	 */
-	private void deleteFile(File file) throws IOException {
+	public void deleteFile(File file) throws IOException {
+		
+		//Check to make sure the world is unloaded from memory.
+		if (minigameWorld == null) {
+			
+			if (file.isDirectory()) {
 
-		if (file.isDirectory()) {
+				// directory is empty, then delete it
+				if (file.list().length == 0) {
 
-			// directory is empty, then delete it
-			if (file.list().length == 0) {
+					file.delete();
 
-				file.delete();
+				} else {
+
+					// list all the directory contents
+					String files[] = file.list();
+
+					for (String temp : files) {
+						// construct the file structure
+						File fileDelete = new File(file, temp);
+
+						// recursive delete
+						deleteFile(fileDelete);
+					}
+
+					// check the directory again, if empty then delete it
+					if (file.list().length == 0) {
+						file.delete();
+					}
+				}
 
 			} else {
-
-				// list all the directory contents
-				String files[] = file.list();
-
-				for (String temp : files) {
-					// construct the file structure
-					File fileDelete = new File(file, temp);
-
-					// recursive delete
-					deleteFile(fileDelete);
-				}
-
-				// check the directory again, if empty then delete it
-				if (file.list().length == 0) {
-					file.delete();
-				}
+				// if file, then delete it
+				file.delete();
 			}
-
 		} else {
-			// if file, then delete it
-			file.delete();
+			//The world is still in memory and can not be deleted.
+			Bukkit.getServer()
+			.getLogger()
+			.info("[MPMG-Framework] Failed to delete " + minigameWorld.getName() + "! It is still in use!");
 		}
 	}
 

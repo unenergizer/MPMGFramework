@@ -15,6 +15,7 @@ public class GameManager {
 	private final int MIN_PLAYERS = 1;
 
 	private GameState gameState;
+	private Integer gamesPlayed;
 
 	public GameManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
@@ -54,8 +55,11 @@ public class GameManager {
 		//Setup lobby world
 		gameLobby.loadLobbyWorld();
 
-		//Get all players and teleport them to the lobby world.
+		//Setup lobby players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
+			//TODO: Setup lobby player profiles and items.
+			
+			//Get all players and teleport them to the lobby world.	
 			gameLobby.tpToLobbySpawn(players);
 		}
 
@@ -84,10 +88,11 @@ public class GameManager {
 		//Set game state.
 		gameState = GameState.GAME_STARTING;
 
-		//Get all players and teleport them to the game world.
+		//Setup minigame players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
-
-			//Teleport to temp location.
+			//TODO: Setup player profiles and items for minigame.
+			
+			//Get all players and teleport them to the game world.
 			gameArena.tpToGameWorld(players, 0, 90, 0);
 		}
 
@@ -115,7 +120,7 @@ public class GameManager {
 
 		gameState = GameState.GAME_ENDING;
 
-		//If players are still connected, lets show them some scores.
+		//If players are still online, lets show them the game scores.
 		if (Bukkit.getOnlinePlayers().size() > 0) {
 			//TODO: Show scores
 		}
@@ -127,6 +132,9 @@ public class GameManager {
 
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
+		
+		//Increment the number of games played.
+		gamesPlayed++;
 
 		//Setup the next game.
 		if (setupNextGame) {
@@ -145,20 +153,20 @@ public class GameManager {
 			@Override
 			public void run() {
 				if (countdown != 0) {
+					
+					//Show countdown in chat.
 					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 0) {
 						Bukkit.broadcastMessage(ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.");
 					}
-
+					
 					countdown--;
 				} else {
 					cancel();
 					
+					//Do one last check to make sure the game should start.
 					if (shouldMinigameStart()) {
 						Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Starting Game");
 						startGame();
-					} else {
-						Bukkit.broadcastMessage(ChatColor.GREEN + "Lobby set to waiting. GameState: " + gameState.toString());
-						gameState = GameState.LOBBY_WAITING;
 					}
 				}
 			}
