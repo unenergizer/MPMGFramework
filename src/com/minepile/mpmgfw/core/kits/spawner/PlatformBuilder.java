@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-public class PlatformSpawner {
+public class PlatformBuilder {
 	
 	/**
 	 * Places platforms in the given world.

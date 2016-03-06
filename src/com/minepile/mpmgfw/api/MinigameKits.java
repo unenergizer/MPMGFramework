@@ -3,39 +3,40 @@ package com.minepile.mpmgfw.api;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class MinigameKits {
 	
 	/**
-	 * A list of entity spawn locations.
-	 * @return Returns a lost of entity spawn locations.
+	 * A list of entity types to spawn.
+	 * @return Returns a list of entity types to spawn.
 	 */
-	public abstract ArrayList<Location> entityLocations();
+	public abstract ArrayList<EntityType> getEntityTypes();
 
 	/**
 	 * A list of entity hand items.
-	 * @return Returns a lost of entity hand items.
+	 * @return Returns a list of entity hand items.
 	 */
-	public abstract ArrayList<ItemStack> entityHandItems();
+	public abstract ArrayList<ItemStack> getEntityHandItems();
 
 	/**
 	 * A list of entity spawn locations.
-	 * @return Returns a lost of entity entity armor.
+	 * @return Returns a list of entity entity armor.
 	 */
-	public abstract ArrayList<ItemStack> entityArmorItems();
+	public abstract ArrayList<ItemStack> getEntityArmorItems();
 	
 	/**
 	 * A list of minigame kit names.
 	 * @return Returns a list of minigame kit names.
 	 */
-	public abstract ArrayList<String> getKitName();
+	public abstract ArrayList<String> getKitNames();
 	
 	/**
 	 * A list of minigame kit descriptions.
 	 * @return Returns a list of minigame kit descriptions.
 	 */
-	public abstract ArrayList<String> getKitDescription();
+	public abstract ArrayList<String> getKitDescriptions();
 	
 	/**
 	 * A list of minigame platform locations.
@@ -44,5 +45,5 @@ public abstract class MinigameKits {
 	 * 
 	 * @return Returns a list of minigame platform locations.
 	 */
-	public abstract ArrayList<ArrayList<Location>> getKitPlatformLocation();
+	public abstract ArrayList<ArrayList<Location>> getKitPlatformLocations();
 }
