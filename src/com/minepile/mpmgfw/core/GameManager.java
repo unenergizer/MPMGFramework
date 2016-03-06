@@ -16,7 +16,7 @@ import net.md_5.bungee.api.ChatColor;
 public class GameManager {
 
 	private final MPMGFramework PLUGIN;
-	private final int MIN_PLAYERS = 1;
+	private final int MIN_PLAYERS = 2;
 	private final KitSelector KIT_SELECTOR;
 
 	private GameState gameState;
@@ -112,10 +112,11 @@ public class GameManager {
 		pollForGameOver();
 
 	}
-
+	
 	/**
 	 * The game has ended, so now we will show scores and do some cleanup.
 	 * This will also unload the current minigame plugin.
+	 * @param setupNextGame Set to true, to load the next game.
 	 */
 	public void endGame(boolean setupNextGame) {
 		GameArena gameArena = PLUGIN.getGameArena();
@@ -150,6 +151,8 @@ public class GameManager {
 		//Setup the next game.
 		if (setupNextGame) {
 			setupGame();
+		} else {
+			Bukkit.getLogger().warning("[MPMGFramework] We will not setup the next game!");
 		}
 	}
 

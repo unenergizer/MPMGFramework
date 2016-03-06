@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.api.MinigameKits;
+import com.minepile.mpmgfw.core.kits.spawner.EntitySpawner;
+import com.minepile.mpmgfw.core.kits.spawner.PlatformSpawner;
 
 import net.citizensnpcs.api.npc.NPC;
 
@@ -18,13 +20,15 @@ import net.citizensnpcs.api.npc.NPC;
 public class KitSelector {
 	
 	private final MPMGFramework PLUGIN;
-	
+
 	private PlatformSpawner platformSpawner;
+	private EntitySpawner entitySpawner;
 	private HashMap<UUID, Integer> playerKit;
 	
 	public KitSelector(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		platformSpawner = new PlatformSpawner();
+		entitySpawner = new EntitySpawner();
 	}
 	
 	/**
@@ -47,6 +51,8 @@ public class KitSelector {
 		platformSpawner.SetPlatforms(minigameKit.getKitPlatformLocation());
 		
 		//TODO: Spawn NPC
+		entitySpawner.setEntities(minigameKit.getKitPlatformLocation());
+		
 	}
 	
 	/**
@@ -58,7 +64,7 @@ public class KitSelector {
 		//TODO: Remove NPC
 		
 		//Remove kit platform.
-		platformSpawner.SetPlatforms(minigameKit.getKitPlatformLocation(), Material.AIR);
+		platformSpawner.setPlatforms(minigameKit.getKitPlatformLocation(), Material.AIR);
 	}
 
 	/**

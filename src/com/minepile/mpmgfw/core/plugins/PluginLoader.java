@@ -47,10 +47,16 @@ public class PluginLoader {
 	/**
 	 * This method will disable the currently loaded game plugin.
 	 */
-	public void disablePlugin() {
-		PluginManager pm = Bukkit.getPluginManager();
-		pm.disablePlugin(loadedGamePlugin);
-		loadedGamePlugin = null;
+	public boolean disablePlugin() {
+		if (loadedGamePlugin != null) {
+			PluginManager pm = Bukkit.getPluginManager();
+			pm.disablePlugin(loadedGamePlugin);
+			loadedGamePlugin = null;
+			return true;
+		} else {
+			//The game is not loaded?
+			return false;
+		}
 	}
 
 	/**

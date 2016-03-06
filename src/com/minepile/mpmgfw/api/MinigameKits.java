@@ -3,19 +3,31 @@ package com.minepile.mpmgfw.api;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 public abstract class MinigameKits {
+	
+	/**
+	 * A list of entity spawn locations.
+	 * @return Returns a lost of entity spawn locations.
+	 */
+	public abstract ArrayList<Location> entityLocations();
 
 	/**
-	 * TODO: Kit Methods to Implement:
-	 * 	NPC's
-	 * 	NPC items in hand
-	 * 	NPC wearable items
+	 * A list of entity hand items.
+	 * @return Returns a lost of entity hand items.
 	 */
+	public abstract ArrayList<ItemStack> entityHandItems();
+
+	/**
+	 * A list of entity spawn locations.
+	 * @return Returns a lost of entity entity armor.
+	 */
+	public abstract ArrayList<ItemStack> entityArmorItems();
 	
 	/**
 	 * A list of minigame kit names.
-	 * @return Returns list of minigame kit names.
+	 * @return Returns a list of minigame kit names.
 	 */
 	public abstract ArrayList<String> getKitName();
 	

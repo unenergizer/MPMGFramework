@@ -1,4 +1,4 @@
-package com.minepile.mpmgfw.core.kits;
+package com.minepile.mpmgfw.core.kits.spawner;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
@@ -26,7 +26,7 @@ public class PlatformSpawner {
 	 * <p>
 	 * You can set a platform as Material.Air to clear an existing platform.
 	 */
-	public void SetPlatforms(ArrayList<ArrayList<Location>> platformLocation, Material material){
+	public void setPlatforms(ArrayList<ArrayList<Location>> platformLocation, Material material){
 		
 		//Set platform
 		for (int i = 0; i < platformLocation.size(); i++) {

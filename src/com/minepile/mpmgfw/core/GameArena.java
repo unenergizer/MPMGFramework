@@ -24,33 +24,35 @@ public class GameArena {
 	 * Loads the needed assets from the minigame plugin.
 	 */
 	public void loadGameWorld() {
-		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getWorldName();
+		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getArenaWorldName();
 		File wc = Bukkit.getServer().getWorldContainer();
 		File destinationFolder = new File(wc + File.separator + name);
 		File backupFolder = new File(wc + File.separator + "worlds" + File.separator + name.concat("_backup"));
 
-		//Copy the backup world folder.
-		try {
-			worldDupe.copyFolder(backupFolder, destinationFolder);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (worldDupe.getWorld() == null) {
+			//Copy the backup world folder.
+			try {
+				worldDupe.copyFolder(backupFolder, destinationFolder);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			//Show success message in console.
+			Bukkit.getServer().getLogger().info("[MPMG-Framework] Copied world: " + name);
+
+			//Load the map into memory
+			worldDupe.loadWorld(name);
+
+			//Cleanup any map entities.
+			worldDupe.clearEntities();
 		}
-
-		//Show success message in console.
-		Bukkit.getServer().getLogger().info("[MPMG-Framework] Copied world: " + name);
-
-		//Load the map into memory
-		worldDupe.loadWorld(name);
-
-		//Cleanup any map entities.
-		worldDupe.clearEntities();
 	}
 
 	/**
 	 * Disables the games loaded assets.
 	 */
 	public void unloadGameWorld() {
-		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getWorldName();
+		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getArenaWorldName();
 		File wc = Bukkit.getServer().getWorldContainer();
 		File destinationFolder = new File(wc + File.separator + name);
 

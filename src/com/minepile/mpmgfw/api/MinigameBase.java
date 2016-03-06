@@ -2,12 +2,14 @@ package com.minepile.mpmgfw.api;
 
 public abstract class MinigameBase {
 	protected final String minigameName;
-	protected final String worldName;
+	protected final String arenaWorldName;
+	protected final String lobbyWorldName;
 	private boolean isGameOver;
 
-	public MinigameBase(final String minigameName, final String worldName, boolean isGameOver) {
+	public MinigameBase(final String minigameName, final String arenaWorldName, final String lobbyWorldName, boolean isGameOver) {
 		this.minigameName = minigameName;
-		this.worldName = worldName;
+		this.arenaWorldName = arenaWorldName;
+		this.lobbyWorldName = lobbyWorldName;
 		this.isGameOver = false;
 	}
 	
@@ -28,8 +30,16 @@ public abstract class MinigameBase {
 	 * Gets the game world (arena) the player will play in.
 	 * @return	The name of the game world.
 	 */
-	public String getWorldName() {
-		return worldName;
+	public String getArenaWorldName() {
+		return arenaWorldName;
+	}
+
+	/**
+	 * Gets the lobby world the player will select kits and teams in.
+	 * @return	The name of the game world.
+	 */
+	public String getLobbyWorldName() {
+		return lobbyWorldName;
 	}
 
 	/**

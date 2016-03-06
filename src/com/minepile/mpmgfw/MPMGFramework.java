@@ -35,8 +35,6 @@ public class MPMGFramework extends JavaPlugin {
 
 	@Override 
 	public void onDisable() {
-		//Clean up
-		gameManager.endGame(false);
 	}
 
 	/**
