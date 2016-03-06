@@ -1,11 +1,15 @@
 package com.minepile.mpmgfw.core;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import com.minepile.mpmgfw.profiles.PlayerProfile;
 
 public class GameLobby {
 
@@ -15,6 +19,25 @@ public class GameLobby {
 	public GameLobby() {
 		lobbyWorldName = "mg-lobby";
 		lobbySpawn = new Location(Bukkit.getWorld(lobbyWorldName), 0.5, 76, 0.5);
+	}
+
+	public void setupLobbyPlayers(HashMap<Player, PlayerProfile> playerProfile) {
+		//Setup lobby players.
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			//Get all players and teleport them to the lobby world.	
+			tpToLobbySpawn(players);
+			
+			//Heal the player
+			players.setHealth(20);
+
+			//Setup lobby player profiles (for server reloads).
+			if (!playerProfile.containsKey(players)) {
+				playerProfile.put(players, new PlayerProfile(players));
+			}
+
+			//Set the player as a spectator.
+			playerProfile.get(players).setSpectator(false);
+		}
 	}
 
 	/**

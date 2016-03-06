@@ -16,7 +16,7 @@ import net.md_5.bungee.api.ChatColor;
 public class GameManager {
 
 	private final MPMGFramework PLUGIN;
-	private final int MIN_PLAYERS = 2;
+	private final int MIN_PLAYERS = 1;
 	private final KitSelector KIT_SELECTOR;
 
 	private GameState gameState;
@@ -63,20 +63,6 @@ public class GameManager {
 
 		//Setup lobby world
 		gameLobby.loadLobbyWorld();
-
-		//Setup lobby players.
-		for (Player players: Bukkit.getOnlinePlayers()) {
-			//Get all players and teleport them to the lobby world.	
-			gameLobby.tpToLobbySpawn(players);
-			
-			//Setup lobby player profiles (for server reloads).
-			if (!playerProfile.containsKey(players)) {
-				playerProfile.put(players, new PlayerProfile(players));
-			}
-			
-			//Set the player as a spectator.
-			playerProfile.get(players).setSpectator(false);
-		}
 
 		//Setup lobby kits.
 		KIT_SELECTOR.spawnKits();
@@ -133,6 +119,7 @@ public class GameManager {
 	 */
 	public void endGame(boolean setupNextGame) {
 		GameArena gameArena = PLUGIN.getGameArena();
+		GameLobby gameLobby = PLUGIN.getGameLobby();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 
 		gameState = GameState.GAME_ENDING;
@@ -146,6 +133,9 @@ public class GameManager {
 		
 		//Remove the kits from the lobby world.
 		KIT_SELECTOR.removeKits();
+		
+		//Pull the players out of the arena map so it can be unloaded.
+		gameLobby.setupLobbyPlayers(playerProfile);
 		
 		//Unload the game world.
 		gameArena.unloadGameWorld();

@@ -17,7 +17,7 @@ public class PlatformSpawner {
 			Location loc1 = platformLocation.get(i).get(0);
 			Location loc2 = platformLocation.get(i).get(1);
 
-			setBlock(loc1, loc2, Material.STAINED_CLAY);
+			setBlock(loc1, loc2, Material.GLOWSTONE);
 		}
 	}
 
