@@ -5,9 +5,10 @@ import java.util.ArrayList;
 
 import org.bukkit.plugin.Plugin;
 
-import com.minepile.mpmgfw.api.Minigame;
-import com.minepile.mpmgfw.api.MinigameKit;
+import com.minepile.mpmgfw.api.MinigameBase;
+import com.minepile.mpmgfw.api.MinigameKits;
 import com.minepile.mpmgfw.api.MinigamePlugin;
+import com.minepile.mpmgfw.api.MinigameTeams;
 import com.minepile.mpmgfw.core.plugins.PluginFinder;
 import com.minepile.mpmgfw.core.plugins.PluginLoader;
 
@@ -16,8 +17,10 @@ public class MinigamePluginManager {
 	private final PluginLoader PLUGIN_LOADER;
 	private final String FILE_PATH;
 
-	private Minigame minigameBase;
-	private MinigameKit minigameKit;
+	private MinigameBase minigameBase;
+	private MinigameKits minigameKit;
+	private MinigameTeams minigameTeams;
+	
 	private ArrayList<File> gamePlugins;
 	private Integer gamePluginIndex;
 
@@ -68,24 +71,6 @@ public class MinigamePluginManager {
 	}
 
 	/**
-	 * Returns a list of the currently loaded minigame.
-	 * 
-	 * @return	Returns a list of the currently loaded minigame.
-	 */
-	public Minigame getMinigameBase() {
-		return minigameBase;
-	}
-
-	/**
-	 * Returns a list of the currently loaded minigame.
-	 * 
-	 * @return	Returns a list of the currently loaded minigame.
-	 */
-	public MinigameKit getMinigameKit() {
-		return minigameKit;
-	}
-
-	/**
 	 * This will get the game plugins instance for grabbing .
 	 * 
 	 * @param plugin The Minigame plugin that is currently loaded.
@@ -93,12 +78,41 @@ public class MinigamePluginManager {
 	private void setMinigamePluginInstance(final Plugin plugin) {
 
 		if (plugin instanceof MinigamePlugin) {
-			final Minigame minigameBase = ((MinigamePlugin) plugin).getMinigame();
-			final MinigameKit minigameKit = ((MinigamePlugin) plugin).getMinigameKit();
+			final MinigameBase minigameBase = ((MinigamePlugin) plugin).getMinigameBase();
+			final MinigameKits minigameKit = ((MinigamePlugin) plugin).getMinigameKits();
+			final MinigameTeams minigameTeams = ((MinigamePlugin) plugin).getMinigameTeams();
 
 			this.minigameBase = minigameBase;
 			this.minigameKit = minigameKit;
+			this.minigameTeams = minigameTeams;
 		}
+	}
+
+	/**
+	 * Returns a instance of the currently loaded minigame.
+	 * 
+	 * @return	Returns a instance of the currently loaded minigame.
+	 */
+	public MinigameBase getMinigameBase() {
+		return minigameBase;
+	}
+
+	/**
+	 * Returns a instance of the currently loaded minigame kits.
+	 * 
+	 * @return	Returns a instance of the currently loaded minigame kits.
+	 */
+	public MinigameKits getMinigameKit() {
+		return minigameKit;
+	}
+
+	/**
+	 * Returns a instance of the currently loaded minigame teams.
+	 * 
+	 * @return	Returns a instance of the currently loaded minigame teams.
+	 */
+	public MinigameTeams getMinigameTeams() {
+		return minigameTeams;
 	}
 
 	/**

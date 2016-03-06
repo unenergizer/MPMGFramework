@@ -20,6 +20,22 @@ public class PlatformSpawner {
 			setBlock(loc1, loc2, Material.GLOWSTONE);
 		}
 	}
+	
+	/**
+	 * Places platforms in the given world of a given type.
+	 * <p>
+	 * You can set a platform as Material.Air to clear an existing platform.
+	 */
+	public void SetPlatforms(ArrayList<ArrayList<Location>> platformLocation, Material material){
+		
+		//Set platform
+		for (int i = 0; i < platformLocation.size(); i++) {
+			Location loc1 = platformLocation.get(i).get(0);
+			Location loc2 = platformLocation.get(i).get(1);
+
+			setBlock(loc1, loc2, material);
+		}
+	}
 
 	/**
 	 * Sets blocks between two locations.

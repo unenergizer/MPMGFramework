@@ -1,11 +1,11 @@
 package com.minepile.mpmgfw.api;
 
-public abstract class Minigame {
+public abstract class MinigameBase {
 	protected final String minigameName;
 	protected final String worldName;
 	private boolean isGameOver;
 
-	public Minigame(final String minigameName, final String worldName, boolean isGameOver) {
+	public MinigameBase(final String minigameName, final String worldName, boolean isGameOver) {
 		this.minigameName = minigameName;
 		this.worldName = worldName;
 		this.isGameOver = false;

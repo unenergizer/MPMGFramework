@@ -1,5 +1,6 @@
 package com.minepile.mpmgfw.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,6 +32,8 @@ public class PlayerQuit implements Listener {
 
 			//End the game!
 			gameManager.endGame(true);
+			
+			Bukkit.getLogger().warning("[MPMGFramework] Ending game early. No players online!");
 		}
 	}
 }

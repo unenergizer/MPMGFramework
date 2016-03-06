@@ -3,9 +3,11 @@ package com.minepile.mpmgfw.core.kits;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.minepile.mpmgfw.MPMGFramework;
+import com.minepile.mpmgfw.api.MinigameKits;
 
 import net.citizensnpcs.api.npc.NPC;
 
@@ -18,7 +20,6 @@ public class KitSelector {
 	private final MPMGFramework PLUGIN;
 	
 	private PlatformSpawner platformSpawner;
-	private Integer numOfKits;
 	private HashMap<UUID, Integer> playerKit;
 	
 	public KitSelector(MPMGFramework plugin) {
@@ -32,6 +33,7 @@ public class KitSelector {
 	 * @return Returns the kit reference number (0-6). 
 	 */
 	public int kitInteract(NPC name) {
+		//TODO: Setup a real kitIntereaction method.
 		return 0;
 	}
 	
@@ -39,9 +41,10 @@ public class KitSelector {
 	 * Spawns the kits in the game lobby.
 	 */
 	public void spawnKits() {
-		//TODO: Spawn platform
-		platformSpawner.SetPlatforms(PLUGIN.getMinigamePluginManager().getMinigameKit().setKitPlatformLocation());
+		MinigameKits minigameKit = PLUGIN.getMinigamePluginManager().getMinigameKit();
 		
+		//Spawn platform for NPC's to stand on.
+		platformSpawner.SetPlatforms(minigameKit.getKitPlatformLocation());
 		
 		//TODO: Spawn NPC
 	}
@@ -50,17 +53,12 @@ public class KitSelector {
 	 * Removes the kits from the game lobby.
 	 */
 	public void removeKits() {
+		MinigameKits minigameKit = PLUGIN.getMinigamePluginManager().getMinigameKit();
+		
 		//TODO: Remove NPC
 		
-		//TODO: Remove platform
-	}
-	
-	public Integer getNumOfKits() {
-		return numOfKits;
-	}
-
-	public void setNumOfKits(Integer numOfKits) {
-		this.numOfKits = numOfKits;
+		//Remove kit platform.
+		platformSpawner.SetPlatforms(minigameKit.getKitPlatformLocation(), Material.AIR);
 	}
 
 	/**

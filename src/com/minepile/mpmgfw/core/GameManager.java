@@ -134,14 +134,14 @@ public class GameManager {
 		//Remove the kits from the lobby world.
 		KIT_SELECTOR.removeKits();
 		
+		//Unload the game plugin.
+		mpm.disableCurrentGamePlugin();
+		
 		//Pull the players out of the arena map so it can be unloaded.
 		gameLobby.setupLobbyPlayers(playerProfile);
 		
 		//Unload the game world.
 		gameArena.unloadGameWorld();
-
-		//Unload the game plugin.
-		mpm.disableCurrentGamePlugin();
 		
 		//Increment the number of games played.
 		// gamesPlayed++; ???
@@ -234,7 +234,7 @@ public class GameManager {
 	 * @return This will figure out if the game should end.
 	 */
 	public boolean shouldMinigameEnd() {
-		return Bukkit.getOnlinePlayers().size() < 1;
+		return Bukkit.getOnlinePlayers().size() == 0;
 	}
 
 	/**
