@@ -1,5 +1,6 @@
 package com.minepile.mpmgfw.listeners;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -20,7 +21,11 @@ public class PlayerQuit implements Listener {
 		event.setQuitMessage(null);
 
 		GameManager gameManager = PLUGIN.getGameManager();
-
+		Player player = event.getPlayer();
+		
+		//Remove the player from the players hashmap.
+		gameManager.getPlayerProfile().remove(player);
+		
 		//Check to see if the game should end.
 		if (gameManager.shouldMinigameEnd()) {
 

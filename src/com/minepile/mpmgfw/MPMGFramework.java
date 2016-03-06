@@ -5,10 +5,11 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.minepile.mpmgfw.core.GameArena;
-import com.minepile.mpmgfw.core.GameManager;
 import com.minepile.mpmgfw.core.GameLobby;
+import com.minepile.mpmgfw.core.GameManager;
 import com.minepile.mpmgfw.core.MinigamePluginManager;
 import com.minepile.mpmgfw.listeners.EntityDamage;
+import com.minepile.mpmgfw.listeners.EntityDamageByEntity;
 import com.minepile.mpmgfw.listeners.PlayerJoin;
 import com.minepile.mpmgfw.listeners.PlayerQuit;
 import com.minepile.mpmgfw.listeners.WeatherChange;
@@ -45,6 +46,7 @@ public class MPMGFramework extends JavaPlugin {
 		PluginManager pm = Bukkit.getPluginManager();
 
 		pm.registerEvents(new EntityDamage(this), this);
+		pm.registerEvents(new EntityDamageByEntity(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);
 		pm.registerEvents(new WeatherChange(this), this);

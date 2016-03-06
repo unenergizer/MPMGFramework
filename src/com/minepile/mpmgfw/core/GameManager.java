@@ -1,11 +1,14 @@
 package com.minepile.mpmgfw.core;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.constants.GameState;
+import com.minepile.mpmgfw.profiles.PlayerProfile;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -15,10 +18,12 @@ public class GameManager {
 	private final int MIN_PLAYERS = 1;
 
 	private GameState gameState;
-	private Integer gamesPlayed;
+	private int gamesPlayed;
+	private HashMap<Player, PlayerProfile> playerProfile;
 
 	public GameManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
+		playerProfile = new HashMap<Player, PlayerProfile>();
 
 		//On first load, lets begin with setting up the game.
 		setupGame();
@@ -57,10 +62,16 @@ public class GameManager {
 
 		//Setup lobby players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
-			//TODO: Setup lobby player profiles and items.
-			
 			//Get all players and teleport them to the lobby world.	
 			gameLobby.tpToLobbySpawn(players);
+			
+			//Setup lobby player profiles (for server reloads).
+			if (!playerProfile.containsKey(players)) {
+				playerProfile.put(players, new PlayerProfile(players));
+			}
+			
+			//Set the player as a spectator.
+			playerProfile.get(players).setSpectator(false);
 		}
 
 		//TODO: Kit Selection
@@ -91,6 +102,7 @@ public class GameManager {
 		//Setup minigame players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
 			//TODO: Setup player profiles and items for minigame.
+			
 			
 			//Get all players and teleport them to the game world.
 			gameArena.tpToGameWorld(players, 0, 90, 0);
@@ -134,7 +146,8 @@ public class GameManager {
 		mpm.disableCurrentGamePlugin();
 		
 		//Increment the number of games played.
-		gamesPlayed++;
+		// gamesPlayed++; ???
+		setGamesPlayed(getGamesPlayed() + 1);
 
 		//Setup the next game.
 		if (setupNextGame) {
@@ -146,6 +159,7 @@ public class GameManager {
 	 * This will start the game countdown.
 	 */
 	public void startCountdown() {
+		gameState = GameState.LOBBY_COUNTDOWN;
 		
 		new BukkitRunnable() {
 			int countdown = 30;
@@ -164,9 +178,12 @@ public class GameManager {
 					cancel();
 					
 					//Do one last check to make sure the game should start.
-					if (shouldMinigameStart()) {
+					if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
 						Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Starting Game");
 						startGame();
+					} else {
+						//Set game state.
+						gameState = GameState.LOBBY_WAITING;
 					}
 				}
 			}
@@ -251,5 +268,17 @@ public class GameManager {
 	 */
 	public void setGameState(GameState state) {
 		this.gameState = state;
+	}
+
+	public int getGamesPlayed() {
+		return gamesPlayed;
+	}
+
+	public void setGamesPlayed(int gamesPlayed) {
+		this.gamesPlayed = gamesPlayed;
+	}
+
+	public HashMap<Player, PlayerProfile> getPlayerProfile() {
+		return playerProfile;
 	}
 }

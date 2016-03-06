@@ -1,5 +1,7 @@
 package com.minepile.mpmgfw.listeners;
 
+import java.util.HashMap;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,9 +10,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
-import com.minepile.mpmgfw.core.GameManager;
 import com.minepile.mpmgfw.core.GameArena;
 import com.minepile.mpmgfw.core.GameLobby;
+import com.minepile.mpmgfw.core.GameManager;
+import com.minepile.mpmgfw.core.constants.GameState;
+import com.minepile.mpmgfw.profiles.PlayerProfile;
 
 public class PlayerJoin implements Listener {
 
@@ -29,9 +33,19 @@ public class PlayerJoin implements Listener {
 		GameArena gameArena = PLUGIN.getGameArena();
 		GameLobby lobby = PLUGIN.getGameLobby();
 		Location lobbySpawn = lobby.getLobbySpawn();
-
+		HashMap<Player, PlayerProfile> playerProfile = gameManager.getPlayerProfile();
+		GameState gameState = gameManager.getGameState();
+		
+		//Setup lobby player profiles.
+		if (!playerProfile.containsKey(player)) {
+			playerProfile.put(player, new PlayerProfile(player));
+		}
+		
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {
+			
+			//Set the player as a spectator.
+			playerProfile.get(player).setSpectator(true);
 			
 			//Teleport the player to a spectator spawn in the game world.
 			//TODO: Get a real spectator spawn point from the minigame plugin.
@@ -42,7 +56,7 @@ public class PlayerJoin implements Listener {
 			teleport(player, lobbySpawn);
 			
 			//If the game has enough players to start, lets do that now.
-			if (gameManager.shouldMinigameStart()) {
+			if (gameManager.shouldMinigameStart() && !gameState.equals(GameState.LOBBY_COUNTDOWN)) {
 				gameManager.startCountdown();
 			}
 		}
