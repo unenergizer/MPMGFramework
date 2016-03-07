@@ -1,5 +1,6 @@
 package com.minepile.mpmgfw.core.kits;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ import com.minepile.mpmgfw.core.kits.spawner.EntitySpawner;
 import com.minepile.mpmgfw.core.kits.spawner.PlatformBuilder;
 import com.minepile.mpmgfw.core.kits.spawner.Spawner;
 
-import net.citizensnpcs.api.npc.NPC;
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * Spawns kits in the lobby.
@@ -25,20 +26,29 @@ public class KitSelector {
 	private PlatformBuilder platformSpawner;
 	private Spawner entitySpawner;
 	private HashMap<UUID, Integer> playerKit;
+	private ArrayList<UUID> kitEntityUUID;
 
 	public KitSelector(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		platformSpawner = new PlatformBuilder();
+		playerKit = new HashMap<UUID, Integer>();
+		kitEntityUUID = new ArrayList<UUID>();
 	}
 
 	/**
 	 * Called when a player interacts with a kit.
-	 * @param name The NPC the player interacted with.
-	 * @return Returns the kit reference number (0-6). 
+	 * @param name The NPC the player interacted with. 
 	 */
-	public int kitInteract(NPC name) {
-		//TODO: Setup a real kitIntereaction method.
-		return 0;
+	public void kitInteract(Player player, int kit) {
+		MinigameKits minigameKit = PLUGIN.getMinigamePluginManager().getMinigameKit();
+		UUID uuid = player.getUniqueId();
+		
+		//Set the the players kit.
+		playerKit.put(uuid, kit);
+		
+		//Set player a confirmation message.
+		player.sendMessage(ChatColor.GREEN + "You selected the " + minigameKit.getKitNames().get(kit) + ChatColor.GREEN + " kit!");
+		
 	}
 
 	/**
@@ -48,12 +58,12 @@ public class KitSelector {
 		MinigameKits kit = PLUGIN.getMinigamePluginManager().getMinigameKit();
 
 		//Spawn platform for NPC's to stand on.
-		platformSpawner.SetPlatforms(kit.getKitPlatformLocations());
+		platformSpawner.setPlatforms(kit.getKitPlatformLocations(), kit.getKitPlatformMaterials());
 
 		//TODO: Spawn NPC
 
 		//Spawn a bukkit/spigot entity.
-		entitySpawner = new EntitySpawner();
+		entitySpawner = new EntitySpawner(this);
 		entitySpawner.setEntities(kit.getKitPlatformLocations(), kit.getKitNames(), kit.getEntityTypes());
 	}
 
@@ -67,6 +77,9 @@ public class KitSelector {
 
 		//Remove kit platform.
 		platformSpawner.setPlatforms(minigameKit.getKitPlatformLocations(), Material.AIR);
+		
+		//Empty the kit entity
+		kitEntityUUID.clear();
 	}
 
 	/**
@@ -92,5 +105,13 @@ public class KitSelector {
 	 */
 	public void setPlayerKit(Player player, int kit) {
 		playerKit.put(player.getUniqueId(), kit);
+	}
+	
+	/**
+	 * Returns an instance of the KitEntityUUID variable.
+	 * @return Returns an instance of the KitEntityUUID variable.
+	 */
+	public ArrayList<UUID> getKitEntityUUID() {
+		return kitEntityUUID;
 	}
 }

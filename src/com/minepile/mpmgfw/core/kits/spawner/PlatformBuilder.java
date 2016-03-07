@@ -10,22 +10,6 @@ public class PlatformBuilder {
 	/**
 	 * Places platforms in the given world.
 	 */
-	public void SetPlatforms(ArrayList<ArrayList<Location>> platformLocation){
-		
-		//Set platform
-		for (int i = 0; i < platformLocation.size(); i++) {
-			Location loc1 = platformLocation.get(i).get(0);
-			Location loc2 = platformLocation.get(i).get(1);
-
-			setBlock(loc1, loc2, Material.GLOWSTONE);
-		}
-	}
-	
-	/**
-	 * Places platforms in the given world of a given type.
-	 * <p>
-	 * You can set a platform as Material.Air to clear an existing platform.
-	 */
 	public void setPlatforms(ArrayList<ArrayList<Location>> platformLocation, Material material){
 		
 		//Set platform
@@ -34,6 +18,22 @@ public class PlatformBuilder {
 			Location loc2 = platformLocation.get(i).get(1);
 
 			setBlock(loc1, loc2, material);
+		}
+	}
+	
+	/**
+	 * Places platforms in the given world of a given type.
+	 * <p>
+	 * You can set a platform as Material.Air to clear an existing platform.
+	 */
+	public void setPlatforms(ArrayList<ArrayList<Location>> platformLocation, ArrayList<Material> material){
+		
+		//Set platform
+		for (int i = 0; i < platformLocation.size(); i++) {
+			Location loc1 = platformLocation.get(i).get(0);
+			Location loc2 = platformLocation.get(i).get(1);
+
+			setBlock(loc1, loc2, material.get(i));
 		}
 	}
 

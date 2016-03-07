@@ -16,7 +16,7 @@ import net.md_5.bungee.api.ChatColor;
 public class GameManager {
 
 	private final MPMGFramework PLUGIN;
-	private final int MIN_PLAYERS = 2;
+	private final int MIN_PLAYERS = 5;
 	private final KitSelector KIT_SELECTOR;
 
 	private GameState gameState;
@@ -253,6 +253,14 @@ public class GameManager {
 		default:
 			return false;
 		}
+	}
+	
+	/**
+	 * Gets an instance of the KitSelector class.
+	 * @return Returns an instance of the KitSelector class.
+	 */
+	public KitSelector getKitSelector() {
+		return KIT_SELECTOR;
 	}
 
 	/**

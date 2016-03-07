@@ -6,8 +6,16 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.minepile.mpmgfw.core.kits.KitSelector;
+
 public class EntitySpawner extends Spawner{
 	
+	private final KitSelector kitSelector;
+	
+	public EntitySpawner(KitSelector kitSelector) {
+		this.kitSelector = kitSelector;
+	}
+
 	@Override
 	public void spawnEntity(String kitName, Location location, EntityType entityType) {
 		//Spawn the entity.
@@ -23,5 +31,8 @@ public class EntitySpawner extends Spawner{
 
 		entity.addPotionEffect(noWalk);
 		entity.addPotionEffect(noJump);
+		
+		//Add the kit selection entities UUID's to an array list.
+		kitSelector.getKitEntityUUID().add(entity.getUniqueId());
 	}
 }

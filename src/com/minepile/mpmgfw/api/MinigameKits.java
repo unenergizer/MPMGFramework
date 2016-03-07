@@ -3,6 +3,7 @@ package com.minepile.mpmgfw.api;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -46,4 +47,10 @@ public abstract class MinigameKits {
 	 * @return Returns a list of minigame platform locations.
 	 */
 	public abstract ArrayList<ArrayList<Location>> getKitPlatformLocations();
+	
+	/**
+	 * A list of minigame platform materials.
+	 * @return Returns a list of minigame platform materials.
+	 */
+	public abstract ArrayList<Material> getKitPlatformMaterials();
 }
