@@ -1,4 +1,4 @@
-package com.minepile.mpmgfw.core.kits.spawner;
+package com.minepile.mpmgfw.util;
 import java.util.ArrayList;
 
 import org.bukkit.Location;

@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.api.MinigameKits;
 import com.minepile.mpmgfw.core.kits.spawner.EntitySpawner;
-import com.minepile.mpmgfw.core.kits.spawner.PlatformBuilder;
 import com.minepile.mpmgfw.core.kits.spawner.Spawner;
+import com.minepile.mpmgfw.util.PlatformBuilder;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -25,13 +26,16 @@ public class KitSelector {
 
 	private PlatformBuilder platformSpawner;
 	private Spawner entitySpawner;
+	private EntityFreezer entityFreezer;
 	private HashMap<UUID, Integer> playerKit;
+	private HashMap<UUID, Location> kitLocations;
 	private ArrayList<UUID> kitEntityUUID;
 
 	public KitSelector(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		platformSpawner = new PlatformBuilder();
 		playerKit = new HashMap<UUID, Integer>();
+		kitLocations = new HashMap<UUID, Location>();
 		kitEntityUUID = new ArrayList<UUID>();
 	}
 
@@ -65,6 +69,11 @@ public class KitSelector {
 		//Spawn a bukkit/spigot entity.
 		entitySpawner = new EntitySpawner(this);
 		entitySpawner.setEntities(kit.getKitPlatformLocations(), kit.getKitNames(), kit.getEntityTypes());
+		
+		//Start entity freezing.
+		setEntityFreezer(new EntityFreezer(PLUGIN, this));
+		entityFreezer.teleportEntity();
+		
 	}
 
 	/**
@@ -80,6 +89,18 @@ public class KitSelector {
 		
 		//Empty the kit entity
 		kitEntityUUID.clear();
+		
+		//Stop entity freezing.
+		entityFreezer.setTpEntity(false);
+		setEntityFreezer(null);
+	}
+
+	public EntityFreezer getEntityFreezer() {
+		return entityFreezer;
+	}
+
+	public void setEntityFreezer(EntityFreezer entityFreezer) {
+		this.entityFreezer = entityFreezer;
 	}
 
 	/**
@@ -107,6 +128,10 @@ public class KitSelector {
 		playerKit.put(player.getUniqueId(), kit);
 	}
 	
+	public HashMap<UUID, Location> getKitLocations() {
+		return kitLocations;
+	}
+
 	/**
 	 * Returns an instance of the KitEntityUUID variable.
 	 * @return Returns an instance of the KitEntityUUID variable.

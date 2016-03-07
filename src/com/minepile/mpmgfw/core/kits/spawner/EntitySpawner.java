@@ -1,5 +1,7 @@
 package com.minepile.mpmgfw.core.kits.spawner;
 
+import java.util.UUID;
+
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -20,6 +22,8 @@ public class EntitySpawner extends Spawner{
 	public void spawnEntity(String kitName, Location location, EntityType entityType) {
 		//Spawn the entity.
 		LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+		UUID uuid = entity.getUniqueId();
+		
 		entity.setCustomName(kitName);
 		entity.setCustomNameVisible(true);
 		entity.setRemoveWhenFarAway(false);
@@ -33,6 +37,9 @@ public class EntitySpawner extends Spawner{
 		entity.addPotionEffect(noJump);
 		
 		//Add the kit selection entities UUID's to an array list.
-		kitSelector.getKitEntityUUID().add(entity.getUniqueId());
+		kitSelector.getKitEntityUUID().add(uuid);
+		
+		//Add the location of the entity to the main kit class.
+		kitSelector.getKitLocations().put(uuid, location);
 	}
 }
