@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.constants.GameState;
+import com.minepile.mpmgfw.core.display.TipAnnouncer;
 import com.minepile.mpmgfw.core.kits.KitSelector;
 import com.minepile.mpmgfw.profiles.PlayerProfile;
 
@@ -20,12 +21,14 @@ public class GameManager {
 	private final KitSelector KIT_SELECTOR;
 
 	private GameState gameState;
+	private TipAnnouncer tips;
 	private int gamesPlayed;
 	private HashMap<Player, PlayerProfile> playerProfile;
 
 	public GameManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		KIT_SELECTOR = new KitSelector(PLUGIN);
+		tips = new TipAnnouncer(PLUGIN);
 		playerProfile = new HashMap<Player, PlayerProfile>();
 
 		//On first load, lets begin with setting up the game.
@@ -57,7 +60,7 @@ public class GameManager {
 	 */
 	private void setupLobby() {
 		GameLobby gameLobby = PLUGIN.getGameLobby();
-
+		
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
 
@@ -70,7 +73,10 @@ public class GameManager {
 		//TODO: Team Selection
 		//TODO: Scoreboard
 		//TODO: Bossbar Announcer
-
+		
+		//Setup rotating game tips.
+		tips.startTipMessages(PLUGIN.getMinigamePluginManager().getMinigameBase().getTips());
+				
 		//Set game state.
 		gameState = GameState.LOBBY_WAITING;
 		
@@ -89,6 +95,9 @@ public class GameManager {
 
 		//Set game state.
 		gameState = GameState.GAME_STARTING;
+		
+		//Stop game tips from displaying.
+		tips.setShowTips(false);
 
 		//Setup minigame players.
 		for (Player players: Bukkit.getOnlinePlayers()) {

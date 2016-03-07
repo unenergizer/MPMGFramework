@@ -1,5 +1,7 @@
 package com.minepile.mpmgfw.api;
 
+import java.util.ArrayList;
+
 public abstract class MinigameBase {
 	protected final String minigameName;
 	protected final String arenaWorldName;
@@ -17,6 +19,13 @@ public abstract class MinigameBase {
 	 * Tell the minigame plugin to start execution.
 	 */
 	public abstract void startGame();
+
+	
+	/**
+	 * Gets a list of minigame tips to show to the players while in the lobby world.
+	 * @return Returns an array list of strings.
+	 */
+	public abstract ArrayList<String> getTips();
 
 	/**
 	 * Gets the player friendly name of the current minigame.
