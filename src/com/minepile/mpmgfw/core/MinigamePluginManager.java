@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.bukkit.plugin.Plugin;
 
 import com.minepile.mpmgfw.api.Minigame;
+import com.minepile.mpmgfw.api.MinigameKit;
 import com.minepile.mpmgfw.api.MinigamePlugin;
 import com.minepile.mpmgfw.core.plugins.PluginFinder;
 import com.minepile.mpmgfw.core.plugins.PluginLoader;
@@ -15,7 +16,8 @@ public class MinigamePluginManager {
 	private final PluginLoader PLUGIN_LOADER;
 	private final String FILE_PATH;
 
-	private Minigame minigame;
+	private Minigame minigameBase;
+	private MinigameKit minigameKit;
 	private ArrayList<File> gamePlugins;
 	private Integer gamePluginIndex;
 
@@ -70,8 +72,17 @@ public class MinigamePluginManager {
 	 * 
 	 * @return	Returns a list of the currently loaded minigame.
 	 */
-	public Minigame getMinigame() {
-		return minigame;
+	public Minigame getMinigameBase() {
+		return minigameBase;
+	}
+
+	/**
+	 * Returns a list of the currently loaded minigame.
+	 * 
+	 * @return	Returns a list of the currently loaded minigame.
+	 */
+	public MinigameKit getMinigameKit() {
+		return minigameKit;
 	}
 
 	/**
@@ -82,9 +93,11 @@ public class MinigamePluginManager {
 	private void setMinigamePluginInstance(final Plugin plugin) {
 
 		if (plugin instanceof MinigamePlugin) {
-			final Minigame minigamePlugin = ((MinigamePlugin) plugin).getMinigame();
+			final Minigame minigameBase = ((MinigamePlugin) plugin).getMinigame();
+			final MinigameKit minigameKit = ((MinigamePlugin) plugin).getMinigameKit();
 
-			minigame = minigamePlugin;
+			this.minigameBase = minigameBase;
+			this.minigameKit = minigameKit;
 		}
 	}
 

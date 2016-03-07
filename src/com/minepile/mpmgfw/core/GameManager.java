@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.constants.GameState;
+import com.minepile.mpmgfw.core.kits.KitSelector;
 import com.minepile.mpmgfw.profiles.PlayerProfile;
 
 import net.md_5.bungee.api.ChatColor;
@@ -15,7 +16,8 @@ import net.md_5.bungee.api.ChatColor;
 public class GameManager {
 
 	private final MPMGFramework PLUGIN;
-	private final int MIN_PLAYERS = 1;
+	private final int MIN_PLAYERS = 2;
+	private final KitSelector KIT_SELECTOR;
 
 	private GameState gameState;
 	private int gamesPlayed;
@@ -23,6 +25,7 @@ public class GameManager {
 
 	public GameManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
+		KIT_SELECTOR = new KitSelector(PLUGIN);
 		playerProfile = new HashMap<Player, PlayerProfile>();
 
 		//On first load, lets begin with setting up the game.
@@ -33,15 +36,16 @@ public class GameManager {
 	 * This will load the minigame plugin and setup the game world.
 	 */
 	private void setupGame() {
+		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
+		GameArena gameArena = PLUGIN.getGameArena();
+		
 		//Set game state.
 		gameState = GameState.SETUP_GAME;
 
 		//Load game plugin.
-		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 		mpm.loadNextGamePlugin();
 
 		//Load game world.
-		GameArena gameArena = PLUGIN.getGameArena();
 		gameArena.loadGameWorld();
 
 		//Setup game lobby.
@@ -74,11 +78,12 @@ public class GameManager {
 			playerProfile.get(players).setSpectator(false);
 		}
 
-		//TODO: Kit Selection
+		//Setup lobby kits.
+		KIT_SELECTOR.spawnKits();
+
 		//TODO: Team Selection
 		//TODO: Scoreboard
 		//TODO: Bossbar Announcer
-
 
 		//Set game state.
 		gameState = GameState.LOBBY_WAITING;
@@ -108,14 +113,14 @@ public class GameManager {
 			gameArena.tpToGameWorld(players, 0, 90, 0);
 		}
 
-		//TODO: Kit Selection
-		//TODO: Team Selection
-		//TODO: Scoreboard
+		//TODO: Give kit
+		//TODO: Do team spawn
+		//TODO: Show Scoreboard
 		//TODO: Bossbar Announcer
 		//TODO: Show Game Description
 
 		//Let the plugin know to start the game.
-		PLUGIN.getMinigamePluginManager().getMinigame().startGame();
+		PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
 
 		//Start the async check to see if the game is over.
 		pollForGameOver();
@@ -138,7 +143,10 @@ public class GameManager {
 		}
 
 		//TODO: Save Scores (MySQL)
-
+		
+		//Remove the kits from the lobby world.
+		KIT_SELECTOR.removeKits();
+		
 		//Unload the game world.
 		gameArena.unloadGameWorld();
 
@@ -201,7 +209,7 @@ public class GameManager {
 
 			@Override
 			public void run() {
-				boolean isGameOver = mgpm.getMinigame().isGameOver();
+				boolean isGameOver = mgpm.getMinigameBase().isGameOver();
 
 				//Continuously poll to see if the minigame is over.
 				if (isGameOver) {

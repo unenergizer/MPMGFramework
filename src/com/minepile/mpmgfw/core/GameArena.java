@@ -20,7 +20,7 @@ public class GameArena {
 	 * Loads the needed assets from the minigame plugin.
 	 */
 	public void loadGameWorld() {
-		String worldName = PLUGIN.getMinigamePluginManager().getMinigame().getWorldName();
+		String worldName = PLUGIN.getMinigamePluginManager().getMinigameBase().getWorldName();
 
 		//Load the map into memory
 		worldDupe.loadWorld(worldName);
