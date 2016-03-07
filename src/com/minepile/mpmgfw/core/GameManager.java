@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.constants.GameState;
+import com.minepile.mpmgfw.core.display.BossBarAnnouncer;
 import com.minepile.mpmgfw.core.display.TipAnnouncer;
 import com.minepile.mpmgfw.core.kits.KitSelector;
 import com.minepile.mpmgfw.profiles.PlayerProfile;
@@ -22,6 +23,7 @@ public class GameManager {
 
 	private GameState gameState;
 	private TipAnnouncer tips;
+	private BossBarAnnouncer bar;
 	private int gamesPlayed;
 	private HashMap<Player, PlayerProfile> playerProfile;
 
@@ -29,6 +31,7 @@ public class GameManager {
 		PLUGIN = plugin;
 		KIT_SELECTOR = new KitSelector(PLUGIN);
 		tips = new TipAnnouncer(PLUGIN);
+		bar = new BossBarAnnouncer();
 		playerProfile = new HashMap<Player, PlayerProfile>();
 
 		//On first load, lets begin with setting up the game.
@@ -41,7 +44,7 @@ public class GameManager {
 	private void setupGame() {
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 		GameArena gameArena = PLUGIN.getGameArena();
-		
+
 		//Set game state.
 		gameState = GameState.SETUP_GAME;
 
@@ -60,7 +63,7 @@ public class GameManager {
 	 */
 	private void setupLobby() {
 		GameLobby gameLobby = PLUGIN.getGameLobby();
-		
+
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
 
@@ -72,14 +75,18 @@ public class GameManager {
 
 		//TODO: Team Selection
 		//TODO: Scoreboard
+
 		//TODO: Bossbar Announcer
-		
+		for(Player players: Bukkit.getOnlinePlayers()) {
+			bar.showBossBar(players);
+		}
+
 		//Setup rotating game tips.
 		tips.startTipMessages(PLUGIN.getMinigamePluginManager().getMinigameBase().getTips());
-				
+
 		//Set game state.
 		gameState = GameState.LOBBY_WAITING;
-		
+
 		//Check if game needs to start.
 		if (shouldMinigameStart()) {
 			startCountdown();
@@ -95,15 +102,18 @@ public class GameManager {
 
 		//Set game state.
 		gameState = GameState.GAME_STARTING;
-		
+
+		//Remove boss bars from the player.
+		bar.removeAllBossBars();
+
 		//Stop game tips from displaying.
 		tips.setShowTips(false);
 
 		//Setup minigame players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
 			//TODO: Setup player profiles and items for minigame.
-			
-			
+
+
 			//Get all players and teleport them to the game world.
 			gameArena.tpToGameWorld(players, 0, 90, 0);
 		}
@@ -121,7 +131,7 @@ public class GameManager {
 		pollForGameOver();
 
 	}
-	
+
 	/**
 	 * The game has ended, so now we will show scores and do some cleanup.
 	 * This will also unload the current minigame plugin.
@@ -140,19 +150,19 @@ public class GameManager {
 		}
 
 		//TODO: Save Scores (MySQL)
-		
+
 		//Remove the kits from the lobby world.
 		KIT_SELECTOR.removeKits();
-		
+
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
-		
+
 		//Pull the players out of the arena map so it can be unloaded.
 		gameLobby.setupLobbyPlayers(playerProfile);
-		
+
 		//Unload the game world.
 		gameArena.unloadGameWorld();
-		
+
 		//Increment the number of games played.
 		// gamesPlayed++; ???
 		setGamesPlayed(getGamesPlayed() + 1);
@@ -170,23 +180,23 @@ public class GameManager {
 	 */
 	public void startCountdown() {
 		gameState = GameState.LOBBY_COUNTDOWN;
-		
+
 		new BukkitRunnable() {
 			int countdown = 30;
 
 			@Override
 			public void run() {
 				if (countdown != 0) {
-					
+
 					//Show countdown in chat.
 					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 0) {
 						Bukkit.broadcastMessage(ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.");
 					}
-					
+
 					countdown--;
 				} else {
 					cancel();
-					
+
 					//Do one last check to make sure the game should start.
 					if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
 						Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Starting Game");
@@ -263,7 +273,7 @@ public class GameManager {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gets an instance of the KitSelector class.
 	 * @return Returns an instance of the KitSelector class.
@@ -286,6 +296,10 @@ public class GameManager {
 	 */
 	public void setGameState(GameState state) {
 		this.gameState = state;
+	}
+
+	public BossBarAnnouncer getBar() {
+		return bar;
 	}
 
 	public int getGamesPlayed() {

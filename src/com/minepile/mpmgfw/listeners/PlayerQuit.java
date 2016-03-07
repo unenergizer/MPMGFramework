@@ -27,6 +27,8 @@ public class PlayerQuit implements Listener {
 		//Remove the player from the players hashmap.
 		gameManager.getPlayerProfile().remove(player);
 		
+		gameManager.getBar().removeBossBar(player);
+		
 		//Check to see if the game should end.
 		if (gameManager.shouldMinigameEnd()) {
 
