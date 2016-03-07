@@ -11,6 +11,7 @@ import com.minepile.mpmgfw.core.MinigamePluginManager;
 import com.minepile.mpmgfw.listeners.EntityCombust;
 import com.minepile.mpmgfw.listeners.EntityDamage;
 import com.minepile.mpmgfw.listeners.EntityDamageByEntity;
+import com.minepile.mpmgfw.listeners.EntityTargetLivingEntity;
 import com.minepile.mpmgfw.listeners.PlayerInteractEntity;
 import com.minepile.mpmgfw.listeners.PlayerJoin;
 import com.minepile.mpmgfw.listeners.PlayerQuit;
@@ -48,6 +49,7 @@ public class MPMGFramework extends JavaPlugin {
 		pm.registerEvents(new EntityCombust(), this);
 		pm.registerEvents(new EntityDamage(this), this);
 		pm.registerEvents(new EntityDamageByEntity(this), this);
+		pm.registerEvents(new EntityTargetLivingEntity(this), this);
 		pm.registerEvents(new PlayerInteractEntity(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);

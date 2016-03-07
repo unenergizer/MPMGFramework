@@ -11,6 +11,7 @@ import com.minepile.mpmgfw.core.constants.GameState;
 import com.minepile.mpmgfw.core.display.BossBarAnnouncer;
 import com.minepile.mpmgfw.core.display.TipAnnouncer;
 import com.minepile.mpmgfw.core.kits.KitSelector;
+import com.minepile.mpmgfw.core.teams.TeamSelector;
 import com.minepile.mpmgfw.profiles.PlayerProfile;
 
 import net.md_5.bungee.api.ChatColor;
@@ -20,6 +21,7 @@ public class GameManager {
 	private final MPMGFramework PLUGIN;
 	private final int MIN_PLAYERS = 5;
 	private final KitSelector KIT_SELECTOR;
+	private final TeamSelector TEAM_SELECTOR;
 
 	private GameState gameState;
 	private TipAnnouncer tips;
@@ -30,6 +32,7 @@ public class GameManager {
 	public GameManager(MPMGFramework plugin) {
 		PLUGIN = plugin;
 		KIT_SELECTOR = new KitSelector(PLUGIN);
+		TEAM_SELECTOR = new TeamSelector(PLUGIN);
 		tips = new TipAnnouncer(PLUGIN);
 		bar = new BossBarAnnouncer();
 		playerProfile = new HashMap<Player, PlayerProfile>();
@@ -72,6 +75,9 @@ public class GameManager {
 
 		//Setup lobby kits.
 		KIT_SELECTOR.spawnKits();
+
+		//Setup lobby teams.
+		TEAM_SELECTOR.spawnTeams();
 
 		//TODO: Team Selection
 		//TODO: Scoreboard
@@ -153,6 +159,9 @@ public class GameManager {
 
 		//Remove the kits from the lobby world.
 		KIT_SELECTOR.removeKits();
+		
+		//Remove the teams from the lobby world.
+		TEAM_SELECTOR.removeTeams();
 
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
@@ -280,6 +289,14 @@ public class GameManager {
 	 */
 	public KitSelector getKitSelector() {
 		return KIT_SELECTOR;
+	}
+
+	/**
+	 * Gets an instance of the KitSelector class.
+	 * @return Returns an instance of the KitSelector class.
+	 */
+	public TeamSelector getTeamSelector() {
+		return TEAM_SELECTOR;
 	}
 
 	/**

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.api.MinigameKits;
+import com.minepile.mpmgfw.core.kits.spawner.EntityFreezer;
 import com.minepile.mpmgfw.core.kits.spawner.EntitySpawner;
 import com.minepile.mpmgfw.core.kits.spawner.Spawner;
 import com.minepile.mpmgfw.util.PlatformBuilder;
@@ -52,6 +53,7 @@ public class KitSelector {
 		
 		//Set player a confirmation message.
 		player.sendMessage(ChatColor.GREEN + "You selected the " + minigameKit.getKitNames().get(kit) + ChatColor.GREEN + " kit!");
+		player.sendMessage(ChatColor.BLUE + minigameKit.getKitDescriptions().get(kit));
 		
 	}
 

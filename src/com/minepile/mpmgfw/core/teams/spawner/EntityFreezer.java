@@ -1,4 +1,4 @@
-package com.minepile.mpmgfw.core.kits;
+package com.minepile.mpmgfw.core.teams.spawner;
 
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -10,17 +10,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.minepile.mpmgfw.MPMGFramework;
+import com.minepile.mpmgfw.core.teams.TeamSelector;
 
 public class EntityFreezer {
 	
 	private final MPMGFramework PLUGIN;
-	private final KitSelector KIT_SELECTOR;
+	private final TeamSelector TEAM_SELECTOR;
 	
 	private boolean tpEntity;
 	
-	public EntityFreezer(MPMGFramework plugin, KitSelector kitSelector) {
+	public EntityFreezer(MPMGFramework plugin, TeamSelector teamSelector) {
 		PLUGIN = plugin;
-		KIT_SELECTOR = kitSelector;
+		TEAM_SELECTOR = teamSelector;
 		
 		tpEntity = true;
 	}
@@ -38,7 +39,7 @@ public class EntityFreezer {
 			@Override
 			public void run() {
 				//Loop through our entityKitLocation hashmap and teleport mobs back to their spawns.
-				for (Entry<UUID, Location> entry : KIT_SELECTOR.getKitLocations().entrySet()) {
+				for (Entry<UUID, Location> entry : TEAM_SELECTOR.getTeamLocations().entrySet()) {
 					UUID mobID = entry.getKey();
 					Location spawnLocation = entry.getValue();
 

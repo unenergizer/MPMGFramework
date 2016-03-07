@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.minepile.mpmgfw.MPMGFramework;
 import com.minepile.mpmgfw.core.kits.KitSelector;
+import com.minepile.mpmgfw.core.teams.TeamSelector;
 import com.minepile.mpmgfw.profiles.PlayerProfile;
 
 public class EntityDamageByEntity implements Listener {
@@ -44,14 +45,17 @@ public class EntityDamageByEntity implements Listener {
 			}
 		}
 		
-		//Test for kit interaction.
+		//Test for kit and team interaction.
 		if (event.getDamager() instanceof Player) {
-			
+
 			KitSelector kitSelector = PLUGIN.getGameManager().getKitSelector();
+			TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
 			Player player = (Player) event.getDamager();
 			UUID uuid = event.getEntity().getUniqueId();
 			ArrayList<UUID> kitUUID = kitSelector.getKitEntityUUID();
-
+			ArrayList<UUID> teamUUID = teamSelector.getTeamEntityUUID();
+			
+			//Test for kit interaction.
 			for(int i = 0; i < kitUUID.size(); i++) {
 				if (uuid.equals(kitUUID.get(i))) {
 					//Cancel the event (do no damage).
@@ -59,6 +63,17 @@ public class EntityDamageByEntity implements Listener {
 					
 					//Toggle interact
 					kitSelector.kitInteract(player, i);
+				}
+			}
+			
+			//Test for team interaction.
+			for(int i = 0; i < teamUUID.size(); i++) {
+				if (uuid.equals(teamUUID.get(i))) {
+					//Cancel the event (do no damage).
+					event.setCancelled(true);
+					
+					//Toggle interact
+					teamSelector.teamInteract(player, i);
 				}
 			}
 		}
