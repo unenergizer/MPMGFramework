@@ -1,7 +1,7 @@
 name: MPMG-Framework
-main: com.minepile.mpmgfw.MPMGFramework
+main: com.forgestorm.mgfw.MGFramework
 version: 0.1
-description: MinePile MiniGame Framework
+description: ForgeStorm MiniGame Framework
 author: Robert Andrew Brown
-website: http://www.minepile.com/
+website: http://www.forgestorm.com/
 commands:
