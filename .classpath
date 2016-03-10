@@ -12,5 +12,10 @@
 			<attribute name="javadoc_location" value="http://jd.citizensnpcs.co/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Andrew/Development/MinecraftDevelopment/MPMGFramework/API/TitleManager-1.5.11.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://jd.puharesource.io/titlemanager/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

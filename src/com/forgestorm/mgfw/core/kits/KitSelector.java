@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameKits;
+import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.kits.spawner.EntityFreezer;
 import com.forgestorm.mgfw.core.kits.spawner.EntitySpawner;
 import com.forgestorm.mgfw.core.kits.spawner.Spawner;
@@ -52,9 +53,13 @@ public class KitSelector {
 		playerKit.put(uuid, kit);
 		
 		//Set player a confirmation message.
+		player.sendMessage("");
+		player.sendMessage(Messages.GAME_BAR_TOP.toString());
+		player.sendMessage("");
 		player.sendMessage(ChatColor.GREEN + "You selected the " + minigameKit.getKitNames().get(kit) + ChatColor.GREEN + " kit!");
 		player.sendMessage(ChatColor.BLUE + minigameKit.getKitDescriptions().get(kit));
-		
+		player.sendMessage("");
+		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
 	}
 
 	/**

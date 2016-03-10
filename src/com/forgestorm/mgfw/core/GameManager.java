@@ -1,12 +1,16 @@
 package com.forgestorm.mgfw.core;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.GameState;
+import com.forgestorm.mgfw.core.display.ActionBarText;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
+import com.forgestorm.mgfw.core.display.LobbyScoreboard;
+import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.core.display.TipAnnouncer;
 import com.forgestorm.mgfw.core.kits.KitSelector;
 import com.forgestorm.mgfw.core.teams.TeamSelector;
@@ -17,8 +21,10 @@ public class GameManager {
 
 	private final MGFramework PLUGIN;
 	private final int MIN_PLAYERS = 1;
+	private final int MAX_PLAYERS = 16;
 	private final KitSelector KIT_SELECTOR;
 	private final TeamSelector TEAM_SELECTOR;
+	private final LobbyScoreboard LOBBY_SCOREBOARD;
 
 	private GameState gameState;
 	private TipAnnouncer tips;
@@ -29,6 +35,7 @@ public class GameManager {
 		PLUGIN = plugin;
 		KIT_SELECTOR = new KitSelector(PLUGIN);
 		TEAM_SELECTOR = new TeamSelector(PLUGIN);
+		LOBBY_SCOREBOARD = new LobbyScoreboard(PLUGIN);
 		tips = new TipAnnouncer(PLUGIN);
 		bar = new BossBarAnnouncer();
 
@@ -74,12 +81,18 @@ public class GameManager {
 		//Setup lobby teams.
 		TEAM_SELECTOR.spawnTeams();
 
-		//TODO: Team Selection
-		//TODO: Scoreboard
-
-		//TODO: Bossbar Announcer
 		for(Player players: Bukkit.getOnlinePlayers()) {
+			//Setup lobby scoreboard
+			LOBBY_SCOREBOARD.addPlayer(players);
+
+			//Bossbar Announcer			
 			bar.showBossBar(players);
+			
+			//Send Tab Menu text
+			TabMenuText tmt = new TabMenuText();
+			String header = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "You are playing on " + ChatColor.YELLOW + ChatColor.BOLD + "mc.ForgeStorm.com";
+			String footer = ChatColor.GOLD + "" + ChatColor.BOLD + "Forums, TS3, Store, & more at " + ChatColor.RED + ChatColor.BOLD + "ForgeStorm.com";
+			tmt.sendHeaderAndFooter(players, header, footer);
 		}
 
 		//Setup rotating game tips.
@@ -106,6 +119,11 @@ public class GameManager {
 
 		//Remove boss bars from the player.
 		bar.removeAllBossBars();
+		
+		//Remove the lobby scoreboard.
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			LOBBY_SCOREBOARD.removePlayer(players);
+		}
 
 		//Stop game tips from displaying.
 		tips.setShowTips(false);
@@ -194,7 +212,13 @@ public class GameManager {
 
 					//Show countdown in chat.
 					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 0) {
-						Bukkit.broadcastMessage(ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.");
+						//Bukkit.broadcastMessage(ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.");
+						ActionBarText abt = new ActionBarText();
+						String message = ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.";
+						for (Player players: Bukkit.getOnlinePlayers()) {
+							abt.sendActionbarMessage(players, message);
+							players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+						}
 					}
 
 					countdown--;
@@ -278,6 +302,15 @@ public class GameManager {
 		}
 	}
 
+	/**
+	 * Gets the maximum number of players this game arcade can support.
+	 * 
+	 * @return Retuns the maximum number of players the game arcade can hold.
+	 */
+	public int getMAX_PLAYERS() {
+		return MAX_PLAYERS;
+	}
+	
 	/**
 	 * Gets an instance of the KitSelector class.
 	 * @return Returns an instance of the KitSelector class.

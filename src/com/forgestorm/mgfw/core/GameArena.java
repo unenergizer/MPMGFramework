@@ -10,8 +10,6 @@ import org.bukkit.entity.Player;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
 
-import net.md_5.bungee.api.ChatColor;
-
 public class GameArena {
 
 	private final MGFramework PLUGIN;
@@ -27,8 +25,6 @@ public class GameArena {
 	 */
 	public void loadGameWorld() {
 		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getArenaWorldName();
-		
-		Bukkit.broadcastMessage(ChatColor.RED + "MAP TO LOAD: " + ChatColor.YELLOW + name);
 		
 		File wc = Bukkit.getServer().getWorldContainer();
 		File destinationFolder = new File(wc + File.separator + name);

@@ -1,6 +1,7 @@
 package com.forgestorm.mgfw.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,6 +38,7 @@ public class EntityDamage implements Listener {
 				//If the player falls into the void, tp them to the lobby spawn.
 				if (event.getCause().equals(DamageCause.VOID)) {
 					lobby.tpToLobbySpawn(player);
+					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 				}
 			}
 		}

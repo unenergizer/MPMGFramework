@@ -1,17 +1,74 @@
 package com.forgestorm.mgfw.core.display;
 
+import java.util.HashMap;
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
+
+import com.forgestorm.mgfw.MGFramework;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class LobbyScoreboard {
+
+	private final MGFramework PLUGIN;
 	
-	public void createPlayerScoreboard(Player player) {
-		ScoreboardManager manager = Bukkit.getScoreboardManager();
-		Scoreboard board = manager.getNewScoreboard();
-		Team team = board.registerNewTeam(player.getName());
-		//team.getScoreboard().
+	private ScoreboardManager manager;
+	private HashMap<Player, Scoreboard> playerBoards;
+	//private HashMap<Player, ArrayList<String>> objectives;
+	
+	
+	public LobbyScoreboard(MGFramework plugin) {
+		PLUGIN = plugin;
+		manager = Bukkit.getScoreboardManager();
+		//objectives = new HashMap<Player, ArrayList<String>>();
+		playerBoards = new HashMap<Player, Scoreboard>();
 	}
+	
+	private void setBoardToPlayer(Player player) {
+		Scoreboard board = playerBoards.get(player);
+		
+		//If the player already 
+		if (player.getScoreboard() != null) {
+			playerBoards.remove(player);
+			playerBoards.put(player, player.getScoreboard());
+			board = player.getScoreboard();
+		}
+		
+		int random = new Random().nextInt(5999);
+		int random1 = new Random().nextInt(5999);
+		
+		//Set the board objective.
+		Objective obj = board.registerNewObjective("sb" + Integer.toString(random), "ct" + Integer.toString(random1));
+		String name = ChatColor.RED + "mc" + ChatColor.GRAY + "." + ChatColor.RED + "ForgeStorm" + ChatColor.GRAY + "." + ChatColor.RED + "com";
+		obj.setDisplayName(name);
+		
+		//Makesure the display slot is the sidebar.
+		if(obj.getDisplaySlot() != DisplaySlot.SIDEBAR) {
+			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+		}
+		
+		//Try adding a test score.
+		Score score = obj.getScore(player.getName());
+		score.setScore(15);
+		
+		//Sends the player the current scoreboard.
+		player.setScoreboard(board);
+	}
+	
+	public void addPlayer(Player player) {
+		playerBoards.put(player, manager.getNewScoreboard());
+		setBoardToPlayer(player);
+	}
+	
+	public void removePlayer(Player player) {
+		playerBoards.remove(player);
+	}
+	
 }
