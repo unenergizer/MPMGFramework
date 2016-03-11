@@ -55,8 +55,8 @@ public class PlayerJoin implements Listener {
 			//Teleport the player to the lobby.
 			teleport(player, lobbySpawn);
 			
-			//Show the player the bossbar.
-			gameManager.getBar().showBossBar(player);
+			//Setup a lobby player.
+			lobby.setupLobbyPlayer(player);
 			
 			//If the game has enough players to start, lets do that now.
 			if (gameManager.shouldMinigameStart() && !gameState.equals(GameState.LOBBY_COUNTDOWN)) {

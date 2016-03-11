@@ -69,7 +69,17 @@ public class GameArena {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Teleport all players in the server to the game world.
+	 */
+	public void tpAllToGameWorld() {
+		for(Player players: Bukkit.getOnlinePlayers()) {
+			//TODO: Get spawn cords from minigame plugin.
+			tpToGameWorld(players, 0, 90, 0);
+		}
+	}
+	
 	/**
 	 * Teleports a player to the game arena.
 	 * 

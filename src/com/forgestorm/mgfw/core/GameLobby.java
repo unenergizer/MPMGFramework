@@ -9,37 +9,88 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import com.forgestorm.mgfw.MGFramework;
+import com.forgestorm.mgfw.core.constants.Messages;
+import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
+import com.forgestorm.mgfw.core.display.LobbyScoreboard;
+import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class GameLobby {
-
-	private final String lobbyWorldName;
-	private final Location lobbySpawn;
+	
+	private final MGFramework PLUGIN;
+	private final String LOBBY_WORLD_NAME;
+	private final Location LOBBY_SPAWN;
+	
 	private HashMap<Player, PlayerProfile> playerProfile;
+	private BossBarAnnouncer bar;
+	private LobbyScoreboard scoreboard;
 
-	public GameLobby() {
-		lobbyWorldName = "mg-lobby";
-		lobbySpawn = new Location(Bukkit.getWorld(lobbyWorldName), 0.5, 76, 0.5);
+	public GameLobby(MGFramework plugin) {
+		PLUGIN = plugin;
+		LOBBY_WORLD_NAME = "mg-lobby";
+		LOBBY_SPAWN = new Location(Bukkit.getWorld(LOBBY_WORLD_NAME), 0.5, 76, 0.5);
+		
 		playerProfile = new HashMap<Player, PlayerProfile>();
+		bar = new BossBarAnnouncer();
+		scoreboard = new LobbyScoreboard(PLUGIN);
 	}
-
-	public void setupLobbyPlayers() {
-		//Setup lobby players.
+	
+	/**
+	 * This will setup all the players in the server for the lobby.
+	 */
+	public void setupAllLobbyPlayers() {
+		//Setup all the lobby players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
-			//Get all players and teleport them to the lobby world.	
-			tpToLobbySpawn(players);
-			
-			//Heal the player
-			players.setHealth(20);
-
-			//Setup lobby player profiles (for server reloads).
-			if (!playerProfile.containsKey(players)) {
-				playerProfile.put(players, new PlayerProfile(players));
-			}
-
-			//Set the player as a spectator.
-			playerProfile.get(players).setSpectator(false);
+			setupLobbyPlayer(players);
 		}
+	}
+	
+	/**
+	 * This will setup a player in the lobby.
+	 * 
+	 * @param player The player to setup in the lobby.
+	 */
+	public void setupLobbyPlayer(Player player) {
+		//Get all players and teleport them to the lobby world.	
+		tpToLobbySpawn(player);
+		
+		//Heal the player
+		player.setHealth(20);
+
+		//Setup lobby player profiles (for server reloads).
+		if (!playerProfile.containsKey(player)) {
+			playerProfile.put(player, new PlayerProfile(player));
+		}
+
+		//Set the player as a spectator.
+		playerProfile.get(player).setSpectator(false);
+		
+		//Setup lobby scoreboard
+		scoreboard.addPlayer(player);
+
+		//Show the boss bar.
+		bar.showBossBar(player);
+		
+		//Send Tab Menu text
+		TabMenuText tmt = new TabMenuText();
+		String header = Messages.GAME_TAB_HEADRER.toString();
+		String footer = Messages.GAME_TAB_FOOTER.toString();
+		tmt.sendHeaderAndFooter(player, header, footer);
+	}
+	
+	public void removeAllLobbyPlayers() {
+		for(Player players: Bukkit.getOnlinePlayers()) {
+			removeLobbyPlayer(players);
+		}
+	}
+	
+	public void removeLobbyPlayer(Player player) {
+		//Remove boss bars from the player.
+		bar.removeBossBar(player);
+		
+		//Remove the lobby scoreboard.
+		scoreboard.removePlayer(player);
 	}
 
 	/**
@@ -60,14 +111,23 @@ public class GameLobby {
 			}
 		}
 	}
-
+	
+	/**
+	 * This will teleport all the players in the server to the lobby spawn.
+	 */
+	public void tpAllToLobbySpawn() {
+		for(Player players: Bukkit.getOnlinePlayers()) {
+			tpToLobbySpawn(players);
+		}
+	}
+	
 	/**
 	 * Teleports a player to the lobby spawn pad.
 	 * 
 	 * @param player The player to teleport to lobby spawn.
 	 */
 	public void tpToLobbySpawn(Player player) {
-		player.teleport(lobbySpawn);
+		player.teleport(LOBBY_SPAWN);
 	}
 
 	/**
@@ -75,7 +135,7 @@ public class GameLobby {
 	 * @return A location with the lobby's spawn point.
 	 */
 	public Location getLobbySpawn() {
-		return lobbySpawn;
+		return LOBBY_SPAWN;
 	}
 
 	/**
@@ -83,7 +143,7 @@ public class GameLobby {
 	 * @return The name of the lobby world.
 	 */
 	public String getLobbyWorldName() {
-		return lobbyWorldName;
+		return LOBBY_WORLD_NAME;
 	}
 
 	public HashMap<Player, PlayerProfile> getPlayerProfile() {

@@ -27,7 +27,7 @@ public class TipAnnouncer {
 	 * other useful information to the player.
 	 */
 	public void startTipMessages(ArrayList<String> tips) {
-
+		showTips = true;
 		int numberOfTips = tips.size();
 
 		//Start a repeating task.

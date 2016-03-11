@@ -6,10 +6,12 @@ import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameTeams;
+import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.teams.spawner.EntityFreezer;
 import com.forgestorm.mgfw.core.teams.spawner.EntitySpawner;
 import com.forgestorm.mgfw.core.teams.spawner.Spawner;
@@ -47,14 +49,23 @@ public class TeamSelector {
 	public void teamInteract(Player player, int team) {
 		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 		UUID uuid = player.getUniqueId();
-		
+
 		//Set the the players team.
 		playerTeam.put(uuid, team);
-		
+
 		//Set player a confirmation message.
-		player.sendMessage(ChatColor.GREEN + "You selected the " + minigameTeam.getTeamNames().get(team) + ChatColor.GREEN + " team!");
-		player.sendMessage(ChatColor.BLUE + minigameTeam.getTeamDescriptions().get(team));
-		
+		player.sendMessage("");
+		player.sendMessage(Messages.GAME_BAR_TEAM.toString());
+		player.sendMessage("");
+		player.sendMessage(minigameTeam.getTeamNames().get(team) + ChatColor.DARK_GRAY + ":");
+		player.sendMessage("");
+		player.sendMessage(minigameTeam.getTeamDescriptions().get(team));
+		player.sendMessage("");
+		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
+		player.sendMessage("");
+
+		//Play a confirmation sound.
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
 	}
 
 	/**
@@ -71,11 +82,11 @@ public class TeamSelector {
 		//Spawn a bukteam/spigot entity.
 		entitySpawner = new EntitySpawner(this);
 		entitySpawner.setEntities(team.getTeamPlatformLocations(), team.getTeamNames(), team.getEntityTypes());
-		
+
 		//Start entity freezing.
 		setEntityFreezer(new EntityFreezer(PLUGIN, this));
 		entityFreezer.teleportEntity();
-		
+
 	}
 
 	/**
@@ -88,10 +99,10 @@ public class TeamSelector {
 
 		//Remove team platform.
 		platformSpawner.setPlatforms(minigameTeam.getTeamPlatformLocations(), Material.AIR);
-		
+
 		//Empty the team entity
 		teamEntityUUID.clear();
-		
+
 		//Stop entity freezing.
 		entityFreezer.setTpEntity(false);
 		setEntityFreezer(null);
@@ -129,7 +140,7 @@ public class TeamSelector {
 	public void setPlayerTeam(Player player, int team) {
 		playerTeam.put(player.getUniqueId(), team);
 	}
-	
+
 	public HashMap<UUID, Location> getTeamLocations() {
 		return teamLocations;
 	}

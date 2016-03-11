@@ -7,37 +7,33 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.GameState;
+import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.ActionBarText;
-import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
-import com.forgestorm.mgfw.core.display.LobbyScoreboard;
-import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.core.display.TipAnnouncer;
 import com.forgestorm.mgfw.core.kits.KitSelector;
 import com.forgestorm.mgfw.core.teams.TeamSelector;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class GameManager {
 
 	private final MGFramework PLUGIN;
 	private final int MIN_PLAYERS = 1;
 	private final int MAX_PLAYERS = 16;
+	private final GameArena GAME_ARENA;
+	private final GameLobby GAME_LOBBY;
 	private final KitSelector KIT_SELECTOR;
 	private final TeamSelector TEAM_SELECTOR;
-	private final LobbyScoreboard LOBBY_SCOREBOARD;
 
 	private GameState gameState;
 	private TipAnnouncer tips;
-	private BossBarAnnouncer bar;
 	private int gamesPlayed;
 
 	public GameManager(MGFramework plugin) {
 		PLUGIN = plugin;
+		GAME_ARENA = PLUGIN.getGameArena();
+		GAME_LOBBY = PLUGIN.getGameLobby();
 		KIT_SELECTOR = new KitSelector(PLUGIN);
 		TEAM_SELECTOR = new TeamSelector(PLUGIN);
-		LOBBY_SCOREBOARD = new LobbyScoreboard(PLUGIN);
 		tips = new TipAnnouncer(PLUGIN);
-		bar = new BossBarAnnouncer();
 
 		//On first load, lets begin with setting up the game.
 		setupGame();
@@ -48,7 +44,6 @@ public class GameManager {
 	 */
 	private void setupGame() {
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
-		GameArena gameArena = PLUGIN.getGameArena();
 
 		//Set game state.
 		gameState = GameState.SETUP_GAME;
@@ -57,7 +52,7 @@ public class GameManager {
 		mpm.loadNextGamePlugin();
 
 		//Load game world.
-		gameArena.loadGameWorld();
+		GAME_ARENA.loadGameWorld();
 
 		//Setup game lobby.
 		setupLobby();
@@ -67,33 +62,21 @@ public class GameManager {
 	 * This will setup our game lobby.
 	 */
 	private void setupLobby() {
-		GameLobby gameLobby = PLUGIN.getGameLobby();
 
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
 
 		//Setup lobby world
-		gameLobby.loadLobbyWorld();
+		GAME_LOBBY.loadLobbyWorld();
 
 		//Setup lobby kits.
 		KIT_SELECTOR.spawnKits();
 
 		//Setup lobby teams.
 		TEAM_SELECTOR.spawnTeams();
-
-		for(Player players: Bukkit.getOnlinePlayers()) {
-			//Setup lobby scoreboard
-			LOBBY_SCOREBOARD.addPlayer(players);
-
-			//Bossbar Announcer			
-			bar.showBossBar(players);
-			
-			//Send Tab Menu text
-			TabMenuText tmt = new TabMenuText();
-			String header = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "You are playing on " + ChatColor.YELLOW + ChatColor.BOLD + "mc.ForgeStorm.com";
-			String footer = ChatColor.GOLD + "" + ChatColor.BOLD + "Forums, TS3, Store, & more at " + ChatColor.RED + ChatColor.BOLD + "ForgeStorm.com";
-			tmt.sendHeaderAndFooter(players, header, footer);
-		}
+		
+		//Setup all the players currently in the lobby.
+		GAME_LOBBY.setupAllLobbyPlayers();
 
 		//Setup rotating game tips.
 		tips.startTipMessages(PLUGIN.getMinigamePluginManager().getMinigameBase().getTips());
@@ -112,30 +95,19 @@ public class GameManager {
 	 * Thus starting the game.
 	 */
 	private void startGame() {
-		GameArena gameArena = PLUGIN.getGameArena();
 
 		//Set game state.
 		gameState = GameState.GAME_STARTING;
 
-		//Remove boss bars from the player.
-		bar.removeAllBossBars();
-		
-		//Remove the lobby scoreboard.
-		for (Player players: Bukkit.getOnlinePlayers()) {
-			LOBBY_SCOREBOARD.removePlayer(players);
-		}
+		//Remove lobby players
+		GAME_LOBBY.removeAllLobbyPlayers();
 
 		//Stop game tips from displaying.
 		tips.setShowTips(false);
 
-		//Setup minigame players.
-		for (Player players: Bukkit.getOnlinePlayers()) {
-			//TODO: Setup player profiles and items for minigame.
+		//Get all players and teleport them to the game world.
+		GAME_ARENA.tpAllToGameWorld();
 
-
-			//Get all players and teleport them to the game world.
-			gameArena.tpToGameWorld(players, 0, 90, 0);
-		}
 
 		//TODO: Give kit
 		//TODO: Do team spawn
@@ -157,15 +129,15 @@ public class GameManager {
 	 * @param setupNextGame Set to true, to load the next game.
 	 */
 	public void endGame(boolean setupNextGame) {
-		GameArena gameArena = PLUGIN.getGameArena();
-		GameLobby gameLobby = PLUGIN.getGameLobby();
+		GameArena GAME_ARENA = PLUGIN.getGameArena();
+		GameLobby GAME_LOBBY = PLUGIN.getGameLobby();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 
 		gameState = GameState.GAME_ENDING;
 
 		//If players are still online, lets show them the game scores.
 		if (Bukkit.getOnlinePlayers().size() > 0) {
-			//TODO: Show scores
+			//TODO: Show scores & MOVE TO GAME ARENA
 		}
 
 		//TODO: Save Scores (MySQL)
@@ -180,10 +152,10 @@ public class GameManager {
 		mpm.disableCurrentGamePlugin();
 		
 		//Pull the players out of the arena map so it can be unloaded.
-		gameLobby.setupLobbyPlayers();
-
+		GAME_LOBBY.tpAllToLobbySpawn();
+		
 		//Unload the game world.
-		gameArena.unloadGameWorld();
+		GAME_ARENA.unloadGameWorld();
 
 		//Increment the number of games played.
 		// gamesPlayed++; ???
@@ -211,13 +183,21 @@ public class GameManager {
 				if (countdown != 0) {
 
 					//Show countdown in chat.
-					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 0) {
-						//Bukkit.broadcastMessage(ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.");
+					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 1) {
 						ActionBarText abt = new ActionBarText();
-						String message = ChatColor.YELLOW + "Game will start in " + ChatColor.RED + countdown + ChatColor.YELLOW + " seconds.";
+						String message = Messages.GAME_TIME_REMAINING_PLURAL.toString();
+						for (Player players: Bukkit.getOnlinePlayers()) {
+							abt.sendActionbarMessage(players, message.replace("%s", Integer.toString(countdown)));
+							players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+						}
+					}
+					
+					if (countdown == 1) {
+						ActionBarText abt = new ActionBarText();
+						String message = Messages.GAME_TIME_REMAINING_SINGULAR.toString();
 						for (Player players: Bukkit.getOnlinePlayers()) {
 							abt.sendActionbarMessage(players, message);
-							players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+							players.playSound(players.getLocation(), Sound.BLOCK_NOTE_HARP, 1f, 1f);
 						}
 					}
 
@@ -227,7 +207,6 @@ public class GameManager {
 
 					//Do one last check to make sure the game should start.
 					if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
-						Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Starting Game");
 						startGame();
 					} else {
 						//Set game state.
@@ -341,10 +320,6 @@ public class GameManager {
 	 */
 	public void setGameState(GameState state) {
 		this.gameState = state;
-	}
-
-	public BossBarAnnouncer getBar() {
-		return bar;
 	}
 
 	public int getGamesPlayed() {

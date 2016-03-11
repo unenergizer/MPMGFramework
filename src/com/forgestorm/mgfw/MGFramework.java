@@ -28,7 +28,7 @@ public class MGFramework extends JavaPlugin {
 	public void onEnable() {
 
 		minigamePluginManager = new MinigamePluginManager();
-		lobby = new GameLobby();
+		lobby = new GameLobby(this);
 		arena = new GameArena(this);
 		gameManager = new GameManager(this);
 

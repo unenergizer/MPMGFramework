@@ -12,8 +12,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
 import com.forgestorm.mgfw.MGFramework;
-
-import net.md_5.bungee.api.ChatColor;
+import com.forgestorm.mgfw.core.constants.Messages;
 
 public class LobbyScoreboard {
 
@@ -46,7 +45,7 @@ public class LobbyScoreboard {
 		
 		//Set the board objective.
 		Objective obj = board.registerNewObjective("sb" + Integer.toString(random), "ct" + Integer.toString(random1));
-		String name = ChatColor.RED + "mc" + ChatColor.GRAY + "." + ChatColor.RED + "ForgeStorm" + ChatColor.GRAY + "." + ChatColor.RED + "com";
+		String name = Messages.SB_LOBBY_TITLE.toString();
 		obj.setDisplayName(name);
 		
 		//Makesure the display slot is the sidebar.
@@ -68,7 +67,11 @@ public class LobbyScoreboard {
 	}
 	
 	public void removePlayer(Player player) {
+		//Remove the player from the HashMap.
 		playerBoards.remove(player);
+		
+		//Give the player a new "blank" scoreboard.
+		player.setScoreboard(manager.getNewScoreboard());
 	}
 	
 }

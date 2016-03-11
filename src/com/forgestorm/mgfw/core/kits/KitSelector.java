@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
@@ -54,12 +55,17 @@ public class KitSelector {
 		
 		//Set player a confirmation message.
 		player.sendMessage("");
-		player.sendMessage(Messages.GAME_BAR_TOP.toString());
+		player.sendMessage(Messages.GAME_BAR_KIT.toString());
 		player.sendMessage("");
-		player.sendMessage(ChatColor.GREEN + "You selected the " + minigameKit.getKitNames().get(kit) + ChatColor.GREEN + " kit!");
+		player.sendMessage(minigameKit.getKitNames().get(kit) + ChatColor.DARK_GRAY + ":");
+		player.sendMessage("");
 		player.sendMessage(ChatColor.BLUE + minigameKit.getKitDescriptions().get(kit));
 		player.sendMessage("");
 		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
+		player.sendMessage("");
+		
+		//Play a confirmation sound.
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
 	}
 
 	/**

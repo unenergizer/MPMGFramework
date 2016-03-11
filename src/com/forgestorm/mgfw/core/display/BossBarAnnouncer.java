@@ -28,11 +28,4 @@ public class BossBarAnnouncer {
 	public void removeBossBar(Player player) {
 		bar.removePlayer(player);
 	}
-	
-	/**
-	 * This will remove the boss bar from all players.
-	 */
-	public void removeAllBossBars() {
-		bar.removeAll();
-	}
 }
