@@ -21,19 +21,15 @@ public class Admin implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
-		if (!(commandSender instanceof Player)) {
-			return false;
-		}
-		
+
 		//Check if the command sender is a server Operator
-		if (!commandSender.isOp()) {
+		if (!commandSender.isOp() && (commandSender instanceof Player)) {
 			commandSender.sendMessage(Messages.COMMAND_ADMIN_NOT_OP.toString());
 			return false;
 		}
 
 		GameManager gameManager = PLUGIN.getGameManager();
 		GameLobby gameLobby = PLUGIN.getGameLobby();
-		Player player = (Player) commandSender;
 
 		if (args.length == 1) {
 			switch (args[0].toLowerCase()) {
@@ -41,37 +37,48 @@ public class Admin implements CommandExecutor {
 				//Messages.USAGE_GAME.send(player);
 				break;
 			case "endgame":
+				//End the game, if the game is actually running.
 				if (gameManager.isMinigameRunning()) {
-					player.sendMessage(Messages.COMMAND_ADMIN_END_GAME.toString());
+					commandSender.sendMessage(Messages.COMMAND_ADMIN_END_GAME.toString());
 					gameManager.endGame(true);
 				} else {
-					player.sendMessage(Messages.COMMAND_ADMIN_END_ERROR.toString());
+					//The game was not running. Send error message.
+					commandSender.sendMessage(Messages.COMMAND_ADMIN_END_ERROR.toString());
 				}
 				break;
 			case "gamesplayed":
-				player.sendMessage(Messages.COMMAND_ADMIN_GAMES_PLAYED.toString().replace("%s", Integer.toString(gameManager.getGamesPlayed())));
+				//Send the number of games played.
+				commandSender.sendMessage(Messages.COMMAND_ADMIN_GAMES_PLAYED.toString().replace("%s", Integer.toString(gameManager.getGamesPlayed())));
 				break;
 			case "pause":
 				//Messages.CREATED_NUKEROOM.send(player);
 				break;
 			default:
-				player.sendMessage(Messages.COMMAND_ADMIN_UNKNOWN.toString());
+				commandSender.sendMessage(Messages.COMMAND_ADMIN_UNKNOWN.toString());
 			}
 		} else if (args.length == 2) {
 			switch (args[0].toLowerCase()) {
 			case "maxplayers":
+				//Set the maximum amount of players allowed in the server.
 				gameManager.setMaxPlayers(Integer.valueOf(args[1]));
+				
+				//Update every players scoreboard.
 				gameLobby.getScoreboard().updateAllPlayerScoreboards();
 				break;
 			case "minplayers":
+				//Set the minimal amount of players to start game.
 				gameManager.setMinPlayers(Integer.valueOf(args[1]));
+				
+				//Update every players scoreboard.
+				gameLobby.getScoreboard().updateAllPlayerScoreboards();
+				
 				//If the game has enough players to start, lets do that now.
 				if (gameManager.shouldMinigameStart() && !gameManager.getGameState().equals(GameState.LOBBY_COUNTDOWN)) {
 					gameManager.startCountdown();
 				}
 				break;
 			default:
-				player.sendMessage(Messages.COMMAND_ADMIN_UNKNOWN.toString());
+				commandSender.sendMessage(Messages.COMMAND_ADMIN_UNKNOWN.toString());
 			}
 		}
 		return false;

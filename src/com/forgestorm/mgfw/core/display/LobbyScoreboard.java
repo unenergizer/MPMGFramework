@@ -95,7 +95,7 @@ public class LobbyScoreboard {
 		objective.getScore(Messages.SB_GAME_STATUS.toString()).setScore(14);
 
 		//Game Status
-		if(gameManager.shouldMinigameStart()) {
+		if(currentPlayers >= gameManager.getMinPlayers()) {
 			objective.getScore(Messages.SB_GAME_STATUS_READY.toString()).setScore(13);
 		} else {
 			if(gameWaitingAnamate == 1) {
