@@ -62,9 +62,7 @@ public class PlayerQuit implements Listener {
 			@Override
 			public void run() {
 				//Update scoreboard for all players
-				for(Player players: Bukkit.getOnlinePlayers()) {
-					gameLobby.getScoreboard().updatePlayerScoreboard(players);
-				}
+				gameLobby.getScoreboard().updateAllPlayerScoreboards();
 			}
 		}.runTaskLater(PLUGIN, 10);
 	}

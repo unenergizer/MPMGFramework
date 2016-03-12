@@ -9,10 +9,24 @@ public enum Messages {
 	ADMIN_NEXT_MAP_LOBBY("Next lobby map: "),
 	
 	//Debug messages
+	BOSS_BAR_MESSAGE("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
+	
+	//Commands
+	COMMAND_ADMIN_NOT_OP("&cYou do not have permission to do this."),
+	COMMAND_ADMIN_UNKNOWN("&cCommand unknown! Use &a/admin help &cfor more information!"),
+	COMMAND_ADMIN_GAMES_PLAYED("&e&lTotal games played: &c%s"),
+	
+	//Game display messages
+	GAME_TAB_HEADRER("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom"),
+	GAME_TAB_FOOTER("&bNews&7, &aForum&7, &eTeamSpeak&7, &dShop &6@ &cwww&7.&cForgeStorm&7.&ccom&b!"),
+	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),
+	GAME_BAR_TEAM("&8&l&m----------------&r&8&l<[ &3&lTeam Select &8&l]>&8&l&m---------------"),
+	GAME_BAR_BOTTOM("&8&l&m---------------------------------------------"),
+	GAME_TIME_REMAINING_PLURAL("&eGame will start in &c%s &eseconds."),
+	GAME_TIME_REMAINING_SINGULAR("&eGame will start in &c1 &esecond."),
 	
 	//Scoreboard
 	SB_LOBBY_TITLE("&cmc&7.&cForgeStorm&7.&ccom"),
-	
 	SB_BLANK_LINE_1("&r"),
 	SB_BLANK_LINE_2("&r&r"),
 	SB_BLANK_LINE_3("&r&r&r"),
@@ -28,30 +42,29 @@ public enum Messages {
 	SB_PLAYER_COUNT("&a%s / %f"),
 	SB_KIT("&lKit:"),
 	SB_TEAM("&lTeam:"),
-	SB_NEXT_GAME("&lNext Game:"),
-	
-	//Game display messages
-	GAME_TAB_HEADRER("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom"),
-	GAME_TAB_FOOTER("&bNews&7, &aForum&7, &eTeamSpeak&7, &dShop &6@ &cwww&7.&cForgeStorm&7.&ccom"),
-	
-	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),
-	GAME_BAR_TEAM("&8&l&m----------------&r&8&l<[ &3&lTeam Select &8&l]>&8&l&m---------------"),
-	GAME_BAR_BOTTOM("&8&l&m---------------------------------------------"),
-	
-	GAME_TIME_REMAINING_PLURAL("&eGame will start in &c%s &eseconds."),
-	GAME_TIME_REMAINING_SINGULAR("&eGame will start in &c1 &esecond.");
-	
+	SB_NEXT_GAME("&lNext Game:");
 	
 	private String message;
-
+	
+	//Constructor
 	Messages(String message) {
 		this.message = color(message);
 	}
-
+	
+	/**
+	 * Sends a string representation of the enumerator item.
+	 */
 	public String toString() {
 		return message;
 	}
 	
+	/**
+	 * Converts special characters in text into Minecraft client color codes.
+	 * <p>
+	 * This will give the messages color.
+	 * @param msg The message that needs to have its color codes converted.
+	 * @return Returns a colored message!
+	 */
 	public static String color(String msg) {
         return ChatColor.translateAlternateColorCodes('&', msg);
     }

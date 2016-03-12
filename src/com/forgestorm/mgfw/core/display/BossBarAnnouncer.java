@@ -7,6 +7,8 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
+import com.forgestorm.mgfw.core.constants.Messages;
+
 public class BossBarAnnouncer {
 	
 	private BossBar bar;
@@ -16,7 +18,7 @@ public class BossBarAnnouncer {
 	 * @param player The player who will receive a boss bar message.
 	 */
 	public void showBossBar(Player player) {
-		bar = Bukkit.createBossBar("THIS IS A TEST MESSAGE", BarColor.RED, BarStyle.SOLID, new BarFlag[] { BarFlag.DARKEN_SKY });
+		bar = Bukkit.createBossBar(Messages.BOSS_BAR_MESSAGE.toString(), BarColor.PURPLE, BarStyle.SOLID, new BarFlag[] { BarFlag.DARKEN_SKY });
 		bar.addPlayer(player);
 		bar.show();
 	}

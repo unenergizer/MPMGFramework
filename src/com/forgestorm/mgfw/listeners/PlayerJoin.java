@@ -2,7 +2,6 @@ package com.forgestorm.mgfw.listeners;
 
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,9 +31,9 @@ public class PlayerJoin implements Listener {
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
 		GameArena gameArena = PLUGIN.getGameArena();
-		GameLobby lobby = PLUGIN.getGameLobby();
-		Location lobbySpawn = lobby.getLobbySpawn();
-		HashMap<Player, PlayerProfile> playerProfile = lobby.getPlayerProfile();
+		GameLobby gameLobby = PLUGIN.getGameLobby();
+		Location lobbySpawn = gameLobby.getLobbySpawn();
+		HashMap<Player, PlayerProfile> playerProfile = gameLobby.getPlayerProfile();
 		GameState gameState = gameManager.getGameState();
 		
 		//Setup lobby player profiles.
@@ -59,12 +58,10 @@ public class PlayerJoin implements Listener {
 			teleport(player, lobbySpawn);
 			
 			//Setup a lobby player.
-			lobby.setupLobbyPlayer(player);
+			gameLobby.setupLobbyPlayer(player);
 			
 			//Update scoreboard for all players
-			for(Player players: Bukkit.getOnlinePlayers()) {
-				lobby.getScoreboard().updatePlayerScoreboard(players);
-			}
+			gameLobby.getScoreboard().updateAllPlayerScoreboards();
 			
 			//If the game has enough players to start, lets do that now.
 			if (gameManager.shouldMinigameStart() && !gameState.equals(GameState.LOBBY_COUNTDOWN)) {

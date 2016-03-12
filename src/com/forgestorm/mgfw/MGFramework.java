@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.forgestorm.mgfw.command.Admin;
 import com.forgestorm.mgfw.core.GameArena;
 import com.forgestorm.mgfw.core.GameLobby;
 import com.forgestorm.mgfw.core.GameManager;
@@ -35,6 +36,9 @@ public class MGFramework extends JavaPlugin {
 
 		//Register Event listeners
 		registerListeners();
+		
+		//Register commands
+		getCommand("admin").setExecutor(new Admin(this));
 	}
 
 	@Override 

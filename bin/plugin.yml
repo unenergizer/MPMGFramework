@@ -6,3 +6,4 @@ author: Robert Andrew Brown
 website: http://www.forgestorm.com/
 depend: [TitleManager]
 commands:
+  admin:

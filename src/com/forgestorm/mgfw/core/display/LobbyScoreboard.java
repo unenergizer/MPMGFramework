@@ -54,6 +54,7 @@ public class LobbyScoreboard {
 		//Set the board objective.
 		Objective objective = board.registerNewObjective("test", "dummy");
 
+		//Set the board title.
 		String name = Messages.SB_LOBBY_TITLE.toString();
 		objective.setDisplayName(name);
 
@@ -79,10 +80,10 @@ public class LobbyScoreboard {
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 		MinigameKits minigameKit = mpm.getMinigameKit();
 		MinigameTeams minigameTeam = mpm.getMinigameTeams();
-		
+
 		int currentPlayers = Bukkit.getOnlinePlayers().size();
 		int maxPlayers = gameManager.getMAX_PLAYERS();
-		
+
 		String kit = minigameKit.getKitNames().get(gameManager.getKitSelector().getPlayerKit(player));
 		String team = minigameTeam.getTeamNames().get(gameManager.getTeamSelector().getPlayerTeam(player));
 		String gameName = mpm.getMinigameBase().getMinigameName();
@@ -92,7 +93,7 @@ public class LobbyScoreboard {
 
 		//Games Stats
 		objective.getScore(Messages.SB_GAME_STATUS.toString()).setScore(14);
-		
+
 		//Game Status
 		if(gameManager.shouldMinigameStart()) {
 			objective.getScore(Messages.SB_GAME_STATUS_READY.toString()).setScore(13);
@@ -124,29 +125,29 @@ public class LobbyScoreboard {
 
 		//Kit
 		objective.getScore(Messages.SB_KIT.toString()).setScore(8);
-		
+
 		//Player Kit
 		objective.getScore(trimString(kit)).setScore(7);
 
 		//Blank line 4
 		objective.getScore(Messages.SB_BLANK_LINE_4.toString()).setScore(6);
-	
+
 		//Team
 		objective.getScore(Messages.SB_TEAM.toString()).setScore(5);
-		
+
 		//Player Team
 		objective.getScore(trimString(team)).setScore(4);
 
 		//Blank line 5
 		objective.getScore(Messages.SB_BLANK_LINE_5.toString()).setScore(3);
-		
+
 		//Next game:
 		objective.getScore(Messages.SB_NEXT_GAME.toString()).setScore(2);
-		
+
 		//Next game name.
 		objective.getScore(ChatColor.AQUA + trimString(gameName)).setScore(1);
 	}
-	
+
 	/**
 	 * This will make sure a string is not longer than 14 characters.
 	 * If it is, we will shorten the string.
@@ -154,9 +155,16 @@ public class LobbyScoreboard {
 	 * @return The trimmed string.
 	 */
 	public String trimString(String input) {
-		int ammountOver = input.length() - 14;
-		String newString = input.substring(0, input.length() - ammountOver - 2) + "..";
-		return newString;
+
+		//Check to see if the input lengity is greater than 14 characters.
+		if (input.length() >= 14) {
+			int ammountOver = input.length() - 14;
+			String newString = input.substring(0, input.length() - ammountOver - 2) + "..";
+			return newString;
+		} else {
+			//The input is less than 15 characters so it does not need to be trimmed.
+			return input;
+		}
 	}
 
 	/**
@@ -189,7 +197,16 @@ public class LobbyScoreboard {
 		//Give the player a new "blank" scoreboard.
 		player.setScoreboard(manager.getNewScoreboard());
 	}
-	
+
+	/**
+	 * Removes all player scoreboards.
+	 */
+	public void removeAllPlayers() {
+		for(Player players: Bukkit.getOnlinePlayers()) {
+			removePlayer(players);
+		}
+	}
+
 	/**
 	 * Update a players scoreboard.
 	 * @param player The player scoreboard we will update.
@@ -197,6 +214,15 @@ public class LobbyScoreboard {
 	public void updatePlayerScoreboard(Player player) {
 		removePlayer(player);
 		addPlayer(player);
+	}
+
+	/**
+	 * Update all players scoreboard.
+	 */
+	public void updateAllPlayerScoreboards() {
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			updatePlayerScoreboard(players);
+		}
 	}
 
 	/**

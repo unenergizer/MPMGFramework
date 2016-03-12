@@ -16,8 +16,6 @@ import com.forgestorm.mgfw.core.teams.TeamSelector;
 public class GameManager {
 
 	private final MGFramework PLUGIN;
-	private final int MIN_PLAYERS = 2;
-	private final int MAX_PLAYERS = 16;
 	private final GameArena GAME_ARENA;
 	private final GameLobby GAME_LOBBY;
 	private final KitSelector KIT_SELECTOR;
@@ -26,6 +24,8 @@ public class GameManager {
 	private GameState gameState;
 	private TipAnnouncer tips;
 	private int gamesPlayed;
+	private int minPlayers = 2;
+	private int maxPlayers = 16;
 
 	public GameManager(MGFramework plugin) {
 		PLUGIN = plugin;
@@ -247,7 +247,7 @@ public class GameManager {
 	 * @return True if the minimal amount of players exist.
 	 */
 	public boolean isMinimumPlayersMet() {
-		return (Bukkit.getOnlinePlayers().size() >= MIN_PLAYERS);
+		return (Bukkit.getOnlinePlayers().size() >= minPlayers);
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class GameManager {
 	 * @return Retuns the maximum number of players the game arcade can hold.
 	 */
 	public int getMAX_PLAYERS() {
-		return MAX_PLAYERS;
+		return maxPlayers;
 	}
 	
 	/**
@@ -328,5 +328,21 @@ public class GameManager {
 
 	public void setGamesPlayed(int gamesPlayed) {
 		this.gamesPlayed = gamesPlayed;
+	}
+
+	public int getMinPlayers() {
+		return minPlayers;
+	}
+
+	public void setMinPlayers(int minPlayers) {
+		this.minPlayers = minPlayers;
+	}
+
+	public int getMaxPlayers() {
+		return maxPlayers;
+	}
+
+	public void setMaxPlayers(int maxPlayers) {
+		this.maxPlayers = maxPlayers;
 	}
 }
