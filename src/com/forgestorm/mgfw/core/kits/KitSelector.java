@@ -66,6 +66,9 @@ public class KitSelector {
 		
 		//Play a confirmation sound.
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
+		
+		//Update the lobby scoreboard.
+		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
 	}
 
 	/**

@@ -2,6 +2,7 @@ package com.forgestorm.mgfw.listeners;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,8 +45,10 @@ public class PlayerJoin implements Listener {
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {
 			
-			//Set the player as a spectator.
 			playerProfile.get(player).setSpectator(true);
+			
+			//Setup the player as a spectator.
+			gameArena.setupSpectator(player);
 			
 			//Teleport the player to a spectator spawn in the game world.
 			//TODO: Get a real spectator spawn point from the minigame plugin.
@@ -57,6 +60,11 @@ public class PlayerJoin implements Listener {
 			
 			//Setup a lobby player.
 			lobby.setupLobbyPlayer(player);
+			
+			//Update scoreboard for all players
+			for(Player players: Bukkit.getOnlinePlayers()) {
+				lobby.getScoreboard().updatePlayerScoreboard(players);
+			}
 			
 			//If the game has enough players to start, lets do that now.
 			if (gameManager.shouldMinigameStart() && !gameState.equals(GameState.LOBBY_COUNTDOWN)) {

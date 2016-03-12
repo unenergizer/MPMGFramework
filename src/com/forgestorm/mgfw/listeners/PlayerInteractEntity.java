@@ -34,6 +34,7 @@ public class PlayerInteractEntity implements Listener {
 			if (uuid.equals(kitUUID.get(i))) {
 				//Toggle interact
 				kitSelector.kitInteract(player, i);
+				event.setCancelled(true);
 			}
 		}
 		
@@ -41,6 +42,7 @@ public class PlayerInteractEntity implements Listener {
 			if (uuid.equals(teamUUID.get(i))) {
 				//Toggle interact
 				teamSelector.teamInteract(player, i);
+				event.setCancelled(true);
 			}
 		}
 	}

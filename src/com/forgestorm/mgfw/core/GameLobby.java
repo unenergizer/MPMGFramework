@@ -3,6 +3,7 @@ package com.forgestorm.mgfw.core;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -21,9 +22,9 @@ public class GameLobby {
 	private final MGFramework PLUGIN;
 	private final String LOBBY_WORLD_NAME;
 	private final Location LOBBY_SPAWN;
-	
+
 	private HashMap<Player, PlayerProfile> playerProfile;
-	private BossBarAnnouncer bar;
+	private HashMap<Player, BossBarAnnouncer> bar;
 	private LobbyScoreboard scoreboard;
 
 	public GameLobby(MGFramework plugin) {
@@ -32,7 +33,7 @@ public class GameLobby {
 		LOBBY_SPAWN = new Location(Bukkit.getWorld(LOBBY_WORLD_NAME), 0.5, 76, 0.5);
 		
 		playerProfile = new HashMap<Player, PlayerProfile>();
-		bar = new BossBarAnnouncer();
+		bar = new HashMap<Player, BossBarAnnouncer>();
 		scoreboard = new LobbyScoreboard(PLUGIN);
 	}
 	
@@ -57,6 +58,24 @@ public class GameLobby {
 		
 		//Heal the player
 		player.setHealth(20);
+		player.setFoodLevel(20);
+		
+		//Clear a players inventory
+		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
+		
+		//Set gamemode.
+		player.setGameMode(GameMode.ADVENTURE);
+		
+		//Give the player flying.
+		player.setAllowFlight(false);
+		player.setFlying(false);
+		
+		//Set collide entities false.
+		player.spigot().setCollidesWithEntities(true);
 
 		//Setup lobby player profiles (for server reloads).
 		if (!playerProfile.containsKey(player)) {
@@ -69,8 +88,12 @@ public class GameLobby {
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
 
-		//Show the boss bar.
-		bar.showBossBar(player);
+		//Give the player a boss bar if they dont have one.
+		if(!bar.containsKey(player)) {
+			bar.put(player, new BossBarAnnouncer());
+		}
+		//Send the player the boss bar.
+		bar.get(player).showBossBar(player);
 		
 		//Send Tab Menu text
 		TabMenuText tmt = new TabMenuText();
@@ -87,7 +110,7 @@ public class GameLobby {
 	
 	public void removeLobbyPlayer(Player player) {
 		//Remove boss bars from the player.
-		bar.removeBossBar(player);
+		bar.get(player).removeBossBar(player);
 		
 		//Remove the lobby scoreboard.
 		scoreboard.removePlayer(player);
@@ -148,5 +171,9 @@ public class GameLobby {
 
 	public HashMap<Player, PlayerProfile> getPlayerProfile() {
 		return playerProfile;
+	}
+
+	public LobbyScoreboard getScoreboard() {
+		return scoreboard;
 	}
 }

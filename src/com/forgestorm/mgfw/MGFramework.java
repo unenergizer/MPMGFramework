@@ -12,6 +12,7 @@ import com.forgestorm.mgfw.listeners.EntityCombust;
 import com.forgestorm.mgfw.listeners.EntityDamage;
 import com.forgestorm.mgfw.listeners.EntityDamageByEntity;
 import com.forgestorm.mgfw.listeners.EntityTargetLivingEntity;
+import com.forgestorm.mgfw.listeners.FoodLevelChange;
 import com.forgestorm.mgfw.listeners.PlayerInteractEntity;
 import com.forgestorm.mgfw.listeners.PlayerJoin;
 import com.forgestorm.mgfw.listeners.PlayerQuit;
@@ -51,6 +52,7 @@ public class MGFramework extends JavaPlugin {
 		pm.registerEvents(new EntityDamage(this), this);
 		pm.registerEvents(new EntityDamageByEntity(this), this);
 		pm.registerEvents(new EntityTargetLivingEntity(this), this);
+		pm.registerEvents(new FoodLevelChange(this), this);
 		pm.registerEvents(new PlayerInteractEntity(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);

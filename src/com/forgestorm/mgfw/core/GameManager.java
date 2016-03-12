@@ -16,7 +16,7 @@ import com.forgestorm.mgfw.core.teams.TeamSelector;
 public class GameManager {
 
 	private final MGFramework PLUGIN;
-	private final int MIN_PLAYERS = 1;
+	private final int MIN_PLAYERS = 2;
 	private final int MAX_PLAYERS = 16;
 	private final GameArena GAME_ARENA;
 	private final GameLobby GAME_LOBBY;

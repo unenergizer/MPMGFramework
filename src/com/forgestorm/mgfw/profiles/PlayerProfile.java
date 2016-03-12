@@ -8,7 +8,6 @@ public class PlayerProfile {
 	
 	private UUID uuid;
 	private String name;
-	
 	private boolean isSpectator;
 	
 	public PlayerProfile(Player player) {

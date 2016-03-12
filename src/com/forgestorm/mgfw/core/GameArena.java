@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -19,7 +20,34 @@ public class GameArena {
 		PLUGIN = plugin;
 		worldDupe = new WorldDuplicator();
 	}
-
+	
+	/**
+	 * This will setup a spectator for a player.
+	 * @param player The player that will be setup as a spectator.
+	 */
+	public void setupSpectator(Player player) {
+		//Heal the player
+		player.setHealth(20);
+		player.setFoodLevel(20);
+		
+		//Clear a players inventory
+		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
+		
+		//Switch Gamemode
+		player.setGameMode(GameMode.ADVENTURE);
+		
+		//Give the player flying.
+		player.setAllowFlight(true);
+		player.setFlying(true);
+		
+		//Set collide entities false.
+		player.spigot().setCollidesWithEntities(false);
+	}
+	
 	/**
 	 * Loads the needed assets from the minigame plugin.
 	 */

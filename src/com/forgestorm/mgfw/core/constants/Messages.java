@@ -19,6 +19,16 @@ public enum Messages {
 	SB_BLANK_LINE_4("&r&r&r&r"),
 	SB_BLANK_LINE_5("&r&r&r&r&r"),
 	SB_BLANK_LINE_6("&r&r&r&r&r&r"),
+	SB_GAME_STATUS("&lGame Status:"),
+	SB_GAME_STATUS_WAITING_1("&eNeed players"),
+	SB_GAME_STATUS_WAITING_2("&eNeed players."),
+	SB_GAME_STATUS_WAITING_3("&eNeed players.."),
+	SB_GAME_STATUS_READY("&aGame ready!"),
+	SB_PLAYERS("&lPlayers:"),
+	SB_PLAYER_COUNT("&a%s / %f"),
+	SB_KIT("&lKit:"),
+	SB_TEAM("&lTeam:"),
+	SB_NEXT_GAME("&lNext Game:"),
 	
 	//Game display messages
 	GAME_TAB_HEADRER("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom"),
