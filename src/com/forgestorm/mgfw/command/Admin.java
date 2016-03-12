@@ -40,6 +40,14 @@ public class Admin implements CommandExecutor {
 			case "help":
 				//Messages.USAGE_GAME.send(player);
 				break;
+			case "endgame":
+				if (gameManager.isMinigameRunning()) {
+					player.sendMessage(Messages.COMMAND_ADMIN_END_GAME.toString());
+					gameManager.endGame(true);
+				} else {
+					player.sendMessage(Messages.COMMAND_ADMIN_END_ERROR.toString());
+				}
+				break;
 			case "gamesplayed":
 				player.sendMessage(Messages.COMMAND_ADMIN_GAMES_PLAYED.toString().replace("%s", Integer.toString(gameManager.getGamesPlayed())));
 				break;

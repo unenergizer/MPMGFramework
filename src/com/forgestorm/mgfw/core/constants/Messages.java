@@ -15,10 +15,12 @@ public enum Messages {
 	COMMAND_ADMIN_NOT_OP("&cYou do not have permission to do this."),
 	COMMAND_ADMIN_UNKNOWN("&cCommand unknown! Use &a/admin help &cfor more information!"),
 	COMMAND_ADMIN_GAMES_PLAYED("&e&lTotal games played: &c%s"),
+	COMMAND_ADMIN_END_GAME("&c&lThe game has just been shut down. Returning to game lobby."),
+	COMMAND_ADMIN_END_ERROR("&c&lYou can not end a game if the game is not running."),
 	
 	//Game display messages
-	GAME_TAB_HEADRER("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom"),
-	GAME_TAB_FOOTER("&bNews&7, &aForum&7, &eTeamSpeak&7, &dShop &6@ &cwww&7.&cForgeStorm&7.&ccom&b!"),
+	GAME_TAB_HEADRER("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
+	GAME_TAB_FOOTER("&bNews&7, &aForum&7, &eTeamSpeak&7, &dShop &6@ &cwww&7.&cForgeStorm&7.&ccom"),
 	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),
 	GAME_BAR_TEAM("&8&l&m----------------&r&8&l<[ &3&lTeam Select &8&l]>&8&l&m---------------"),
 	GAME_BAR_BOTTOM("&8&l&m---------------------------------------------"),
