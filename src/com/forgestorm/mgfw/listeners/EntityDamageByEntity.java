@@ -73,7 +73,7 @@ public class EntityDamageByEntity implements Listener {
 					event.setCancelled(true);
 					
 					//Toggle interact
-					teamSelector.teamInteract(player, i);
+					teamSelector.teamInteract(i, player);
 				}
 			}
 		}

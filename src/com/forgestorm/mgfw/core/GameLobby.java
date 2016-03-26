@@ -15,6 +15,7 @@ import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.LobbyScoreboard;
 import com.forgestorm.mgfw.core.display.TabMenuText;
+import com.forgestorm.mgfw.core.teams.TeamSelector;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class GameLobby {
@@ -53,8 +54,15 @@ public class GameLobby {
 	 * @param player The player to setup in the lobby.
 	 */
 	public void setupLobbyPlayer(Player player) {
+		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
+		
 		//Get all players and teleport them to the lobby world.	
 		tpToLobbySpawn(player);
+		
+		//TODO: Do proper team assignment.  Assigning the player to a team.
+		if (teamSelector.getPlayerTeam(player) == null) {
+			teamSelector.setPlayerTeam(0, player);
+		}
 		
 		//Heal the player
 		player.setHealth(20);

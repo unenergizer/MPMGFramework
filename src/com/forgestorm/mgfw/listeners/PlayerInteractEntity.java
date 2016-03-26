@@ -41,7 +41,7 @@ public class PlayerInteractEntity implements Listener {
 		for(int i = 0; i < teamUUID.size(); i++) {
 			if (uuid.equals(teamUUID.get(i))) {
 				//Toggle interact
-				teamSelector.teamInteract(player, i);
+				teamSelector.teamInteract(i, player);
 				event.setCancelled(true);
 			}
 		}

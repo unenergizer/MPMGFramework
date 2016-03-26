@@ -9,16 +9,17 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
+import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
 
 public class GameArena {
 
 	private final MGFramework PLUGIN;
-	private final WorldDuplicator worldDupe;
+	private final WorldDuplicator WORLD_DUPE;
 
 	public GameArena(MGFramework plugin) {
 		PLUGIN = plugin;
-		worldDupe = new WorldDuplicator();
+		WORLD_DUPE = new WorldDuplicator();
 	}
 	
 	/**
@@ -58,10 +59,10 @@ public class GameArena {
 		File destinationFolder = new File(wc + File.separator + name);
 		File backupFolder = new File(wc + File.separator + "worlds" + File.separator + name.concat("_backup"));
 
-		if (worldDupe.getWorld() == null) {
+		if (WORLD_DUPE.getWorld() == null) {
 			//Copy the backup world folder.
 			try {
-				worldDupe.copyFolder(backupFolder, destinationFolder);
+				WORLD_DUPE.copyFolder(backupFolder, destinationFolder);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -70,10 +71,10 @@ public class GameArena {
 			Bukkit.getServer().getLogger().info("[MPMG-Framework] Copied world: " + name);
 
 			//Load the map into memory
-			worldDupe.loadWorld(name);
+			WORLD_DUPE.loadWorld(name);
 
 			//Cleanup any map entities.
-			worldDupe.clearEntities();
+			WORLD_DUPE.clearEntities();
 		} else {
 			Bukkit.getServer().getLogger().info("[MPMG-Framework] World var not null? We will not load the next world.");
 		}
@@ -88,11 +89,11 @@ public class GameArena {
 		File destinationFolder = new File(wc + File.separator + name);
 
 		//Unload the current game map from memory.
-		worldDupe.unloadWorld();
+		WORLD_DUPE.unloadWorld();
 
 		//Delete the world folder.
 		try {
-			worldDupe.deleteFolder(destinationFolder);
+			WORLD_DUPE.deleteFolder(destinationFolder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -102,10 +103,8 @@ public class GameArena {
 	 * Teleport all players in the server to the game world.
 	 */
 	public void tpAllToGameWorld() {
-		for(Player players: Bukkit.getOnlinePlayers()) {
-			//TODO: Get spawn cords from minigame plugin.
-			tpToGameWorld(players, 0, 90, 0);
-		}
+		PlayerSpawner spawner = new PlayerSpawner(PLUGIN);
+		spawner.spawnPlayers(PLUGIN.getGameManager().getTeamSelector().getSortedTeams());
 	}
 	
 	/**
@@ -115,7 +114,7 @@ public class GameArena {
 	 */
 	public void tpToGameWorld(Player player, double x, double y, double z) {
 		//Teleport to game world
-		player.teleport(new Location(worldDupe.getWorld(), x, y, z));
+		player.teleport(new Location(WORLD_DUPE.getWorld(), x, y, z));
 	}
 
 	/**
@@ -124,6 +123,6 @@ public class GameArena {
 	 * @return An instance of the world duplicator.
 	 */
 	public WorldDuplicator getWorldDupe() {
-		return worldDupe;
+		return WORLD_DUPE;
 	}
 }

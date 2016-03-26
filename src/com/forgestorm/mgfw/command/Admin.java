@@ -30,7 +30,7 @@ public class Admin implements CommandExecutor {
 
 		GameManager gameManager = PLUGIN.getGameManager();
 		GameLobby gameLobby = PLUGIN.getGameLobby();
-
+		
 		if (args.length == 1) {
 			switch (args[0].toLowerCase()) {
 			case "help":

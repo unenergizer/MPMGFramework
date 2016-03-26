@@ -82,7 +82,7 @@ public class LobbyScoreboard {
 		MinigameTeams minigameTeam = mpm.getMinigameTeams();
 
 		int currentPlayers = Bukkit.getOnlinePlayers().size();
-		int maxPlayers = gameManager.getMAX_PLAYERS();
+		int maxPlayers = gameManager.getMaxPlayers();
 
 		String kit = minigameKit.getKitNames().get(gameManager.getKitSelector().getPlayerKit(player));
 		String team = minigameTeam.getTeamNames().get(gameManager.getTeamSelector().getPlayerTeam(player));
@@ -157,7 +157,7 @@ public class LobbyScoreboard {
 	public String trimString(String input) {
 
 		//Check to see if the input lengity is greater than 14 characters.
-		if (input.length() >= 14) {
+		if (input.length() > 14) {
 			int ammountOver = input.length() - 14;
 			String newString = input.substring(0, input.length() - ammountOver - 2) + "..";
 			return newString;

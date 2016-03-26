@@ -34,7 +34,7 @@ public class GameManager {
 		KIT_SELECTOR = new KitSelector(PLUGIN);
 		TEAM_SELECTOR = new TeamSelector(PLUGIN);
 		tips = new TipAnnouncer(PLUGIN);
-
+		
 		//On first load, lets begin with setting up the game.
 		setupGame();
 	}
@@ -74,6 +74,7 @@ public class GameManager {
 
 		//Setup lobby teams.
 		TEAM_SELECTOR.spawnTeams();
+		TEAM_SELECTOR.assignAllPlayerTeams();
 		
 		//Setup all the players currently in the lobby.
 		GAME_LOBBY.setupAllLobbyPlayers();
@@ -280,15 +281,6 @@ public class GameManager {
 			return false;
 		}
 	}
-
-	/**
-	 * Gets the maximum number of players this game arcade can support.
-	 * 
-	 * @return Retuns the maximum number of players the game arcade can hold.
-	 */
-	public int getMAX_PLAYERS() {
-		return maxPlayers;
-	}
 	
 	/**
 	 * Gets an instance of the KitSelector class.
@@ -338,6 +330,11 @@ public class GameManager {
 		this.minPlayers = minPlayers;
 	}
 
+	/**
+	 * Gets the maximum number of players this game arcade can support.
+	 * 
+	 * @return Retuns the maximum number of players the game arcade can hold.
+	 */
 	public int getMaxPlayers() {
 		return maxPlayers;
 	}

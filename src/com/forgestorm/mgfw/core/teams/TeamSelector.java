@@ -2,8 +2,14 @@ package com.forgestorm.mgfw.core.teams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,28 +36,192 @@ public class TeamSelector {
 	private PlatformBuilder platformSpawner;
 	private Spawner entitySpawner;
 	private EntityFreezer entityFreezer;
-	private HashMap<UUID, Integer> playerTeam;
+	private ConcurrentMap<Integer, ArrayList<Player>> sortedTeams;
+	private ConcurrentMap<Integer, Queue<Player>> queuedPlayers;
 	private HashMap<UUID, Location> teamLocations;
 	private ArrayList<UUID> teamEntityUUID;
 
 	public TeamSelector(MGFramework plugin) {
 		PLUGIN = plugin;
 		platformSpawner = new PlatformBuilder();
-		playerTeam = new HashMap<UUID, Integer>();
+		sortedTeams = new ConcurrentHashMap<Integer, ArrayList<Player>>(); //<Team, Player>
+		queuedPlayers = new ConcurrentHashMap<Integer, Queue<Player>>(); //<Team, Queued Player>
 		teamLocations = new HashMap<UUID, Location>();
 		teamEntityUUID = new ArrayList<UUID>();
+	}
+
+	public void assignAllPlayerTeams() {
+		if (Bukkit.getOnlinePlayers().size() > 0) {
+			int maxTeamSize = getMaxTeamSize();
+			int peopleSorted = 0;
+			ArrayList<Player> bukkitPlayers = new ArrayList<Player>();
+
+			//TODO: Remove this hack.
+			for (Player players: Bukkit.getOnlinePlayers()) {
+				bukkitPlayers.add(players);
+			}
+
+			//Loop through the teams.
+			for (int i = 0; i < getNumberOfTeams(); i++) {
+
+				//Add players to a team.
+				for(int j = 0; j < maxTeamSize; j++) {
+
+					int currentTeam = i;
+
+					if (peopleSorted < Bukkit.getOnlinePlayers().size()) {
+						Player currentPerson = bukkitPlayers.get(peopleSorted);
+
+						setPlayerTeam(currentTeam, currentPerson);
+						peopleSorted++;
+					}
+				}
+			}
+		}
+	}
+
+	private int getNumberOfTeams() {
+		return PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames().size();
+	}
+
+	/**
+	 * Gets the maximum size a of players a team can hold.
+	 * @return Return the size a team can hold.
+	 */
+	private int getMaxTeamSize() { return PLUGIN.getGameManager().getMaxPlayers() / getNumberOfTeams(); }	
+
+	/**
+	 * This will try and swap queued players teams if swapping is possible.
+	 */
+	public void swapTeamMembers() {
+
+		//Lets loop through all the teams.
+		for (int i = 0; i < getNumberOfTeams(); i++) {
+			int currentTeam = i;
+			ArrayList<Player> currentTeamPlayers = sortedTeams.get(currentTeam);
+
+			//See if any players are queued for this team.
+			//If none want to join this team, then their is no need to continue.
+			if (queuedPlayers.get(currentTeam) != null && !queuedPlayers.get(currentTeam).isEmpty()) {
+				Player firstQueuedPlayerForCurrentTeam = queuedPlayers.get(currentTeam).peek();
+
+				//Loop through the players
+				for (int j = 0; j < currentTeamPlayers.size(); j++) {
+
+					Player player = currentTeamPlayers.get(j);
+
+					//Loop through the HashMap of queues and lets
+					for (Entry<Integer, Queue<Player>> entry : queuedPlayers.entrySet()) {
+						int newTeam = entry.getKey();
+
+						//Make sure the team we are looking at is not the same as the current team we are working with.
+						if (newTeam != currentTeam) {
+
+							//If the player is the first queued on another team, then we can make a swap.
+							if (queuedPlayers.get(newTeam).peek() != null && queuedPlayers.get(newTeam).peek().equals(player)) {
+
+								//Lets begin making the swap.
+								//Remove players from current teams.
+								removeSortedPlayer(firstQueuedPlayerForCurrentTeam);
+								removeSortedPlayer(player);
+
+								//Remove players from queue.
+								queuedPlayers.get(currentTeam).poll();
+								queuedPlayers.get(newTeam).poll();
+
+								//Add player to the other team.
+								setPlayerTeam(currentTeam, firstQueuedPlayerForCurrentTeam);
+								setPlayerTeam(newTeam, player);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update queued status on certain events (player join, player quit, player change team.
+	 */
+	public void updateQueuePositions() {
+
+		//Loop through every team and update it.
+		for (int i = 0; i < getNumberOfTeams(); i++) {
+			int currentTeam = i;
+			int playersNeeded = getMaxTeamSize() - sortedTeams.get(currentTeam).size();
+
+			//If the team needs players, see if a player can be added from queue.
+			if (playersNeeded > 0) {
+
+				//This team could use a player. Lets see if a player exist in the queue.
+				if (queuedPlayers.get(currentTeam) != null && !queuedPlayers.get(currentTeam).isEmpty()) {
+
+					//Queued players exists, now lets loop through them and add them to the sorted team.
+					for (int j = 0; j < playersNeeded; j++) {
+						Player player = queuedPlayers.get(currentTeam).poll();
+
+
+						//TODO: WARNING: here do isPlayerOnline check to make sure we are 
+						//not adding a player to a team if they quit the game!
+
+						//Remove player from current team.
+						removeSortedPlayer(player);
+
+						//Add player to the new team.
+						setPlayerTeam(currentTeam, player);
+
+						System.out.println("Player: " + player + " -> Team: " + currentTeam);
+					}
+				}
+			}
+		}
+
+		//Test to see if players can swap teams.
+		swapTeamMembers();
+	}
+
+	/**
+	 * Changes a players team from the current one to another.
+	 * @param futureTeam The team the player wants to switch to.
+	 * @param player The player who is trying to switch teams.
+	 */
+	public void changePlayerTeam(int futureTeam, Player player) {
+
+		//If the player is already on the "futureTeam" then don't let them change their team.
+		if (getPlayerTeam(player) != futureTeam) {
+			int maxTeamSize = getMaxTeamSize();
+			int currentTeamSize = sortedTeams.get(futureTeam).size();
+			
+			//If the team has room, place the player in that team.
+			if (currentTeamSize < maxTeamSize) {
+				//Remove them from current team.
+				removeSortedPlayer(player);
+
+				//Put them in the future team.
+				setPlayerTeam(futureTeam, player);
+
+			} else {
+				if (queuedPlayers.get(futureTeam) != null && queuedPlayers.get(futureTeam).contains(player)) {
+					//Their was no room. Put the player in a queue.
+					addQueuedPlayer(futureTeam, player);
+
+					player.sendMessage(ChatColor.YELLOW + "You were placed in a queue to join this team.");
+
+				} else {
+					player.sendMessage(ChatColor.RED + "You are already queued for this team!");
+				}
+			}
+		} else {
+			player.sendMessage(ChatColor.YELLOW + "You are already on this team.");
+		}
 	}
 
 	/**
 	 * Called when a player interacts with a team.
 	 * @param name The NPC the player interacted with. 
 	 */
-	public void teamInteract(Player player, int team) {
+	public void teamInteract(int team, Player player) {
 		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
-		UUID uuid = player.getUniqueId();
-
-		//Set the the players team.
-		playerTeam.put(uuid, team);
 
 		//Set player a confirmation message.
 		player.sendMessage("");
@@ -67,6 +237,9 @@ public class TeamSelector {
 		//Play a confirmation sound.
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
 		
+		//Set the the players team.
+		changePlayerTeam(team, player);
+
 		//Update the lobby scoreboard.
 		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
 	}
@@ -82,7 +255,7 @@ public class TeamSelector {
 
 		//TODO: Spawn NPC
 
-		//Spawn a bukteam/spigot entity.
+		//Spawn a bukkit/spigot entity.
 		entitySpawner = new EntitySpawner(this);
 		entitySpawner.setEntities(team.getTeamPlatformLocations(), team.getTeamNames(), team.getEntityTypes());
 
@@ -109,6 +282,10 @@ public class TeamSelector {
 		//Stop entity freezing.
 		entityFreezer.setTpEntity(false);
 		setEntityFreezer(null);
+
+		//Remove HashMap players.
+		sortedTeams.clear();
+		queuedPlayers.clear();
 	}
 
 	public EntityFreezer getEntityFreezer() {
@@ -119,20 +296,45 @@ public class TeamSelector {
 		this.entityFreezer = entityFreezer;
 	}
 
-	/**
-	 * Gets the team the player has.
-	 * @param player The player with a team.
-	 * @return A players team. If null, return the first team.
-	 */
-	public int getPlayerTeam(Player player) {
-		UUID uuid = player.getUniqueId();
 
-		if (playerTeam.containsKey(uuid)) {
-			return playerTeam.get(uuid);
-		} else {
-			//Return first team.
-			return 0;
+	/**
+	 * Adds a player to a team queue.
+	 * @param futureTeam The team the player wants to join.
+	 * @param player The player who is trying to change teams.
+	 */
+	public void addQueuedPlayer(int futureTeam, Player player) {
+		Queue<Player> currentQueue = queuedPlayers.get(futureTeam);
+		if (currentQueue == null)  {
+			currentQueue = new LinkedList<Player>();
+			queuedPlayers.put(futureTeam, currentQueue);
 		}
+		currentQueue.add(player);
+	}
+
+	/**
+	 * Gets the team the player is currently on.
+	 * @param player The player who we will find a team for.
+	 * @return The name of the team the player is on.
+	 */
+	public Integer getPlayerTeam(Player player) {
+		for (Entry<Integer, ArrayList<Player>> entry : sortedTeams.entrySet()) {
+			int team = entry.getKey();
+
+			//System.out.println("Finding team: " + team);
+
+			ArrayList<Player> currentPlayers = sortedTeams.get(team);
+
+			for (int i = 0; i < currentPlayers.size(); i++) {
+
+				//System.out.println("Finding player: " + currentPlayers.get(i));
+
+				if (currentPlayers.get(i).equals(player)) {
+					return team;
+				}
+			}
+		}
+		//No team was found?
+		return null;
 	}
 
 	/**
@@ -140,8 +342,28 @@ public class TeamSelector {
 	 * @param player The player who needs a team.
 	 * @param team The team the player has selected.
 	 */
-	public void setPlayerTeam(Player player, int team) {
-		playerTeam.put(player.getUniqueId(), team);
+	public void setPlayerTeam(int team, Player player) {
+		ArrayList<Player> currentValue = sortedTeams.get(team);
+		if (currentValue == null) {
+			currentValue = new ArrayList<Player>();
+			sortedTeams.put(team, currentValue);
+		}
+		currentValue.add(player);
+	}
+
+	/**
+	 * Removes a player from the sortedTeams HashMap array.
+	 * @param player The player that will be removed.
+	 */
+	public void removeSortedPlayer(Player player) {
+		ArrayList<Player> currentPlayers = sortedTeams.get(getPlayerTeam(player));
+
+		for (int i = 0; i < currentPlayers.size(); i++) {
+			if (currentPlayers.get(i).equals(player)) {
+				currentPlayers.remove(i);
+				break;
+			}
+		}
 	}
 
 	public HashMap<UUID, Location> getTeamLocations() {
@@ -154,5 +376,9 @@ public class TeamSelector {
 	 */
 	public ArrayList<UUID> getTeamEntityUUID() {
 		return teamEntityUUID;
+	}
+
+	public ConcurrentMap<Integer, ArrayList<Player>> getSortedTeams() {
+		return sortedTeams;
 	}
 }
