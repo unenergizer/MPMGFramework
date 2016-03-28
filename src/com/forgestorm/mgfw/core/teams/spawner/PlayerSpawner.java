@@ -19,13 +19,16 @@ public class PlayerSpawner {
 		PLUGIN = plugin;
 	}
 	
+	/**
+	 * Spawns players in the arena world map at specified spawning locations.
+	 * @param concurrentMap The sorted map of teams and players to spawn.
+	 * @return Returns a HashMap that specifically ties a player to a spawn location. Used to preventing player movement during game rules countdown.
+	 */
 	public HashMap<Player, Location> spawnPlayers(ConcurrentMap<Integer, ArrayList<Player>> concurrentMap) {
 		MinigameTeams instance = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 		ArrayList<ArrayList<Location>> playerTeamSpawnLocations = instance.getPlayerTeamSpawnLocations();
 		HashMap<Player, Location> playerSpawns = new HashMap<Player, Location>();
 		int playersTeleported = 0;
-		
-		//Bukkit.broadcastMessage(ChatColor.RED + concurrentMap.toString());
 		
 		//Loop through the multidimensional array.
 		for (int team = 0; team < playerTeamSpawnLocations.size(); team++) {

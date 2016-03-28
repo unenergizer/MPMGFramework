@@ -17,7 +17,10 @@ public class EntitySpawner extends Spawner{
 	public EntitySpawner(KitSelector kitSelector) {
 		this.kitSelector = kitSelector;
 	}
-
+	
+	/**
+	 * Spawns a kit entity at a specified location.
+	 */
 	@Override
 	public void spawnEntity(String kitName, Location location, EntityType entityType) {
 		//Spawn the entity.

@@ -51,7 +51,6 @@ public class GameLobby {
 	
 	/**
 	 * This will setup a player in the lobby.
-	 * 
 	 * @param player The player to setup in the lobby.
 	 */
 	public void setupLobbyPlayer(Player player) {
@@ -111,12 +110,19 @@ public class GameLobby {
 		tmt.sendHeaderAndFooter(player, header, footer);
 	}
 	
+	/**
+	 * Removes all the players from the lobby player setup.
+	 */
 	public void removeAllLobbyPlayers() {
 		for(Player players: Bukkit.getOnlinePlayers()) {
 			removeLobbyPlayer(players);
 		}
 	}
 	
+	/**
+	 * Removes a players lobby components.
+	 * @param player The player who will have lobby components removed from them.
+	 */
 	public void removeLobbyPlayer(Player player) {
 		//Remove boss bars from the player.
 		bar.get(player).removeBossBar(player);
@@ -125,6 +131,10 @@ public class GameLobby {
 		scoreboard.removePlayer(player);
 	}
 	
+	/**
+	 * When a player quits the game, lets remove lobby components from them.
+	 * @param player The player who has quit the game.
+	 */
 	public void removeQuitPlayer(Player player) {
 		KitSelector kitSelector = PLUGIN.getGameManager().getKitSelector();
 		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
@@ -170,7 +180,6 @@ public class GameLobby {
 	
 	/**
 	 * Teleports a player to the lobby spawn pad.
-	 * 
 	 * @param player The player to teleport to lobby spawn.
 	 */
 	public void tpToLobbySpawn(Player player) {
@@ -192,11 +201,19 @@ public class GameLobby {
 	public String getLobbyWorldName() {
 		return LOBBY_WORLD_NAME;
 	}
-
+	
+	/**
+	 * Gets the specified player's profile.
+	 * @return Retuns an inscance of the players profile.
+	 */
 	public HashMap<Player, PlayerProfile> getPlayerProfile() {
 		return playerProfile;
 	}
 
+	/**
+	 * Gets the lobby scoreboard component.
+	 * @return Retuns an instance of the lobby scoreboard component.
+	 */
 	public LobbyScoreboard getScoreboard() {
 		return scoreboard;
 	}

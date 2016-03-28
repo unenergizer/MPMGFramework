@@ -17,7 +17,10 @@ public class EntitySpawner extends Spawner{
 	public EntitySpawner(TeamSelector teamSelector) {
 		this.teamSelector = teamSelector;
 	}
-
+	
+	/**
+	 * Spawns a team entity mob at a specified location.
+	 */
 	@Override
 	public void spawnEntity(String kitName, Location location, EntityType entityType) {
 		//Spawn the entity.

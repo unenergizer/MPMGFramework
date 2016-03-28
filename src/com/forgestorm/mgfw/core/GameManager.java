@@ -129,7 +129,7 @@ public class GameManager {
 		GameArena GAME_ARENA = PLUGIN.getGameArena();
 		GameLobby GAME_LOBBY = PLUGIN.getGameLobby();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
-
+		
 		gameState = GameState.GAME_ENDING;
 
 		//If players are still online, lets show them the game scores.
@@ -250,8 +250,9 @@ public class GameManager {
 					//Stop the thread first.
 					cancel();
 
-					//Then end the thread.
-					endGame(true);
+					//Show games scores.
+					//This method will envoke the endGame(true) method of this class.
+					GAME_ARENA.showGameScores();
 				}
 			}
 		}.runTaskTimer(PLUGIN, 0, 20);
@@ -330,31 +331,50 @@ public class GameManager {
 		this.gameState = state;
 	}
 
+	/**
+	 * Gets the number of game rounds that have been played.
+	 * @return Returns the number of game rounds that have been played.
+	 */
 	public int getGamesPlayed() {
 		return gamesPlayed;
 	}
 
+	/**
+	 * This will set the number of game rounds that have been played.
+	 * @param gamesPlayed The amount of game rounds to set.
+	 */
 	public void setGamesPlayed(int gamesPlayed) {
 		this.gamesPlayed = gamesPlayed;
 	}
 
+	/**
+	 * Gets the minimal amount of players allowed to start a minigame.
+	 * @return Returns the minimal amount of players to start a minigame.
+	 */
 	public int getMinPlayers() {
 		return minPlayers;
 	}
 
+	/**
+	 * Sets the minimum amount of players needed to start a minigame.
+	 * @param minPlayers The amount of players needed to start a minigame.
+	 */
 	public void setMinPlayers(int minPlayers) {
 		this.minPlayers = minPlayers;
 	}
 
 	/**
 	 * Gets the maximum number of players this game arcade can support.
-	 * 
 	 * @return Retuns the maximum number of players the game arcade can hold.
 	 */
 	public int getMaxPlayers() {
 		return maxPlayers;
 	}
 
+	/**
+	 * Sets the maximum amount of players allowed to join the server.
+	 * @param maxPlayers The maximum amount of players allowed on the server.
+	 */
 	public void setMaxPlayers(int maxPlayers) {
 		this.maxPlayers = maxPlayers;
 	}

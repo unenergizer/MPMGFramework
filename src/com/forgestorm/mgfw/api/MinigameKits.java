@@ -43,7 +43,6 @@ public abstract class MinigameKits {
 	 * A list of minigame platform locations.
 	 * <p>
 	 * Each patform has two locations.
-	 * 
 	 * @return Returns a list of minigame platform locations.
 	 */
 	public abstract ArrayList<ArrayList<Location>> getKitPlatformLocations();

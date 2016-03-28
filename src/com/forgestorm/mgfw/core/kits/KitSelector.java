@@ -123,10 +123,18 @@ public class KitSelector {
 		setEntityFreezer(null);
 	}
 
+	/**
+	 * Gets an instance of the EntityFreezer class.
+	 * @return Returns an instance of the EntityFreezer class.
+	 */
 	public EntityFreezer getEntityFreezer() {
 		return entityFreezer;
 	}
-
+	
+	/**
+	 * Sets the entity freezer instance.  Typically set to null to "reset" it for the next game.
+	 * @param entityFreezer The entity freezer object we want to set.
+	 */
 	public void setEntityFreezer(EntityFreezer entityFreezer) {
 		this.entityFreezer = entityFreezer;
 	}
@@ -156,6 +164,10 @@ public class KitSelector {
 		playerKit.put(player.getUniqueId(), kit);
 	}
 	
+	/**
+	 * Gets the spawn locations of a kit mob.
+	 * @return Returns a HashMap of a <Entity UUID, and a World Location>.
+	 */
 	public HashMap<UUID, Location> getKitLocations() {
 		return kitLocations;
 	}

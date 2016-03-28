@@ -71,7 +71,6 @@ public class MGFramework extends JavaPlugin {
 		pm.registerEvents(new PlayerMove(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);
 		pm.registerEvents(new WeatherChange(this), this);
-		
 	}
 
 	/**

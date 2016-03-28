@@ -82,7 +82,11 @@ public class TeamSelector {
 			}
 		}
 	}
-
+	
+	/**
+	 * Gets the number of teams for a paticular minigame.
+	 * @return
+	 */
 	private int getNumberOfTeams() {
 		return PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames().size();
 	}
@@ -321,14 +325,21 @@ public class TeamSelector {
 		queuedPlayers.clear();
 	}
 
+	/**
+	 * Gets an instance of the EntityFreezer class.
+	 * @return Returns an instance of the EntityFreezer class.
+	 */
 	public EntityFreezer getEntityFreezer() {
 		return entityFreezer;
 	}
 
+	/**
+	 * Sets the entity freezer instance.  Typically set to null to "reset" it for the next game.
+	 * @param entityFreezer The entity freezer object we want to set.
+	 */
 	public void setEntityFreezer(EntityFreezer entityFreezer) {
 		this.entityFreezer = entityFreezer;
 	}
-
 
 	/**
 	 * Adds a player to a team queue.
@@ -434,6 +445,11 @@ public class TeamSelector {
 		}
 	}
 
+	
+	/**
+	 * Gets the spawn locations of a team mob.
+	 * @return Returns a HashMap of a <Entity UUID, and a World Location>.
+	 */
 	public HashMap<UUID, Location> getTeamLocations() {
 		return teamLocations;
 	}
@@ -446,6 +462,10 @@ public class TeamSelector {
 		return teamEntityUUID;
 	}
 
+	/**
+	 * Gets an instance of the sortedTeams HashMap.
+	 * @return Returns a <Team Integer, and a ArrayList<of Players in a team>.
+	 */
 	public ConcurrentMap<Integer, ArrayList<Player>> getSortedTeams() {
 		return sortedTeams;
 	}
