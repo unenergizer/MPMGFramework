@@ -16,8 +16,9 @@ public class EntityTargetLivingEntity implements Listener{
 
 	@EventHandler
 	public void onEntityTarget(EntityTargetLivingEntityEvent event){
-		
-		if(!PLUGIN.getGameManager().isMinigameRunning()){
+		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
+
+		if (!isRunning) {
 			event.setCancelled(true);
 		}
 	}

@@ -70,6 +70,18 @@ public class KitSelector {
 		//Update the lobby scoreboard.
 		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
 	}
+	
+	/**
+	 * This will remove a players kit if they leave the server.
+	 * @param player The player who's kit we will remove.
+	 */
+	public void removePlayerKit(Player player) {
+		UUID uuid = player.getUniqueId();
+		
+		if (playerKit.containsKey(uuid)) {
+			playerKit.remove(uuid);
+		}
+	}
 
 	/**
 	 * Spawns the kits in the game lobby.

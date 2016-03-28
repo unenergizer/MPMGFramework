@@ -44,7 +44,7 @@ public class PlayerQuit implements Listener {
 
 		} else {
 			//Remove the player from the lobby.
-			gameLobby.removeLobbyPlayer(player);
+			gameLobby.removeQuitPlayer(player);
 			
 			//Update scoreboards
 			updateScoreboard(gameLobby);

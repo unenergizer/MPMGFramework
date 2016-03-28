@@ -9,13 +9,18 @@ import com.forgestorm.mgfw.core.GameArena;
 import com.forgestorm.mgfw.core.GameLobby;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.MinigamePluginManager;
+import com.forgestorm.mgfw.listeners.BlockBreak;
+import com.forgestorm.mgfw.listeners.BlockCanBuild;
+import com.forgestorm.mgfw.listeners.BlockPlace;
 import com.forgestorm.mgfw.listeners.EntityCombust;
 import com.forgestorm.mgfw.listeners.EntityDamage;
 import com.forgestorm.mgfw.listeners.EntityDamageByEntity;
 import com.forgestorm.mgfw.listeners.EntityTargetLivingEntity;
 import com.forgestorm.mgfw.listeners.FoodLevelChange;
+import com.forgestorm.mgfw.listeners.PlayerInteract;
 import com.forgestorm.mgfw.listeners.PlayerInteractEntity;
 import com.forgestorm.mgfw.listeners.PlayerJoin;
+import com.forgestorm.mgfw.listeners.PlayerMove;
 import com.forgestorm.mgfw.listeners.PlayerQuit;
 import com.forgestorm.mgfw.listeners.WeatherChange;
 
@@ -51,16 +56,22 @@ public class MGFramework extends JavaPlugin {
 	 */
 	private void registerListeners() {
 		PluginManager pm = Bukkit.getPluginManager();
-
-		pm.registerEvents(new EntityCombust(), this);
+		
+		pm.registerEvents(new BlockBreak(this), this);
+		pm.registerEvents(new BlockCanBuild(this), this);
+		pm.registerEvents(new BlockPlace(this), this);
+		pm.registerEvents(new EntityCombust(this), this);
 		pm.registerEvents(new EntityDamage(this), this);
 		pm.registerEvents(new EntityDamageByEntity(this), this);
+		pm.registerEvents(new PlayerInteract(this), this);
 		pm.registerEvents(new EntityTargetLivingEntity(this), this);
 		pm.registerEvents(new FoodLevelChange(this), this);
 		pm.registerEvents(new PlayerInteractEntity(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
+		pm.registerEvents(new PlayerMove(this), this);
 		pm.registerEvents(new PlayerQuit(this), this);
 		pm.registerEvents(new WeatherChange(this), this);
+		
 	}
 
 	/**

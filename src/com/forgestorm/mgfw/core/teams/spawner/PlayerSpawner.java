@@ -1,6 +1,7 @@
 package com.forgestorm.mgfw.core.teams.spawner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.bukkit.Bukkit;
@@ -18,10 +19,13 @@ public class PlayerSpawner {
 		PLUGIN = plugin;
 	}
 	
-	public void spawnPlayers(ConcurrentMap<Integer, ArrayList<Player>> concurrentMap) {
+	public HashMap<Player, Location> spawnPlayers(ConcurrentMap<Integer, ArrayList<Player>> concurrentMap) {
 		MinigameTeams instance = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 		ArrayList<ArrayList<Location>> playerTeamSpawnLocations = instance.getPlayerTeamSpawnLocations();
+		HashMap<Player, Location> playerSpawns = new HashMap<Player, Location>();
 		int playersTeleported = 0;
+		
+		//Bukkit.broadcastMessage(ChatColor.RED + concurrentMap.toString());
 		
 		//Loop through the multidimensional array.
 		for (int team = 0; team < playerTeamSpawnLocations.size(); team++) {
@@ -35,12 +39,17 @@ public class PlayerSpawner {
 					//Spawn the player at a given location.
 					if(key == team && playersTeleported < Bukkit.getOnlinePlayers().size()) {
 						Location loc = playerTeamSpawnLocations.get(team).get(location);
-						concurrentMap.get(team).get(playersTeleported).teleport(loc);
+						Player player = concurrentMap.get(team).get(playersTeleported);
+						
+						player.teleport(loc);
+						
+						playerSpawns.put(player, loc);
 						
 						playersTeleported++;
 					}
 				}
 			}
 		}
+		return playerSpawns;
 	}
 }

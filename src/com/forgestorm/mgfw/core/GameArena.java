@@ -2,24 +2,98 @@ package com.forgestorm.mgfw.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
+import com.forgestorm.mgfw.core.constants.GameState;
+import com.forgestorm.mgfw.core.constants.Messages;
+import com.forgestorm.mgfw.core.display.FloatingMessage;
 import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class GameArena {
 
 	private final MGFramework PLUGIN;
 	private final WorldDuplicator WORLD_DUPE;
+	
+	private HashMap<Player, Location> playerSpawns;
 
 	public GameArena(MGFramework plugin) {
 		PLUGIN = plugin;
 		WORLD_DUPE = new WorldDuplicator();
+	}
+	
+	public void setupArenaPlayer(Player player) {
+		//TODO: Give kit
+		//TODO: Show Scoreboard
+		//TODO: Show Bossbar Announcer
+	}
+	
+	public void showGameRules() {
+		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
+		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_RULES);
+		
+		//Show the game rules.
+		Bukkit.broadcastMessage("");
+		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
+		Bukkit.broadcastMessage("");
+		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
+		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
+		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
+		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
+		Bukkit.broadcastMessage("");
+		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
+		
+		new BukkitRunnable() {
+			int countdown = 10;
+
+			@Override
+			public void run() {
+				
+				if (countdown <= 5 && countdown > 1) {
+					String title = ChatColor.YELLOW + Integer.toString(countdown);
+					
+					//Show players a countdown message.
+					for (Player players: Bukkit.getOnlinePlayers()) {
+						new FloatingMessage().sendFloatingMessage(players, title, "");
+						players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+					}
+				} else if (countdown == 1) {
+					String title = ChatColor.RED + Integer.toString(countdown);
+					
+					//Show players a countdown message.
+					for (Player players: Bukkit.getOnlinePlayers()) {
+						new FloatingMessage().sendFloatingMessage(players, title, "");
+						players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+					}
+				} else if (countdown == 0) {
+					cancel();
+					String subTitle = ChatColor.GREEN + "Go!";
+					
+					//Show players a countdown message.
+					for (Player players: Bukkit.getOnlinePlayers()) {
+						new FloatingMessage().sendFloatingMessage(players, "", subTitle);
+						players.playSound(players.getLocation(), Sound.BLOCK_NOTE_HARP, 1f, 1f);
+					}
+					
+					//Change the game state.
+					PLUGIN.getGameManager().setGameState(GameState.GAME_RUNNING);
+				}
+				
+				countdown--;
+			}
+		}.runTaskTimer(PLUGIN, 0, 20);
 	}
 	
 	/**
@@ -47,6 +121,14 @@ public class GameArena {
 		
 		//Set collide entities false.
 		player.spigot().setCollidesWithEntities(false);
+		
+		//TODO: Set the player to the spectator scoreboard team.
+		//TODO: Show Bossbar Announcer
+		
+		//Send spectator notification message.
+		String title = "Hello, Spectator!";
+		String subtitle = ChatColor.GRAY + "Another game will start soon!";
+		new FloatingMessage().sendFloatingMessage(player, title, subtitle);
 	}
 	
 	/**
@@ -102,9 +184,25 @@ public class GameArena {
 	/**
 	 * Teleport all players in the server to the game world.
 	 */
-	public void tpAllToGameWorld() {
+	public void setupAllArenaPlayers() {
+		//Spawn the players in the world.
 		PlayerSpawner spawner = new PlayerSpawner(PLUGIN);
-		spawner.spawnPlayers(PLUGIN.getGameManager().getTeamSelector().getSortedTeams());
+		ConcurrentMap<Integer, ArrayList<Player>> sortedTeam = PLUGIN.getGameManager().getTeamSelector().getSortedTeams();
+		
+		//Clear the location of the playerSpawns HashMap
+		if (playerSpawns != null && !playerSpawns.isEmpty()) {
+			playerSpawns.clear();
+		}
+		
+		//Spawn players and record their spawn locations.
+		playerSpawns = spawner.spawnPlayers(sortedTeam);
+		
+		//Do some additional player setup.
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			setupArenaPlayer(players);
+		}
+		
+		//TODO: Now freeze the players so they can not move.
 	}
 	
 	/**
@@ -124,5 +222,13 @@ public class GameArena {
 	 */
 	public WorldDuplicator getWorldDupe() {
 		return WORLD_DUPE;
+	}
+
+	public HashMap<Player, Location> getPlayerSpawns() {
+		return playerSpawns;
+	}
+
+	public void setPlayerSpawns(HashMap<Player, Location> playerSpawns) {
+		this.playerSpawns = playerSpawns;
 	}
 }

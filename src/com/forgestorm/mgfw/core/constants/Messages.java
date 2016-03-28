@@ -17,8 +17,16 @@ public enum Messages {
 	COMMAND_ADMIN_GAMES_PLAYED("&e&lTotal games played: &c%s"),
 	COMMAND_ADMIN_END_GAME("&c&lThe game has just been shut down. Returning to game lobby."),
 	COMMAND_ADMIN_END_ERROR("&c&lYou can not end a game if the game is not running."),
+	COMMAND_ADMIN_FORCE_START("&c&lYou have just force started a game."),
+	
+	//Team Messages
+	TEAM_QUEUE_PLACED("&eYou were placed in a queue to join this team."),
+	TEAM_QUEUE_ALREADY_PLACED("&cYou are already queued for this team!"),
+	TEAM_ALREADY_ON_TEAM("&eYou are already on this team."),
+	TEAM_DROPPED_FROM_QUEUE("&cYou have been removed from the %s &cqueue."),
 	
 	//Game display messages
+	GAME_COUNTDOWN_NOT_ENOUGH_PLAYERS("&cCountdown canceled! Not enough players!"),
 	GAME_TAB_HEADRER("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
 	GAME_TAB_FOOTER("&bNews&7, &aForum&7, &eTeamSpeak&7, &dShop &6@ &cwww&7.&cForgeStorm&7.&ccom"),
 	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),

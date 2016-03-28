@@ -2,24 +2,24 @@ package com.forgestorm.mgfw.listeners;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.block.BlockCanBuildEvent;
 
 import com.forgestorm.mgfw.MGFramework;
 
-public class EntityCombust implements Listener {
-	
+public class BlockCanBuild implements Listener {
+
 	private MGFramework PLUGIN;
-	
-	public EntityCombust(MGFramework plugin) {
+
+	public BlockCanBuild(MGFramework plugin){
 		PLUGIN = plugin;
 	}
-	
-	@EventHandler
-	public void onEntityCombust(EntityCombustEvent event) {
-		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
-		if (!isRunning) {
-			event.setCancelled(true);
+	@EventHandler
+	public void onBlockCanBuild(BlockCanBuildEvent event){
+		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
+		//Let the player place blocks.
+		if(isRunning) {
+			event.setBuildable(true);
 		}
 	}
 }

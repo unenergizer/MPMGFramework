@@ -50,8 +50,12 @@ public class Admin implements CommandExecutor {
 				//Send the number of games played.
 				commandSender.sendMessage(Messages.COMMAND_ADMIN_GAMES_PLAYED.toString().replace("%s", Integer.toString(gameManager.getGamesPlayed())));
 				break;
+			case "forcestart":
+				commandSender.sendMessage(Messages.COMMAND_ADMIN_FORCE_START.toString());
+				gameManager.startGame();
+				break;
 			case "pause":
-				//Messages.CREATED_NUKEROOM.send(player);
+				//TODO: create the ability to pause a game and freeze players.
 				break;
 			default:
 				commandSender.sendMessage(Messages.COMMAND_ADMIN_UNKNOWN.toString());

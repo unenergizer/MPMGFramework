@@ -34,7 +34,7 @@ public class GameManager {
 		KIT_SELECTOR = new KitSelector(PLUGIN);
 		TEAM_SELECTOR = new TeamSelector(PLUGIN);
 		tips = new TipAnnouncer(PLUGIN);
-		
+
 		//On first load, lets begin with setting up the game.
 		setupGame();
 	}
@@ -75,7 +75,7 @@ public class GameManager {
 		//Setup lobby teams.
 		TEAM_SELECTOR.spawnTeams();
 		TEAM_SELECTOR.assignAllPlayerTeams();
-		
+
 		//Setup all the players currently in the lobby.
 		GAME_LOBBY.setupAllLobbyPlayers();
 
@@ -95,7 +95,7 @@ public class GameManager {
 	 * This will move players out of the lobby and into the game map.
 	 * Thus starting the game.
 	 */
-	private void startGame() {
+	public void startGame() {
 
 		//Set game state.
 		gameState = GameState.GAME_STARTING;
@@ -106,16 +106,12 @@ public class GameManager {
 		//Stop game tips from displaying.
 		tips.setShowTips(false);
 
-		//Get all players and teleport them to the game world.
-		GAME_ARENA.tpAllToGameWorld();
-
-
-		//TODO: Give kit
-		//TODO: Do team spawn
-		//TODO: Show Scoreboard
-		//TODO: Bossbar Announcer
-		//TODO: Show Game Description
-
+		//Setup all of the arena players.
+		GAME_ARENA.setupAllArenaPlayers();
+		
+		//Show game description and rules.
+		GAME_ARENA.showGameRules();
+		
 		//Let the plugin know to start the game.
 		PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
 
@@ -145,16 +141,16 @@ public class GameManager {
 
 		//Remove the kits from the lobby world.
 		KIT_SELECTOR.removeKits();
-		
+
 		//Remove the teams from the lobby world.
 		TEAM_SELECTOR.removeTeams();
 
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
-		
+
 		//Pull the players out of the arena map so it can be unloaded.
 		GAME_LOBBY.tpAllToLobbySpawn();
-		
+
 		//Unload the game world.
 		GAME_ARENA.unloadGameWorld();
 
@@ -181,39 +177,57 @@ public class GameManager {
 
 			@Override
 			public void run() {
-				if (countdown != 0) {
 
+				//If the minimum number of players is met, lets do a countdown!
+				if (isMinimumPlayersMet()) {
+					
 					//Show countdown in chat.
 					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 1) {
 						ActionBarText abt = new ActionBarText();
 						String message = Messages.GAME_TIME_REMAINING_PLURAL.toString();
+						
 						for (Player players: Bukkit.getOnlinePlayers()) {
 							abt.sendActionbarMessage(players, message.replace("%s", Integer.toString(countdown)));
 							players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
 						}
 					}
 					
+					//Show the 1 second left countdown message.
 					if (countdown == 1) {
+						cancel();
+
 						ActionBarText abt = new ActionBarText();
 						String message = Messages.GAME_TIME_REMAINING_SINGULAR.toString();
+
 						for (Player players: Bukkit.getOnlinePlayers()) {
 							abt.sendActionbarMessage(players, message);
 							players.playSound(players.getLocation(), Sound.BLOCK_NOTE_HARP, 1f, 1f);
 						}
-					}
 
-					countdown--;
-				} else {
+						//Do one last check to make sure the game should start.
+						if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
+							startGame();
+						}
+					}
+				} else { //Not enough players! Someone left, so let's cancel the countdown and reset everything.
 					cancel();
 
-					//Do one last check to make sure the game should start.
-					if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
-						startGame();
-					} else {
-						//Set game state.
-						gameState = GameState.LOBBY_WAITING;
+					//Set game state.
+					gameState = GameState.LOBBY_WAITING;
+
+					//Show action bar message.
+					ActionBarText abt = new ActionBarText();
+					String message = Messages.GAME_COUNTDOWN_NOT_ENOUGH_PLAYERS.toString();
+
+					for (Player players: Bukkit.getOnlinePlayers()) {
+						//Show message
+						abt.sendActionbarMessage(players, message);
+						//Play notification sound.
+						players.playSound(players.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 					}
 				}
+
+				countdown--;
 			}
 		}.runTaskTimer(PLUGIN, 0, 20);
 	}
@@ -273,6 +287,8 @@ public class GameManager {
 	 */
 	public boolean isMinigameRunning() {
 		switch (getGameState()) {
+		case ARENA_SHOW_RULES:
+		case ARENA_SHOW_SCORES:
 		case GAME_ENDING:
 		case GAME_RUNNING:
 		case GAME_STARTING:
@@ -281,7 +297,7 @@ public class GameManager {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gets an instance of the KitSelector class.
 	 * @return Returns an instance of the KitSelector class.

@@ -50,6 +50,9 @@ public class TeamSelector {
 		teamEntityUUID = new ArrayList<UUID>();
 	}
 
+	/**
+	 * This will assing all the players on the server a team.
+	 */
 	public void assignAllPlayerTeams() {
 		if (Bukkit.getOnlinePlayers().size() > 0) {
 			int maxTeamSize = getMaxTeamSize();
@@ -169,8 +172,6 @@ public class TeamSelector {
 
 						//Add player to the new team.
 						setPlayerTeam(currentTeam, player);
-
-						System.out.println("Player: " + player + " -> Team: " + currentTeam);
 					}
 				}
 			}
@@ -178,6 +179,30 @@ public class TeamSelector {
 
 		//Test to see if players can swap teams.
 		swapTeamMembers();
+	}
+
+	/**
+	 * Adds a late player to a game team.
+	 * 
+	 * @param player The player who will be added to a team.
+	 */
+	public void addLatePlayer(Player player) {
+		for (int i = 0; i < getNumberOfTeams(); i++) {
+
+			int currentTeam = i;
+			
+			if(sortedTeams.get(currentTeam) != null) {
+				int playersNeeded = getMaxTeamSize() - sortedTeams.get(currentTeam).size();
+
+				//If the team needs players, see if a player can be added.
+				if (playersNeeded > 0) {
+
+					setPlayerTeam(currentTeam, player);
+				}
+			} else {
+				setPlayerTeam(currentTeam, player);
+			}
+		}
 	}
 
 	/**
@@ -191,7 +216,7 @@ public class TeamSelector {
 		if (getPlayerTeam(player) != futureTeam) {
 			int maxTeamSize = getMaxTeamSize();
 			int currentTeamSize = sortedTeams.get(futureTeam).size();
-			
+
 			//If the team has room, place the player in that team.
 			if (currentTeamSize < maxTeamSize) {
 				//Remove them from current team.
@@ -202,17 +227,25 @@ public class TeamSelector {
 
 			} else {
 				if (queuedPlayers.get(futureTeam) != null && queuedPlayers.get(futureTeam).contains(player)) {
+
+					//Remove from any existing queue if the player choose a different team.
+					if(isOnAnotherQueue(player)) {
+						removeQueuedPlayer(player);
+					}
+
 					//Their was no room. Put the player in a queue.
 					addQueuedPlayer(futureTeam, player);
 
-					player.sendMessage(ChatColor.YELLOW + "You were placed in a queue to join this team.");
+					player.sendMessage(Messages.TEAM_QUEUE_PLACED.toString());
 
 				} else {
-					player.sendMessage(ChatColor.RED + "You are already queued for this team!");
+					player.sendMessage(Messages.TEAM_QUEUE_ALREADY_PLACED.toString());
+					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 				}
 			}
 		} else {
-			player.sendMessage(ChatColor.YELLOW + "You are already on this team.");
+			player.sendMessage(Messages.TEAM_ALREADY_ON_TEAM.toString());
+			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 		}
 	}
 
@@ -236,7 +269,7 @@ public class TeamSelector {
 
 		//Play a confirmation sound.
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
-		
+
 		//Set the the players team.
 		changePlayerTeam(team, player);
 
@@ -309,6 +342,41 @@ public class TeamSelector {
 			queuedPlayers.put(futureTeam, currentQueue);
 		}
 		currentQueue.add(player);
+	}
+
+	/**
+	 * Remove the player from any queue they might be on.
+	 * @param player The player who will be removed from an existing queue.
+	 */
+	public void removeQueuedPlayer(Player player) {
+
+		for (int i = 0; i < getNumberOfTeams(); i++) {
+			int currentTeam = i;
+			if (queuedPlayers.get(currentTeam) != null && queuedPlayers.get(currentTeam).contains(player)) {
+
+				MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
+
+				queuedPlayers.get(currentTeam).remove(player);
+
+				//Send message letting player know they were dropped from a queue.
+				player.sendMessage(Messages.TEAM_DROPPED_FROM_QUEUE.toString().replace("&s", minigameTeam.getTeamNames().get(currentTeam)));
+			}
+		}
+	}
+
+	/**
+	 * This is a conditional test to see if a player is placed on a queue.
+	 * @param player The player who we are going to run the test for.
+	 * @return Returns true if a player is on a queue for any team.
+	 */
+	public boolean isOnAnotherQueue(Player player) {
+		for (int i = 0; i < getNumberOfTeams(); i++) {
+			int currentTeam = i;
+			if (queuedPlayers.get(currentTeam) != null && queuedPlayers.get(currentTeam).contains(player)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

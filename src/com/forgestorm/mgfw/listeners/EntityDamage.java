@@ -21,24 +21,27 @@ public class EntityDamage implements Listener {
 
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
+		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
-		GameLobby lobby = PLUGIN.getGameLobby();
-		String lobbyWorld = lobby.getLobbyWorldName();
+		if (!isRunning) {
+			GameLobby lobby = PLUGIN.getGameLobby();
+			String lobbyWorld = lobby.getLobbyWorldName();
 
-		//Check to see if the entity was a player entity.
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+			//Check to see if the entity was a player entity.
+			if (event.getEntity() instanceof Player) {
+				Player player = (Player) event.getEntity();
 
-			//If the damage happened in the lobby world, prevent it.
-			if (player.getWorld().equals(Bukkit.getWorld(lobbyWorld))) {
+				//If the damage happened in the lobby world, prevent it.
+				if (player.getWorld().equals(Bukkit.getWorld(lobbyWorld))) {
 
-				//Cancel all damage to the player in the lobby.
-				event.setCancelled(true);
+					//Cancel all damage to the player in the lobby.
+					event.setCancelled(true);
 
-				//If the player falls into the void, tp them to the lobby spawn.
-				if (event.getCause().equals(DamageCause.VOID)) {
-					lobby.tpToLobbySpawn(player);
-					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
+					//If the player falls into the void, tp them to the lobby spawn.
+					if (event.getCause().equals(DamageCause.VOID)) {
+						lobby.tpToLobbySpawn(player);
+						player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
+					}
 				}
 			}
 		}

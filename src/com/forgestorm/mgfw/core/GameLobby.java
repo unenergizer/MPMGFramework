@@ -15,6 +15,7 @@ import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.LobbyScoreboard;
 import com.forgestorm.mgfw.core.display.TabMenuText;
+import com.forgestorm.mgfw.core.kits.KitSelector;
 import com.forgestorm.mgfw.core.teams.TeamSelector;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
@@ -59,9 +60,9 @@ public class GameLobby {
 		//Get all players and teleport them to the lobby world.	
 		tpToLobbySpawn(player);
 		
-		//TODO: Do proper team assignment.  Assigning the player to a team.
+		//Assigning the player to a team.
 		if (teamSelector.getPlayerTeam(player) == null) {
-			teamSelector.setPlayerTeam(0, player);
+			teamSelector.addLatePlayer(player);
 		}
 		
 		//Heal the player
@@ -122,6 +123,21 @@ public class GameLobby {
 		
 		//Remove the lobby scoreboard.
 		scoreboard.removePlayer(player);
+	}
+	
+	public void removeQuitPlayer(Player player) {
+		KitSelector kitSelector = PLUGIN.getGameManager().getKitSelector();
+		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
+		
+		//Remove lobby components from player.
+		removeLobbyPlayer(player);
+
+		//Remove player from kit selecton.
+		kitSelector.removePlayerKit(player);
+		
+		//Remove player form teaming hashmaps.
+		teamSelector.removeQueuedPlayer(player);
+		teamSelector.removeSortedPlayer(player);
 	}
 
 	/**
