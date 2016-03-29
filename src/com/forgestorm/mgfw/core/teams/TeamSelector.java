@@ -100,7 +100,7 @@ public class TeamSelector {
 	/**
 	 * This will try and swap queued players teams if swapping is possible.
 	 */
-	public void swapTeamMembers() {
+	private void swapTeamMembers() {
 
 		//Lets loop through all the teams.
 		for (int i = 0; i < getNumberOfTeams(); i++) {
@@ -150,7 +150,7 @@ public class TeamSelector {
 	/**
 	 * Update queued status on certain events (player join, player quit, player change team.
 	 */
-	public void updateQueuePositions() {
+	private void updateQueuePositions() {
 
 		//Loop through every team and update it.
 		for (int i = 0; i < getNumberOfTeams(); i++) {
@@ -214,7 +214,7 @@ public class TeamSelector {
 	 * @param futureTeam The team the player wants to switch to.
 	 * @param player The player who is trying to switch teams.
 	 */
-	public void changePlayerTeam(int futureTeam, Player player) {
+	private void changePlayerTeam(int futureTeam, Player player) {
 
 		//If the player is already on the "futureTeam" then don't let them change their team.
 		if (getPlayerTeam(player) != futureTeam) {
@@ -279,6 +279,8 @@ public class TeamSelector {
 
 		//Update the lobby scoreboard.
 		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
+		
+		updateQueuePositions();
 	}
 
 	/**
@@ -346,7 +348,7 @@ public class TeamSelector {
 	 * @param futureTeam The team the player wants to join.
 	 * @param player The player who is trying to change teams.
 	 */
-	public void addQueuedPlayer(int futureTeam, Player player) {
+	private void addQueuedPlayer(int futureTeam, Player player) {
 		Queue<Player> currentQueue = queuedPlayers.get(futureTeam);
 		if (currentQueue == null)  {
 			currentQueue = new LinkedList<Player>();
@@ -380,7 +382,7 @@ public class TeamSelector {
 	 * @param player The player who we are going to run the test for.
 	 * @return Returns true if a player is on a queue for any team.
 	 */
-	public boolean isOnAnotherQueue(Player player) {
+	private boolean isOnAnotherQueue(Player player) {
 		for (int i = 0; i < getNumberOfTeams(); i++) {
 			int currentTeam = i;
 			if (queuedPlayers.get(currentTeam) != null && queuedPlayers.get(currentTeam).contains(player)) {
@@ -421,7 +423,7 @@ public class TeamSelector {
 	 * @param player The player who needs a team.
 	 * @param team The team the player has selected.
 	 */
-	public void setPlayerTeam(int team, Player player) {
+	private void setPlayerTeam(int team, Player player) {
 		ArrayList<Player> currentValue = sortedTeams.get(team);
 		if (currentValue == null) {
 			currentValue = new ArrayList<Player>();

@@ -154,15 +154,6 @@ public class KitSelector {
 			return 0;
 		}
 	}
-
-	/**
-	 * Sets the players kit.
-	 * @param player The player who needs a kit.
-	 * @param kit The kit the player has selected.
-	 */
-	public void setPlayerKit(Player player, int kit) {
-		playerKit.put(player.getUniqueId(), kit);
-	}
 	
 	/**
 	 * Gets the spawn locations of a kit mob.

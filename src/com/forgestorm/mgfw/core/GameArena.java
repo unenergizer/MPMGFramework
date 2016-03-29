@@ -38,7 +38,7 @@ public class GameArena {
 	 * Setups an arena player.
 	 * @param player The player who will be setup for the game arena.
 	 */
-	public void setupArenaPlayer(Player player) {
+	private void setupArenaPlayer(Player player) {
 		//Heal the player
 		player.setHealth(20);
 		player.setFoodLevel(20);
@@ -62,7 +62,7 @@ public class GameArena {
 	/**
 	 * Teleport all players in the server to the game world.
 	 */
-	public void setupAllArenaPlayers() {
+	void setupAllArenaPlayers() {
 		//Spawn the players in the world.
 		PlayerSpawner spawner = new PlayerSpawner(PLUGIN);
 		ConcurrentMap<Integer, ArrayList<Player>> sortedTeam = PLUGIN.getGameManager().getTeamSelector().getSortedTeams();
@@ -121,7 +121,7 @@ public class GameArena {
 	/**
 	 * This will show the games rules before the players are able to move around in the arena world.
 	 */
-	public void showGameRules() {
+	void showGameRules() {
 		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
 		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_RULES);
 
@@ -180,7 +180,7 @@ public class GameArena {
 	/**
 	 * This will display the scores at the end of the game to all the players and spectators.
 	 */
-	public void showGameScores() {
+	void showGameScores() {
 		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
 		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_SCORES);
 
@@ -223,7 +223,7 @@ public class GameArena {
 	/**
 	 * Loads the needed assets from the minigame plugin.
 	 */
-	public void loadGameWorld() {
+	void loadGameWorld() {
 		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getArenaWorldName();
 
 		File wc = Bukkit.getServer().getWorldContainer();
@@ -254,7 +254,7 @@ public class GameArena {
 	/**
 	 * Disables the games loaded assets.
 	 */
-	public void unloadGameWorld() {
+	void unloadGameWorld() {
 		String name = PLUGIN.getMinigamePluginManager().getMinigameBase().getArenaWorldName();
 		File wc = Bukkit.getServer().getWorldContainer();
 		File destinationFolder = new File(wc + File.separator + name);

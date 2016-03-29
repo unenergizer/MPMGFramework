@@ -3,9 +3,9 @@ package com.forgestorm.mgfw.api;
 import java.util.ArrayList;
 
 public abstract class MinigameBase {
-	protected final String minigameName;
-	protected final String arenaWorldName;
-	protected final String lobbyWorldName;
+	private final String minigameName;
+	private final String arenaWorldName;
+	private final String lobbyWorldName;
 	private boolean isGameOver;
 
 	public MinigameBase(final String minigameName, final String arenaWorldName, final String lobbyWorldName, boolean isGameOver) {

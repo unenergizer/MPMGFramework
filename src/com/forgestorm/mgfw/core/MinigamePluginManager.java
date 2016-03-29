@@ -36,7 +36,7 @@ public class MinigamePluginManager {
 	/**
 	 * Loads the next plugin in the gamePlugins array list.
 	 */
-	public void loadNextGamePlugin() {
+	void loadNextGamePlugin() {
 		//Find game plugins.
 		if (gameFiles == null) {
 			PluginFinder pf = new PluginFinder(FILE_PATH);
@@ -79,7 +79,7 @@ public class MinigamePluginManager {
 	/**
 	 * This will disable the current game plugin that is loaded.
 	 */
-	public void disableCurrentGamePlugin() {
+	void disableCurrentGamePlugin() {
 		//Now disable the game plugin.
 		PLUGIN_LOADER.disablePlugin(loadedGamePlugin);
 	}

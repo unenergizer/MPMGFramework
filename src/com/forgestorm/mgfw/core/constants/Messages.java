@@ -3,11 +3,7 @@ package com.forgestorm.mgfw.core.constants;
 import net.md_5.bungee.api.ChatColor;
 
 public enum Messages {
-	
-	//Admin only messages
-	ADMIN_NEXT_MAP_ARENA("Next arena map: "),
-	ADMIN_NEXT_MAP_LOBBY("Next lobby map: "),
-	
+
 	//Debug messages
 	BOSS_BAR_MESSAGE("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
 	
@@ -42,7 +38,6 @@ public enum Messages {
 	SB_BLANK_LINE_3("&r&r&r"),
 	SB_BLANK_LINE_4("&r&r&r&r"),
 	SB_BLANK_LINE_5("&r&r&r&r&r"),
-	SB_BLANK_LINE_6("&r&r&r&r&r&r"),
 	SB_GAME_STATUS("&lGame Status:"),
 	SB_GAME_STATUS_WAITING_1("&eNeed players"),
 	SB_GAME_STATUS_WAITING_2("&eNeed players."),

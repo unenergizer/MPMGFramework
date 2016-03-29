@@ -154,7 +154,7 @@ public class LobbyScoreboard {
 	 * @param input The string we want to trim.
 	 * @return The trimmed string.
 	 */
-	public String trimString(String input) {
+	private String trimString(String input) {
 
 		//Check to see if the input lengity is greater than 14 characters.
 		if (input.length() > 14) {
@@ -196,15 +196,6 @@ public class LobbyScoreboard {
 
 		//Give the player a new "blank" scoreboard.
 		player.setScoreboard(manager.getNewScoreboard());
-	}
-
-	/**
-	 * Removes all player scoreboards.
-	 */
-	public void removeAllPlayers() {
-		for(Player players: Bukkit.getOnlinePlayers()) {
-			removePlayer(players);
-		}
 	}
 
 	/**

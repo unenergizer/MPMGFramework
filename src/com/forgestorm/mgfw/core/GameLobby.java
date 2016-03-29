@@ -42,7 +42,7 @@ public class GameLobby {
 	/**
 	 * This will setup all the players in the server for the lobby.
 	 */
-	public void setupAllLobbyPlayers() {
+	void setupAllLobbyPlayers() {
 		//Setup all the lobby players.
 		for (Player players: Bukkit.getOnlinePlayers()) {
 			setupLobbyPlayer(players);
@@ -113,7 +113,7 @@ public class GameLobby {
 	/**
 	 * Removes all the players from the lobby player setup.
 	 */
-	public void removeAllLobbyPlayers() {
+	void removeAllLobbyPlayers() {
 		for(Player players: Bukkit.getOnlinePlayers()) {
 			removeLobbyPlayer(players);
 		}
@@ -123,7 +123,7 @@ public class GameLobby {
 	 * Removes a players lobby components.
 	 * @param player The player who will have lobby components removed from them.
 	 */
-	public void removeLobbyPlayer(Player player) {
+	private void removeLobbyPlayer(Player player) {
 		//Remove boss bars from the player.
 		bar.get(player).removeBossBar(player);
 		
@@ -153,7 +153,7 @@ public class GameLobby {
 	/**
 	 * Initialize (setup) the minigame lobby.
 	 */
-	public void loadLobbyWorld() {
+	void loadLobbyWorld() {
 
 		//Edit world properties.
 		Bukkit.setSpawnRadius(0);
@@ -172,7 +172,7 @@ public class GameLobby {
 	/**
 	 * This will teleport all the players in the server to the lobby spawn.
 	 */
-	public void tpAllToLobbySpawn() {
+	void tpAllToLobbySpawn() {
 		for(Player players: Bukkit.getOnlinePlayers()) {
 			tpToLobbySpawn(players);
 		}

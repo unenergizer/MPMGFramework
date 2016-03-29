@@ -235,7 +235,7 @@ public class GameManager {
 	/**
 	 * Continuously polls the loaded minigame to check if it has ended.
 	 */
-	public void pollForGameOver() {
+	private void pollForGameOver() {
 
 		MinigamePluginManager mgpm = PLUGIN.getMinigamePluginManager();
 
