@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import net.md_5.bungee.api.ChatColor;
+
 public abstract class MinigameTeams {
 	
 	/**
@@ -32,6 +34,12 @@ public abstract class MinigameTeams {
 	 * @return Returns a list of minigame team names.
 	 */
 	public abstract ArrayList<String> getTeamNames();
+	
+	/**
+	 * A list of minigame team colors.
+	 * @return Returns a list of minigame team colors.
+	 */
+	public abstract ArrayList<ChatColor> getTeamColors();
 	
 	/**
 	 * A list of minigame team descriptions.

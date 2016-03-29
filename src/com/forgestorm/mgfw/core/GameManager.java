@@ -62,13 +62,16 @@ public class GameManager {
 	 * This will setup our game lobby.
 	 */
 	private void setupLobby() {
-
+		
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
 
 		//Setup lobby world
 		GAME_LOBBY.loadLobbyWorld();
 
+		//Setup the lobby scoreboard.
+		GAME_LOBBY.getScoreboard().createLobbyScoreboard();
+		
 		//Setup lobby kits.
 		KIT_SELECTOR.spawnKits();
 
@@ -102,6 +105,9 @@ public class GameManager {
 
 		//Remove lobby players
 		GAME_LOBBY.removeAllLobbyPlayers();
+
+		//Destroy the lobby scoreboard.
+		GAME_LOBBY.getScoreboard().destroyLobbyScoreboard();
 
 		//Stop game tips from displaying.
 		tips.setShowTips(false);

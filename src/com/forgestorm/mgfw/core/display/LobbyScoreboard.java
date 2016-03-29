@@ -1,6 +1,6 @@
 package com.forgestorm.mgfw.core.display;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -8,6 +8,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameKits;
@@ -15,6 +16,7 @@ import com.forgestorm.mgfw.api.MinigameTeams;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.MinigamePluginManager;
 import com.forgestorm.mgfw.core.constants.Messages;
+import com.forgestorm.mgfw.core.teams.TeamSelector;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -23,37 +25,67 @@ public class LobbyScoreboard {
 	private final MGFramework PLUGIN;
 
 	private ScoreboardManager manager;
-	private HashMap<Player, Scoreboard> playerBoards;
+	private Scoreboard lobbyScoreboard;
+	private ArrayList<Team> teams;
 	private int gameWaitingAnamate;
 
 
 	public LobbyScoreboard(MGFramework plugin) {
 		PLUGIN = plugin;
 		manager = Bukkit.getScoreboardManager();
-		playerBoards = new HashMap<Player, Scoreboard>();
+		teams = new ArrayList<Team>();
 		gameWaitingAnamate = 1;
 	}
-
+	
 	/**
-	 * Gives a player a scoreboard that has lobby text.
-	 * @param player The player who will receive a lobby scoreboard.
+	 * Creates a new scoreboard for the minigame lobby.
+	 * <p>
+	 * This should happen every time a new game is loaded into the framework.
 	 */
-	private void setBoardToPlayer(Player player) {
-		Scoreboard board = playerBoards.get(player);
-
-		//If the player already 
-		if (player.getScoreboard() != null) {
-			playerBoards.remove(player);
-			playerBoards.put(player, player.getScoreboard());
-			board = player.getScoreboard();
+	public void createLobbyScoreboard() {
+		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
+		
+		lobbyScoreboard = manager.getNewScoreboard();
+		
+		//Create Teams
+		for (int i = 0; i < minigameTeam.getTeamNames().size(); i++) {
+			String teamName = trimString(minigameTeam.getTeamNames().get(i));
+			ChatColor teamColor = minigameTeam.getTeamColors().get(i);
+			Team sbTeam = lobbyScoreboard.registerNewTeam(teamName);
+		
+			//Set this scoreboard team prefix.
+			sbTeam.setPrefix(teamColor + "");
+			
+			//Add this scoreboard team to the teams array.
+			teams.add(sbTeam);
+			
+			//TODO: Rank refixes + colors
+			//team.setPrefix(rankPrefix + teamColor + "");
 		}
-
+	}
+	
+	/**
+	 * This will remove the current lobby scoreboard and components.
+	 */
+	public void destroyLobbyScoreboard() {
+		lobbyScoreboard = null;
+		teams.clear();
+		gameWaitingAnamate = 0;
+	}
+	
+	/**
+	 * Gives a player a scoreboard objective.
+	 * @param player The player who will receive a lobby scoreboard objective.
+	 */
+	private void setBoardObjective(Player player) {
+		Scoreboard board = lobbyScoreboard;
+		
 		//Unregister all current objectives on the scoreboard.
 		unregisterObjectives(board);
-
+				
 		//Set the board objective.
-		Objective objective = board.registerNewObjective("test", "dummy");
-
+		Objective objective = lobbyScoreboard.registerNewObjective(player.getName(), "dummy");
+		
 		//Set the board title.
 		String name = Messages.SB_LOBBY_TITLE.toString();
 		objective.setDisplayName(name);
@@ -62,12 +94,23 @@ public class LobbyScoreboard {
 		if(objective.getDisplaySlot() != DisplaySlot.SIDEBAR) {
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		}
-
+		
 		//Set the scores.
 		setScores(player, objective);
-
+		
 		//Sends the player the current scoreboard.
 		player.setScoreboard(board);
+	}
+	
+	/**
+	 * This will put a player on a team.
+	 * @param player The player what will be placed on a team.
+	 */
+	private void setPlayerTeam(Player player) {
+		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
+		int playerTeam = teamSelector.getPlayerTeam(player);
+		
+		teams.get(playerTeam).addEntry(player.getName());		
 	}
 
 	/**
@@ -87,7 +130,7 @@ public class LobbyScoreboard {
 		String kit = minigameKit.getKitNames().get(gameManager.getKitSelector().getPlayerKit(player));
 		String team = minigameTeam.getTeamNames().get(gameManager.getTeamSelector().getPlayerTeam(player));
 		String gameName = mpm.getMinigameBase().getMinigameName();
-
+		
 		//Blank line 1
 		objective.getScore(Messages.SB_BLANK_LINE_1.toString()).setScore(15);
 
@@ -173,12 +216,14 @@ public class LobbyScoreboard {
 	 * @param player The player that will receive a scoreboard.
 	 */
 	public void addPlayer(Player player) {
-		//Give the player a new "blank" scoreboard.
-		player.setScoreboard(manager.getNewScoreboard());
-
-		Scoreboard board = manager.getNewScoreboard();
-		playerBoards.put(player, board);
-		setBoardToPlayer(player);
+		//Give the player the main scoreboard.
+		player.setScoreboard(lobbyScoreboard);
+		
+		//Set the team.
+		setPlayerTeam(player);
+		
+		//Setup player's scoreboard.
+		setBoardObjective(player);
 	}
 
 	/**
@@ -187,13 +232,6 @@ public class LobbyScoreboard {
 	 * @param player The player that will have their scoreboard removed.
 	 */
 	public void removePlayer(Player player) {
-
-		//Remove all of the boards current objectives.
-		unregisterObjectives(playerBoards.get(player));
-
-		//Remove the player from the Scoreboard HashMap.
-		playerBoards.remove(player);
-
 		//Give the player a new "blank" scoreboard.
 		player.setScoreboard(manager.getNewScoreboard());
 	}
