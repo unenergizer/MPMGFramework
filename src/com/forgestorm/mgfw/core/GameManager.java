@@ -252,7 +252,10 @@ public class GameManager {
 
 					//Show games scores.
 					//This method will envoke the endGame(true) method of this class.
-					GAME_ARENA.showGameScores();
+					//Make sure we only show the scores if the game is running. This is an "/admin endgame" command bug fix.
+					if (gameState.equals(GameState.GAME_RUNNING)) {
+						GAME_ARENA.showGameScores();
+					}
 				}
 			}
 		}.runTaskTimer(PLUGIN, 0, 20);
