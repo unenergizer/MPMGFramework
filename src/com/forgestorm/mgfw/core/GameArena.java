@@ -108,6 +108,9 @@ public class GameArena {
 		
 		//Remove any fire.
 		player.setFireTicks(0);
+		
+		//Teleport player to spectator spawn.
+		player.teleport(PLUGIN.getMinigamePluginManager().getMinigameTeams().getSpectatorSpawnLocation());
 
 		//Switch Gamemode
 		player.setGameMode(GameMode.ADVENTURE);

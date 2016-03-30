@@ -48,11 +48,6 @@ public class PlayerJoin implements Listener {
 			
 			//Setup the player as a spectator.
 			gameArena.setupSpectator(player);
-			
-			//Teleport the player to a spectator spawn in the game world.
-			//TODO: Get a real spectator spawn point from the minigame plugin.
-			gameArena.tpToGameWorld(player, 0, 100, 0);
-			
 		} else {
 			//Teleport the player to the lobby.
 			teleport(player, lobbySpawn);

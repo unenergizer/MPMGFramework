@@ -75,4 +75,10 @@ public abstract class MinigameTeams {
 	 * @return Returns a list of locations that players will spawn at.
 	 */
 	public abstract ArrayList<ArrayList<Location>> getPlayerTeamSpawnLocations();
+	
+	/**
+	 * A location that a spectator will spawn.
+	 * @return Returns a spectator spawn location.
+	 */
+	public abstract Location getSpectatorSpawnLocation();
 }
