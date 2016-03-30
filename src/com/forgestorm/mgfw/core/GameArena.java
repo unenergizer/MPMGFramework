@@ -137,7 +137,7 @@ public class GameArena {
 		
 		//Show the game rules.
 		Bukkit.broadcastMessage("");
-		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
+		Bukkit.broadcastMessage(Messages.GAME_BAR_RULES.toString());
 		Bukkit.broadcastMessage("");
 		
 		//Loop through and show the game rules.
