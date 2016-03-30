@@ -26,13 +26,14 @@ public class ArenaScoreboard {
 	private ScoreboardManager manager;
 	private Scoreboard arenaScoreboard;
 	private ArrayList<Team> teams;
+	private Team spectator;
 
 	public ArenaScoreboard(MGFramework plugin) {
 		PLUGIN = plugin;
 		manager = Bukkit.getScoreboardManager();
 		teams = new ArrayList<Team>();
 	}
-	
+
 	/**
 	 * Creates a new scoreboard for the minigame.
 	 * <p>
@@ -40,26 +41,32 @@ public class ArenaScoreboard {
 	 */
 	public void createScoreboard() {
 		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
-		
+
 		arenaScoreboard = manager.getNewScoreboard();
-		
+
 		//Create Teams
 		for (int i = 0; i < minigameTeam.getTeamNames().size(); i++) {
 			String teamName = trimString(minigameTeam.getTeamNames().get(i));
 			ChatColor teamColor = minigameTeam.getTeamColors().get(i);
 			Team sbTeam = arenaScoreboard.registerNewTeam(teamName);
-		
+
 			//Set this scoreboard team prefix.
 			sbTeam.setPrefix(teamColor + "");
-			
+
 			//Add this scoreboard team to the teams array.
 			teams.add(sbTeam);
-			
-			//TODO: Rank refixes + colors
+
+			//TODO: Rank prefixes + colors
 			//team.setPrefix(rankPrefix + teamColor + "");
 		}
+
+		//Setup spectator team.
+		spectator = arenaScoreboard.registerNewTeam("spectator");
+		spectator.setPrefix(ChatColor.GRAY + "" + ChatColor.ITALIC);
+		spectator.setCanSeeFriendlyInvisibles(true);
+		spectator.setAllowFriendlyFire(false);
 	}
-	
+
 	/**
 	 * This will remove the current lobby scoreboard and components.
 	 */
@@ -67,20 +74,20 @@ public class ArenaScoreboard {
 		arenaScoreboard = null;
 		teams.clear();
 	}
-	
+
 	/**
 	 * Gives a player a scoreboard objective.
 	 * @param player The player who will receive a lobby scoreboard objective.
 	 */
 	private Objective setBoardObjective(Player player) {
 		Scoreboard board = arenaScoreboard;
-		
+
 		//Unregister all current objectives on the scoreboard.
 		unregisterObjectives(board);
-				
+
 		//Set the board objective.
 		Objective objective = arenaScoreboard.registerNewObjective(player.getName(), "dummy");
-		
+
 		//Set the board title.
 		String name = Messages.SB_LOBBY_TITLE.toString();
 		objective.setDisplayName(name);
@@ -89,19 +96,27 @@ public class ArenaScoreboard {
 		if(objective.getDisplaySlot() != DisplaySlot.SIDEBAR) {
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		}
-		
+
 		return objective;
 	}
-	
+
 	/**
 	 * This will put a player on a team.
 	 * @param player The player what will be placed on a team.
 	 */
 	private void setPlayerTeam(Player player) {
-		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
-		int playerTeam = teamSelector.getPlayerTeam(player);
-		
-		teams.get(playerTeam).addEntry(player.getName());		
+		boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+
+		if (!isSpectator) {
+			TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
+			int playerTeam = teamSelector.getPlayerTeam(player);
+
+			teams.get(playerTeam).addEntry(player.getName());
+		} else {
+
+			//Add spectator player.
+			spectator.addEntry(player.getName());
+		}
 	}
 
 	/**
@@ -112,22 +127,21 @@ public class ArenaScoreboard {
 	public void setScores(HashMap<Player, Integer> scoreMap) {
 
 		//Sends scoreboard objectives to a certain player.
-		for (Entry<Player, Integer> entry : scoreMap.entrySet()) {
-			Player player = entry.getKey();
-			
+		for (Player players: Bukkit.getOnlinePlayers()) {
+
 			//Send the player a custom scoreboard objective.
-			Objective objective = setBoardObjective(player);
-			
+			Objective objective = setBoardObjective(players);
+
 			//Puts the values on the scoreboard.
-			for (Entry<Player, Integer> entry2 : scoreMap.entrySet()) {
-				String sbPlayer = entry2.getKey().getName();
-				int sbScore = entry2.getValue();
-				
+			for (Entry<Player, Integer> entry : scoreMap.entrySet()) {
+				String sbPlayer = entry.getKey().getName();
+				int sbScore = entry.getValue();
+
 				objective.getScore(sbPlayer).setScore(sbScore);
 			}
-			
+
 			//Sends the player the current scoreboard.
-			player.setScoreboard(arenaScoreboard);
+			players.setScoreboard(arenaScoreboard);
 		}
 	}
 
@@ -158,10 +172,10 @@ public class ArenaScoreboard {
 	public void addPlayer(Player player) {
 		//Give the player the main scoreboard.
 		player.setScoreboard(arenaScoreboard);
-		
+
 		//Set the team.
 		setPlayerTeam(player);
-		
+
 		//Setup player's scoreboard.
 		setBoardObjective(player);
 	}

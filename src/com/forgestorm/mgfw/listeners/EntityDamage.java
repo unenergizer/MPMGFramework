@@ -44,6 +44,16 @@ public class EntityDamage implements Listener {
 					}
 				}
 			}
+		} else {
+			//Check for spectator damage.
+			if (event.getEntity() instanceof Player) {
+				Player player = (Player) event.getEntity();
+				boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+				
+				if (isSpectator) {
+					event.setCancelled(true);
+				}
+			}
 		}
 	}
 }

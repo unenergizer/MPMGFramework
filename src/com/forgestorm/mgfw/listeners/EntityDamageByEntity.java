@@ -27,6 +27,39 @@ public class EntityDamageByEntity implements Listener {
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
 		if (!isRunning) {
+			//Test for kit and team interaction.
+			if (event.getDamager() instanceof Player) {
+
+				KitSelector kitSelector = PLUGIN.getGameManager().getKitSelector();
+				TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
+				Player player = (Player) event.getDamager();
+				UUID uuid = event.getEntity().getUniqueId();
+				ArrayList<UUID> kitUUID = kitSelector.getKitEntityUUID();
+				ArrayList<UUID> teamUUID = teamSelector.getTeamEntityUUID();
+
+				//Test for kit interaction.
+				for(int i = 0; i < kitUUID.size(); i++) {
+					if (uuid.equals(kitUUID.get(i))) {
+						//Cancel the event (do no damage).
+						event.setCancelled(true);
+
+						//Toggle interact
+						kitSelector.kitInteract(player, i);
+					}
+				}
+
+				//Test for team interaction.
+				for(int i = 0; i < teamUUID.size(); i++) {
+					if (uuid.equals(teamUUID.get(i))) {
+						//Cancel the event (do no damage).
+						event.setCancelled(true);
+
+						//Toggle interact
+						teamSelector.teamInteract(i, player);
+					}
+				}
+			}
+		} else { //Test for spectator damage.
 			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameLobby().getPlayerProfile();
 
 			//Lets check for and prevent spectator vs player damage.
@@ -59,39 +92,6 @@ public class EntityDamageByEntity implements Listener {
 
 						//Cancel the damage if the player was a spectator.
 						event.setCancelled(true);
-					}
-				}
-			}
-
-			//Test for kit and team interaction.
-			if (event.getDamager() instanceof Player) {
-
-				KitSelector kitSelector = PLUGIN.getGameManager().getKitSelector();
-				TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
-				Player player = (Player) event.getDamager();
-				UUID uuid = event.getEntity().getUniqueId();
-				ArrayList<UUID> kitUUID = kitSelector.getKitEntityUUID();
-				ArrayList<UUID> teamUUID = teamSelector.getTeamEntityUUID();
-
-				//Test for kit interaction.
-				for(int i = 0; i < kitUUID.size(); i++) {
-					if (uuid.equals(kitUUID.get(i))) {
-						//Cancel the event (do no damage).
-						event.setCancelled(true);
-
-						//Toggle interact
-						kitSelector.kitInteract(player, i);
-					}
-				}
-
-				//Test for team interaction.
-				for(int i = 0; i < teamUUID.size(); i++) {
-					if (uuid.equals(teamUUID.get(i))) {
-						//Cancel the event (do no damage).
-						event.setCancelled(true);
-
-						//Toggle interact
-						teamSelector.teamInteract(i, player);
 					}
 				}
 			}
