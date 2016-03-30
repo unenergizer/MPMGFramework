@@ -13,14 +13,24 @@ public class BossBarAnnouncer {
 	
 	private BossBar bar;
 	
+	public BossBarAnnouncer() {
+		setupBossBar();
+	}
+	
+	/**
+	 * This will setup a new bossbar.
+	 */
+	private void setupBossBar() {
+		bar = Bukkit.createBossBar(Messages.BOSS_BAR_MESSAGE.toString(), BarColor.PURPLE, BarStyle.SOLID, new BarFlag[] { BarFlag.DARKEN_SKY });
+		bar.setVisible(true);
+	}
+	
 	/**
 	 * Sends a player entity a boss bar message.
 	 * @param player The player who will receive a boss bar message.
 	 */
 	public void showBossBar(Player player) {
-		bar = Bukkit.createBossBar(Messages.BOSS_BAR_MESSAGE.toString(), BarColor.PURPLE, BarStyle.SOLID, new BarFlag[] { BarFlag.DARKEN_SKY });
 		bar.addPlayer(player);
-		bar.show();
 	}
 	
 	/**
