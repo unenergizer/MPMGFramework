@@ -12,8 +12,10 @@ import com.forgestorm.mgfw.core.constants.Messages;
 public class BossBarAnnouncer {
 	
 	private BossBar bar;
+	private String message;
 	
-	public BossBarAnnouncer() {
+	public BossBarAnnouncer(String message) {
+		this.message = message;
 		setupBossBar();
 	}
 	
@@ -21,7 +23,7 @@ public class BossBarAnnouncer {
 	 * This will setup a new bossbar.
 	 */
 	private void setupBossBar() {
-		bar = Bukkit.createBossBar(Messages.BOSS_BAR_MESSAGE.toString(), BarColor.PURPLE, BarStyle.SOLID, new BarFlag[] { BarFlag.DARKEN_SKY });
+		bar = Bukkit.createBossBar(message, BarColor.PURPLE, BarStyle.SOLID, new BarFlag[] { BarFlag.DARKEN_SKY });
 		bar.setVisible(true);
 	}
 	

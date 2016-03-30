@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.core.constants.Messages;
+import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.FloatingMessage;
 import com.forgestorm.mgfw.core.display.scoreboard.ArenaScoreboard;
 import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
@@ -32,11 +33,13 @@ public class GameArena {
 	private final WorldDuplicator WORLD_DUPE;
 
 	private HashMap<Player, Location> playerSpawns;
+	private BossBarAnnouncer spectatorBar;
 	private ArenaScoreboard scoreboard;
 
 	public GameArena(MGFramework plugin) {
 		PLUGIN = plugin;
 		WORLD_DUPE = new WorldDuplicator();
+		spectatorBar = new BossBarAnnouncer(Messages.BOSS_BAR_SPECTATOR_MESSAGE.toString());
 		scoreboard = new ArenaScoreboard(PLUGIN);
 	}
 
@@ -156,13 +159,30 @@ public class GameArena {
 			}
 		}
 		
+		//Show Bossbar Announcer
+		spectatorBar.showBossBar(player);
 		
-		//TODO: Show Bossbar Announcer
-
 		//Send spectator notification message.
 		String title = Messages.GAME_ARENA_SPECTATOR_TITLE.toString();
 		String subtitle = Messages.GAME_ARENA_SPECTATOR_SUBTITLE.toString();
 		new FloatingMessage().sendFloatingMessage(player, title, subtitle);
+	}
+	
+	/**
+	 * Removes a spectator.
+	 * @param player The spectator we will remove.
+	 */
+	private void removeSpectator(Player player) {
+		spectatorBar.removeBossBar(player);
+	}
+	
+	/**
+	 * Removes all the spectators.
+	 */
+	void removeAllSpectators() {
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			removeSpectator(players);
+		}
 	}
 
 	/**

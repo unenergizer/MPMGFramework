@@ -27,7 +27,7 @@ public class GameLobby {
 	private final Location LOBBY_SPAWN;
 
 	private HashMap<Player, PlayerProfile> playerProfile;
-	private HashMap<Player, BossBarAnnouncer> bar;
+	private BossBarAnnouncer bar;
 	private LobbyScoreboard scoreboard;
 
 	public GameLobby(MGFramework plugin) {
@@ -36,7 +36,7 @@ public class GameLobby {
 		LOBBY_SPAWN = new Location(Bukkit.getWorld(LOBBY_WORLD_NAME), 0.5, 76, 0.5);
 
 		playerProfile = new HashMap<Player, PlayerProfile>();
-		bar = new HashMap<Player, BossBarAnnouncer>();
+		bar = new BossBarAnnouncer(Messages.BOSS_BAR_LOBBY_MESSAGE.toString());
 		scoreboard = new LobbyScoreboard(PLUGIN);
 	}
 
@@ -103,12 +103,8 @@ public class GameLobby {
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
 
-		//Give the player a boss bar if they dont have one.
-		if(!bar.containsKey(player)) {
-			bar.put(player, new BossBarAnnouncer());
-		}
 		//Send the player the boss bar.
-		bar.get(player).showBossBar(player);
+		bar.showBossBar(player);
 
 		//Send Tab Menu text
 		TabMenuText tmt = new TabMenuText();
@@ -144,7 +140,7 @@ public class GameLobby {
 	 */
 	private void removeLobbyPlayer(Player player) {
 		//Remove boss bars from the player.
-		bar.get(player).removeBossBar(player);
+		bar.removeBossBar(player);
 
 		//Remove the lobby scoreboard.
 		scoreboard.removePlayer(player);

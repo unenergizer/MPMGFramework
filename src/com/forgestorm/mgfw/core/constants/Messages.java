@@ -5,7 +5,8 @@ import net.md_5.bungee.api.ChatColor;
 public enum Messages {
 
 	//Debug messages
-	BOSS_BAR_MESSAGE("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
+	BOSS_BAR_LOBBY_MESSAGE("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
+	BOSS_BAR_SPECTATOR_MESSAGE("&bYou are a spectator! &amc&7.&aForgeStorm&7.&acom&b!"),
 	
 	//Commands
 	COMMAND_ADMIN_NOT_OP("&cYou do not have permission to do this."),

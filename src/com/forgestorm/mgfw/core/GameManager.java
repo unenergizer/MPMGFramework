@@ -162,6 +162,9 @@ public class GameManager {
 		//Destroy the lobby scoreboard.
 		GAME_ARENA.getScoreboard().destroyScoreboard();
 		
+		//Remove spectators
+		GAME_ARENA.removeAllSpectators();
+		
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
 
