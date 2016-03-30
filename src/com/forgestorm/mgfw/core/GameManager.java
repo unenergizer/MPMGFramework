@@ -1,5 +1,7 @@
 package com.forgestorm.mgfw.core;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -70,7 +72,7 @@ public class GameManager {
 		GAME_LOBBY.loadLobbyWorld();
 
 		//Setup the lobby scoreboard.
-		GAME_LOBBY.getScoreboard().createLobbyScoreboard();
+		GAME_LOBBY.getScoreboard().createScoreboard();
 		
 		//Setup lobby kits.
 		KIT_SELECTOR.spawnKits();
@@ -107,7 +109,10 @@ public class GameManager {
 		GAME_LOBBY.removeAllLobbyPlayers();
 
 		//Destroy the lobby scoreboard.
-		GAME_LOBBY.getScoreboard().destroyLobbyScoreboard();
+		GAME_LOBBY.getScoreboard().destroyScoreboard();
+		
+		//Setup the lobby scoreboard.
+		GAME_ARENA.getScoreboard().createScoreboard();
 
 		//Stop game tips from displaying.
 		tips.setShowTips(false);
@@ -122,7 +127,7 @@ public class GameManager {
 		PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
 
 		//Start the async check to see if the game is over.
-		pollForGameOver();
+		//pollForGameOver();
 
 	}
 
@@ -151,6 +156,9 @@ public class GameManager {
 		//Remove the teams from the lobby world.
 		TEAM_SELECTOR.removeTeams();
 
+		//Destroy the lobby scoreboard.
+		GAME_ARENA.getScoreboard().destroyScoreboard();
+		
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
 
@@ -237,34 +245,17 @@ public class GameManager {
 			}
 		}.runTaskTimer(PLUGIN, 0, 20);
 	}
-
+	
 	/**
-	 * Continuously polls the loaded minigame to check if it has ended.
+	 * This will show the end game results, then toggle the endGame(true) method.
 	 */
-	private void pollForGameOver() {
-
-		MinigamePluginManager mgpm = PLUGIN.getMinigamePluginManager();
-
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				boolean isGameOver = mgpm.getMinigameBase().isGameOver();
-
-				//Continuously poll to see if the minigame is over.
-				if (isGameOver) {
-					//Stop the thread first.
-					cancel();
-
-					//Show games scores.
-					//This method will envoke the endGame(true) method of this class.
-					//Make sure we only show the scores if the game is running. This is an "/admin endgame" command bug fix.
-					if (gameState.equals(GameState.GAME_RUNNING)) {
-						GAME_ARENA.showGameScores();
-					}
-				}
-			}
-		}.runTaskTimer(PLUGIN, 0, 20);
+	public void showEndGameResults(HashMap<Player, Integer> scoreMap) {
+		//Show games scores.
+		//This method will envoke the endGame(true) method of this class.
+		//Make sure we only show the scores if the game is running. This is an "/admin endgame" command bug fix.
+		if (gameState.equals(GameState.GAME_RUNNING)) {
+			GAME_ARENA.showGameScores(scoreMap);
+		}
 	}
 
 	/**

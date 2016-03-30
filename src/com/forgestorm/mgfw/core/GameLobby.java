@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
-import com.forgestorm.mgfw.core.display.LobbyScoreboard;
 import com.forgestorm.mgfw.core.display.TabMenuText;
+import com.forgestorm.mgfw.core.display.scoreboard.LobbyScoreboard;
 import com.forgestorm.mgfw.core.kits.KitSelector;
 import com.forgestorm.mgfw.core.teams.TeamSelector;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
@@ -212,7 +212,7 @@ public class GameLobby {
 
 	/**
 	 * Gets the lobby scoreboard component.
-	 * @return Retuns an instance of the lobby scoreboard component.
+	 * @return Returns an instance of the lobby scoreboard component.
 	 */
 	public LobbyScoreboard getScoreboard() {
 		return scoreboard;

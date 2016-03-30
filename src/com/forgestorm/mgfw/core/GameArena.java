@@ -17,8 +17,10 @@ import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.FloatingMessage;
+import com.forgestorm.mgfw.core.display.scoreboard.ArenaScoreboard;
 import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
+import com.forgestorm.mgfw.util.ScoresToPlaces;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -28,10 +30,12 @@ public class GameArena {
 	private final WorldDuplicator WORLD_DUPE;
 
 	private HashMap<Player, Location> playerSpawns;
+	private ArenaScoreboard scoreboard;
 
 	public GameArena(MGFramework plugin) {
 		PLUGIN = plugin;
 		WORLD_DUPE = new WorldDuplicator();
+		scoreboard = new ArenaScoreboard(PLUGIN);
 	}
 
 	/**
@@ -53,9 +57,11 @@ public class GameArena {
 		//Give the player flying.
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		
+
+		//Setup lobby scoreboard
+		scoreboard.addPlayer(player);
+
 		//TODO: Give kit
-		//TODO: Show Scoreboard
 		//TODO: Show Bossbar Announcer
 	}
 
@@ -108,6 +114,9 @@ public class GameArena {
 
 		//Set collide entities false.
 		player.spigot().setCollidesWithEntities(false);
+
+		//Setup lobby scoreboard
+		scoreboard.addPlayer(player);
 
 		//TODO: Set the player to the spectator scoreboard team.
 		//TODO: Show Bossbar Announcer
@@ -180,19 +189,38 @@ public class GameArena {
 	/**
 	 * This will display the scores at the end of the game to all the players and spectators.
 	 */
-	void showGameScores() {
+	void showGameScores(HashMap<Player, Integer> scoreMap) {
 		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
 		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_SCORES);
+
+		ArrayList<String> playerPlaces = new ScoresToPlaces().scoresToPlaces(scoreMap);
 
 		//Show the game rules.
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
 		Bukkit.broadcastMessage("");
-		Bukkit.broadcastMessage(ChatColor.RED + "1st X");
-		Bukkit.broadcastMessage(ChatColor.YELLOW + "2nd Y");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "3rd Z");
+		Bukkit.broadcastMessage(ChatColor.RED + "1st " + playerPlaces.get(0));
+		
+		if (playerPlaces.size() >= 2) {
+			Bukkit.broadcastMessage(ChatColor.YELLOW + "2nd " + playerPlaces.get(1));
+		}
+		
+		if (playerPlaces.size() >= 3) {
+			Bukkit.broadcastMessage(ChatColor.GREEN + "3rd " + playerPlaces.get(2));
+		}
+		
 		Bukkit.broadcastMessage("");
-		Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "You placed %s.");
+
+		//Show players how they scored.
+		for (int i = 0; i < playerPlaces.size(); i++) {
+			for (Player players: Bukkit.getOnlinePlayers()) {
+				if (playerPlaces.get(i).equals(players.getName()) && i > 2) {
+					int place = i + 1;
+					players.sendMessage(ChatColor.LIGHT_PURPLE + "You placed " + place + "th place.");	
+				}
+			}
+		}
+		
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
 
@@ -296,5 +324,13 @@ public class GameArena {
 	 */
 	public HashMap<Player, Location> getPlayerSpawns() {
 		return playerSpawns;
+	}
+
+	/**
+	 * Gets the arena scoreboard component.
+	 * @return Returns an instance of the lobby scoreboard component.
+	 */
+	public ArenaScoreboard getScoreboard() {
+		return scoreboard;
 	}
 }

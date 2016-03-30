@@ -1,6 +1,8 @@
-package com.forgestorm.mgfw.core.display;
+package com.forgestorm.mgfw.core.display.scoreboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,47 +13,41 @@ import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
 import com.forgestorm.mgfw.MGFramework;
-import com.forgestorm.mgfw.api.MinigameKits;
 import com.forgestorm.mgfw.api.MinigameTeams;
-import com.forgestorm.mgfw.core.GameManager;
-import com.forgestorm.mgfw.core.MinigamePluginManager;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.teams.TeamSelector;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class LobbyScoreboard {
+public class ArenaScoreboard {
 
 	private final MGFramework PLUGIN;
 
 	private ScoreboardManager manager;
-	private Scoreboard lobbyScoreboard;
+	private Scoreboard arenaScoreboard;
 	private ArrayList<Team> teams;
-	private int gameWaitingAnamate;
 
-
-	public LobbyScoreboard(MGFramework plugin) {
+	public ArenaScoreboard(MGFramework plugin) {
 		PLUGIN = plugin;
 		manager = Bukkit.getScoreboardManager();
 		teams = new ArrayList<Team>();
-		gameWaitingAnamate = 1;
 	}
 	
 	/**
-	 * Creates a new scoreboard for the minigame lobby.
+	 * Creates a new scoreboard for the minigame.
 	 * <p>
 	 * This should happen every time a new game is loaded into the framework.
 	 */
-	public void createLobbyScoreboard() {
+	public void createScoreboard() {
 		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 		
-		lobbyScoreboard = manager.getNewScoreboard();
+		arenaScoreboard = manager.getNewScoreboard();
 		
 		//Create Teams
 		for (int i = 0; i < minigameTeam.getTeamNames().size(); i++) {
 			String teamName = trimString(minigameTeam.getTeamNames().get(i));
 			ChatColor teamColor = minigameTeam.getTeamColors().get(i);
-			Team sbTeam = lobbyScoreboard.registerNewTeam(teamName);
+			Team sbTeam = arenaScoreboard.registerNewTeam(teamName);
 		
 			//Set this scoreboard team prefix.
 			sbTeam.setPrefix(teamColor + "");
@@ -67,24 +63,23 @@ public class LobbyScoreboard {
 	/**
 	 * This will remove the current lobby scoreboard and components.
 	 */
-	public void destroyLobbyScoreboard() {
-		lobbyScoreboard = null;
+	public void destroyScoreboard() {
+		arenaScoreboard = null;
 		teams.clear();
-		gameWaitingAnamate = 0;
 	}
 	
 	/**
 	 * Gives a player a scoreboard objective.
 	 * @param player The player who will receive a lobby scoreboard objective.
 	 */
-	private void setBoardObjective(Player player) {
-		Scoreboard board = lobbyScoreboard;
+	private Objective setBoardObjective(Player player) {
+		Scoreboard board = arenaScoreboard;
 		
 		//Unregister all current objectives on the scoreboard.
 		unregisterObjectives(board);
 				
 		//Set the board objective.
-		Objective objective = lobbyScoreboard.registerNewObjective(player.getName(), "dummy");
+		Objective objective = arenaScoreboard.registerNewObjective(player.getName(), "dummy");
 		
 		//Set the board title.
 		String name = Messages.SB_LOBBY_TITLE.toString();
@@ -95,11 +90,7 @@ public class LobbyScoreboard {
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		}
 		
-		//Set the scores.
-		setScores(player, objective);
-		
-		//Sends the player the current scoreboard.
-		player.setScoreboard(board);
+		return objective;
 	}
 	
 	/**
@@ -118,77 +109,26 @@ public class LobbyScoreboard {
 	 * @param player The player that we are setting scores for.
 	 * @param objective The objective object we are working with.
 	 */
-	private void setScores(Player player, Objective objective) {
-		GameManager gameManager = PLUGIN.getGameManager();
-		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
-		MinigameKits minigameKit = mpm.getMinigameKit();
-		MinigameTeams minigameTeam = mpm.getMinigameTeams();
+	public void setScores(HashMap<Player, Integer> scoreMap) {
 
-		int currentPlayers = Bukkit.getOnlinePlayers().size();
-		int maxPlayers = gameManager.getMaxPlayers();
-
-		String kit = minigameKit.getKitNames().get(gameManager.getKitSelector().getPlayerKit(player));
-		String team = minigameTeam.getTeamNames().get(gameManager.getTeamSelector().getPlayerTeam(player));
-		String gameName = mpm.getMinigameBase().getMinigameName();
-		
-		//Blank line 1
-		objective.getScore(Messages.SB_BLANK_LINE_1.toString()).setScore(15);
-
-		//Games Stats
-		objective.getScore(Messages.SB_GAME_STATUS.toString()).setScore(14);
-
-		//Game Status
-		if(currentPlayers >= gameManager.getMinPlayers()) {
-			objective.getScore(Messages.SB_GAME_STATUS_READY.toString()).setScore(13);
-		} else {
-			if(gameWaitingAnamate == 1) {
-				objective.getScore(Messages.SB_GAME_STATUS_WAITING_1.toString()).setScore(13);
-				gameWaitingAnamate++;
-			} else if (gameWaitingAnamate == 2) {
-				objective.getScore(Messages.SB_GAME_STATUS_WAITING_2.toString()).setScore(13);
-				gameWaitingAnamate++;
-			} else if (gameWaitingAnamate == 3) {
-				objective.getScore(Messages.SB_GAME_STATUS_WAITING_3.toString()).setScore(13);
-				gameWaitingAnamate = 1;
+		//Sends scoreboard objectives to a certain player.
+		for (Entry<Player, Integer> entry : scoreMap.entrySet()) {
+			Player player = entry.getKey();
+			
+			//Send the player a custom scoreboard objective.
+			Objective objective = setBoardObjective(player);
+			
+			//Puts the values on the scoreboard.
+			for (Entry<Player, Integer> entry2 : scoreMap.entrySet()) {
+				String sbPlayer = entry2.getKey().getName();
+				int sbScore = entry2.getValue();
+				
+				objective.getScore(sbPlayer).setScore(sbScore);
 			}
+			
+			//Sends the player the current scoreboard.
+			player.setScoreboard(arenaScoreboard);
 		}
-
-		//Blank line 2
-		objective.getScore(Messages.SB_BLANK_LINE_2.toString()).setScore(12);
-
-		//Players total
-		objective.getScore(Messages.SB_PLAYERS.toString()).setScore(11);
-
-		//Player count
-		String pCount = Messages.SB_PLAYER_COUNT.toString().replace("%s", Integer.toString(currentPlayers)).replace("%f", Integer.toString(maxPlayers));
-		objective.getScore(pCount).setScore(10);
-
-		//Blank line 3
-		objective.getScore(Messages.SB_BLANK_LINE_3.toString()).setScore(9);
-
-		//Kit
-		objective.getScore(Messages.SB_KIT.toString()).setScore(8);
-
-		//Player Kit
-		objective.getScore(trimString(kit)).setScore(7);
-
-		//Blank line 4
-		objective.getScore(Messages.SB_BLANK_LINE_4.toString()).setScore(6);
-
-		//Team
-		objective.getScore(Messages.SB_TEAM.toString()).setScore(5);
-
-		//Player Team
-		objective.getScore(trimString(team)).setScore(4);
-
-		//Blank line 5
-		objective.getScore(Messages.SB_BLANK_LINE_5.toString()).setScore(3);
-
-		//Next game:
-		objective.getScore(Messages.SB_NEXT_GAME.toString()).setScore(2);
-
-		//Next game name.
-		objective.getScore(ChatColor.AQUA + trimString(gameName)).setScore(1);
 	}
 
 	/**
@@ -217,7 +157,7 @@ public class LobbyScoreboard {
 	 */
 	public void addPlayer(Player player) {
 		//Give the player the main scoreboard.
-		player.setScoreboard(lobbyScoreboard);
+		player.setScoreboard(arenaScoreboard);
 		
 		//Set the team.
 		setPlayerTeam(player);

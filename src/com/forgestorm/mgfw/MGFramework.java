@@ -26,11 +26,11 @@ import com.forgestorm.mgfw.listeners.WeatherChange;
 
 public class MGFramework extends JavaPlugin {
 
-	private GameManager gameManager;
 	private MinigamePluginManager minigamePluginManager;
 	private GameLobby lobby;
 	private GameArena arena;
-
+	private GameManager gameManager;
+	
 	@Override
 	public void onEnable() {
 
