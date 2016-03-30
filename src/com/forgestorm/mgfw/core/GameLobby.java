@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.Messages;
@@ -95,6 +96,9 @@ public class GameLobby {
 
 		//Set the player as a spectator.
 		playerProfile.get(player).setSpectator(false);
+		
+		//Clear potion effects.
+		player.removePotionEffect(PotionEffectType.INVISIBILITY);
 
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);

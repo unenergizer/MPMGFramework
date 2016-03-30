@@ -11,6 +11,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
@@ -95,6 +97,14 @@ public class GameArena {
 	 * @param player The player that will be setup as a spectator.
 	 */
 	public void setupSpectator(Player player) {
+		GameManager gameManager = PLUGIN.getGameManager();
+		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
+		
+		//Check if the minigame should end.
+		if (gameManager.shouldMinigameEnd()) {
+			gameManager.endGame(true);
+		}
+		
 		//Heal the player
 		player.setHealth(20);
 		player.setFoodLevel(20);
@@ -110,7 +120,7 @@ public class GameArena {
 		player.setFireTicks(0);
 		
 		//Teleport player to spectator spawn.
-		player.teleport(PLUGIN.getMinigamePluginManager().getMinigameTeams().getSpectatorSpawnLocation());
+		player.teleport(mpm.getMinigameTeams().getSpectatorSpawnLocation());
 
 		//Switch Gamemode
 		player.setGameMode(GameMode.ADVENTURE);
@@ -121,6 +131,9 @@ public class GameArena {
 
 		//Set collide entities false.
 		player.spigot().setCollidesWithEntities(false);
+		
+		//Add the invisible potion effect to the player.
+		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 15));
 
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);

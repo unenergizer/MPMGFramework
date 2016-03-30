@@ -282,7 +282,24 @@ public class GameManager {
 	 * @return This will figure out if the game should end.
 	 */
 	public boolean shouldMinigameEnd() {
-		return Bukkit.getOnlinePlayers().size() == 0;
+		int playersOnline = Bukkit.getOnlinePlayers().size();
+		int spectatorsOnline = 0;
+		
+		//Get spectator count.
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(players).isSpectator();
+			
+			if (isSpectator) {
+				spectatorsOnline++;
+			}
+		}
+		
+		//Test if game should end.
+		if (playersOnline == 0 || playersOnline == spectatorsOnline) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
