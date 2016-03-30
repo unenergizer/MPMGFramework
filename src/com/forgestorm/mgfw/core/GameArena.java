@@ -272,8 +272,12 @@ public class GameArena {
 			//Load the map into memory
 			WORLD_DUPE.loadWorld(name);
 
+			//Stop natural spawning of entities.
+			WORLD_DUPE.stopEntitySpawns();
+			
 			//Cleanup any map entities.
 			WORLD_DUPE.clearEntities();
+			
 		} else {
 			Bukkit.getServer().getLogger().info("[MPMG-Framework] World var not null? We will not load the next world.");
 		}

@@ -61,6 +61,14 @@ public class WorldDuplicator {
 			}
 		}
 	}
+	
+	/**
+	 * Stops natural spawning of entities in the game world.
+	 */
+	public void stopEntitySpawns() {
+		world.setSpawnFlags(false, false);
+        world.setGameRuleValue("doMobSpawning", "false");
+	}
 
 	/**
 	 * Copies a world directory to another directory.
