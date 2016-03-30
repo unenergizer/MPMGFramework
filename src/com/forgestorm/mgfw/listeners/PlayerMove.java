@@ -27,10 +27,11 @@ public class PlayerMove implements Listener {
 
 		//Stop the player from moving if the game is showing the rules.
 		if (gameState.equals(GameState.ARENA_SHOW_RULES)) {
+			Player player = event.getPlayer();
+			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
 			
 			//If the countdown has started, then let the player look around.
-			if (!event.getFrom().toVector().equals(event.getTo().toVector())) {
-				Player player = event.getPlayer();
+			if (!event.getFrom().toVector().equals(event.getTo().toVector()) && !isSpectator) {
 				HashMap<Player, Location> playerSpawns = gameArena.getPlayerSpawns();
 				
 				//Teleport player back to their arena spawn location.

@@ -83,6 +83,9 @@ public class GameManager {
 
 		//Setup all the players currently in the lobby.
 		GAME_LOBBY.setupAllLobbyPlayers();
+		
+		//Unhide players
+		GAME_LOBBY.showHiddenPlayers();
 
 		//Setup rotating game tips.
 		tips.startTipMessages(PLUGIN.getMinigamePluginManager().getMinigameBase().getTips());

@@ -117,8 +117,26 @@ public class GameArena {
 
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
-
-		//TODO: Set the player to the spectator scoreboard team.
+		
+		//Hide the spectator from other players.
+		for (Player spectators: Bukkit.getOnlinePlayers()) {
+			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(spectators).isSpectator();
+			
+			//If this player is a spectator lets hide them from the other players.
+			if (isSpectator) {
+				
+				//Now loop through all players and hide them from spectators.
+				for(Player players: Bukkit.getOnlinePlayers()) {
+					boolean isSpectatorToo = PLUGIN.getGameLobby().getPlayerProfile().get(players).isSpectator();
+					
+					if (!isSpectatorToo) {
+						players.hidePlayer(spectators);
+					}
+				}
+			}
+		}
+		
+		
 		//TODO: Show Bossbar Announcer
 
 		//Send spectator notification message.

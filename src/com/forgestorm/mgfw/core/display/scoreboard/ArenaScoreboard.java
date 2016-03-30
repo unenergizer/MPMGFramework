@@ -27,6 +27,7 @@ public class ArenaScoreboard {
 	private Scoreboard arenaScoreboard;
 	private ArrayList<Team> teams;
 	private Team spectator;
+	private HashMap<Player, Integer> lastScoreMapSent;
 
 	public ArenaScoreboard(MGFramework plugin) {
 		PLUGIN = plugin;
@@ -73,6 +74,7 @@ public class ArenaScoreboard {
 	public void destroyScoreboard() {
 		arenaScoreboard = null;
 		teams.clear();
+		lastScoreMapSent.clear();
 	}
 
 	/**
@@ -125,7 +127,9 @@ public class ArenaScoreboard {
 	 * @param objective The objective object we are working with.
 	 */
 	public void setScores(HashMap<Player, Integer> scoreMap) {
-
+		
+		lastScoreMapSent = scoreMap;
+		
 		//Sends scoreboard objectives to a certain player.
 		for (Player players: Bukkit.getOnlinePlayers()) {
 
@@ -177,7 +181,10 @@ public class ArenaScoreboard {
 		setPlayerTeam(player);
 
 		//Setup player's scoreboard.
-		setBoardObjective(player);
+		//TODO: Clean this up.
+		if (PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator()) {
+			setScores(lastScoreMapSent);
+		}
 	}
 
 	/**

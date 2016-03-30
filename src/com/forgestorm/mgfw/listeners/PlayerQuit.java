@@ -25,13 +25,14 @@ public class PlayerQuit implements Listener {
 
 		GameManager gameManager = PLUGIN.getGameManager();
 		GameLobby gameLobby = PLUGIN.getGameLobby();
+		boolean isRunning = gameManager.isMinigameRunning();
 		Player player = event.getPlayer();
 
 		//Remove the player from the players hashmap.
 		gameLobby.getPlayerProfile().remove(player);
 
 		//Test if the game is running.  If it is, teleport the player to the game world.
-		if (gameManager.isMinigameRunning()) {
+		if (isRunning) {
 
 			//Check to see if the game should end.
 			if (gameManager.shouldMinigameEnd()) {

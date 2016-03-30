@@ -20,7 +20,7 @@ import com.forgestorm.mgfw.core.teams.TeamSelector;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class GameLobby {
-	
+
 	private final MGFramework PLUGIN;
 	private final String LOBBY_WORLD_NAME;
 	private final Location LOBBY_SPAWN;
@@ -33,12 +33,12 @@ public class GameLobby {
 		PLUGIN = plugin;
 		LOBBY_WORLD_NAME = "mg-lobby";
 		LOBBY_SPAWN = new Location(Bukkit.getWorld(LOBBY_WORLD_NAME), 0.5, 76, 0.5);
-		
+
 		playerProfile = new HashMap<Player, PlayerProfile>();
 		bar = new HashMap<Player, BossBarAnnouncer>();
 		scoreboard = new LobbyScoreboard(PLUGIN);
 	}
-	
+
 	/**
 	 * This will setup all the players in the server for the lobby.
 	 */
@@ -48,40 +48,40 @@ public class GameLobby {
 			setupLobbyPlayer(players);
 		}
 	}
-	
+
 	/**
 	 * This will setup a player in the lobby.
 	 * @param player The player to setup in the lobby.
 	 */
 	public void setupLobbyPlayer(Player player) {
 		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
-		
+
 		//Get all players and teleport them to the lobby world.	
 		tpToLobbySpawn(player);
-		
+
 		//Assigning the player to a team.
 		if (teamSelector.getPlayerTeam(player) == null) {
 			teamSelector.addLatePlayer(player);
 		}
-		
+
 		//Heal the player
 		player.setHealth(20);
 		player.setFoodLevel(20);
-		
+
 		//Clear a players inventory
 		player.getInventory().clear();
 		player.getInventory().setHelmet(null);
 		player.getInventory().setChestplate(null);
 		player.getInventory().setLeggings(null);
 		player.getInventory().setBoots(null);
-		
+
 		//Set gamemode.
 		player.setGameMode(GameMode.ADVENTURE);
-		
+
 		//Give the player flying.
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		
+
 		//Set collide entities false.
 		player.spigot().setCollidesWithEntities(true);
 
@@ -92,7 +92,7 @@ public class GameLobby {
 
 		//Set the player as a spectator.
 		playerProfile.get(player).setSpectator(false);
-		
+
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
 
@@ -102,12 +102,24 @@ public class GameLobby {
 		}
 		//Send the player the boss bar.
 		bar.get(player).showBossBar(player);
-		
+
 		//Send Tab Menu text
 		TabMenuText tmt = new TabMenuText();
 		String header = Messages.GAME_TAB_HEADRER.toString();
 		String footer = Messages.GAME_TAB_FOOTER.toString();
 		tmt.sendHeaderAndFooter(player, header, footer);
+	}
+
+	public void showHiddenPlayers() {
+		//Hide the spectator from other players.
+		for (Player spectators: Bukkit.getOnlinePlayers()) {
+
+			//Now loop through all players and hide them from spectators.
+			for(Player players: Bukkit.getOnlinePlayers()) {
+				
+				players.showPlayer(spectators);
+			}
+		}
 	}
 	
 	/**
@@ -118,7 +130,7 @@ public class GameLobby {
 			removeLobbyPlayer(players);
 		}
 	}
-	
+
 	/**
 	 * Removes a players lobby components.
 	 * @param player The player who will have lobby components removed from them.
@@ -126,11 +138,11 @@ public class GameLobby {
 	private void removeLobbyPlayer(Player player) {
 		//Remove boss bars from the player.
 		bar.get(player).removeBossBar(player);
-		
+
 		//Remove the lobby scoreboard.
 		scoreboard.removePlayer(player);
 	}
-	
+
 	/**
 	 * When a player quits the game, lets remove lobby components from them.
 	 * @param player The player who has quit the game.
@@ -138,13 +150,13 @@ public class GameLobby {
 	public void removeQuitPlayer(Player player) {
 		KitSelector kitSelector = PLUGIN.getGameManager().getKitSelector();
 		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
-		
+
 		//Remove lobby components from player.
 		removeLobbyPlayer(player);
 
 		//Remove player from kit selecton.
 		kitSelector.removePlayerKit(player);
-		
+
 		//Remove player form teaming hashmaps.
 		teamSelector.removeQueuedPlayer(player);
 		teamSelector.removeSortedPlayer(player);
@@ -168,7 +180,7 @@ public class GameLobby {
 			}
 		}
 	}
-	
+
 	/**
 	 * This will teleport all the players in the server to the lobby spawn.
 	 */
@@ -177,7 +189,7 @@ public class GameLobby {
 			tpToLobbySpawn(players);
 		}
 	}
-	
+
 	/**
 	 * Teleports a player to the lobby spawn pad.
 	 * @param player The player to teleport to lobby spawn.
@@ -201,7 +213,7 @@ public class GameLobby {
 	public String getLobbyWorldName() {
 		return LOBBY_WORLD_NAME;
 	}
-	
+
 	/**
 	 * Gets the specified player's profile.
 	 * @return Retuns an inscance of the players profile.

@@ -22,7 +22,7 @@ public class PlayerInteract implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event){
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
-		if (!isRunning) {
+		if (isRunning) {
 			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameLobby().getPlayerProfile();
 			Player player = (Player) event.getPlayer();
 
