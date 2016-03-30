@@ -133,15 +133,18 @@ public class GameArena {
 	void showGameRules() {
 		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
 		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_RULES);
-
+		ArrayList<String> gameRules = PLUGIN.getMinigamePluginManager().getMinigameBase().getGameRules();
+		
 		//Show the game rules.
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
 		Bukkit.broadcastMessage("");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
-		Bukkit.broadcastMessage(ChatColor.GREEN + "GAME RULES WILL GO HERE");
+		
+		//Loop through and show the game rules.
+		for (int i = 0; i < gameRules.size(); i++) {
+			Bukkit.broadcastMessage(ChatColor.GREEN + gameRules.get(i));
+		}
+		
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
 

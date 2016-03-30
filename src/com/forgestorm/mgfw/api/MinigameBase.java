@@ -20,12 +20,19 @@ public abstract class MinigameBase {
 	 */
 	public abstract void startGame();
 
-	
 	/**
 	 * Gets a list of minigame tips to show to the players while in the lobby world.
 	 * @return Returns an array list of strings.
 	 */
 	public abstract ArrayList<String> getTips();
+	
+	/**
+	 * Gets a list of minigame rules to show when the player is spawned in the arena world.
+	 * <p>
+	 * Their should be no more than 5 lines.
+	 * @return Returns an array list of strings.
+	 */
+	public abstract ArrayList<String> getGameRules();
 
 	/**
 	 * Gets the player friendly name of the current minigame.
