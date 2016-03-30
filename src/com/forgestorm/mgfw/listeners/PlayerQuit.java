@@ -33,16 +33,9 @@ public class PlayerQuit implements Listener {
 
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (isRunning) {
-
-			//Check to see if the game should end.
-			if (gameManager.shouldMinigameEnd()) {
-
-				//End the game!
-				gameManager.endGame(true);
-
-				Bukkit.getLogger().warning("[MPMGFramework] Ending game early. No players online!");
-			}
-
+			
+			//Test to see if the minigame should end.
+			shouldMinigameEnd(gameManager);
 		} else {
 			//Remove the player from the lobby.
 			gameLobby.removeQuitPlayer(player);
@@ -64,6 +57,24 @@ public class PlayerQuit implements Listener {
 			public void run() {
 				//Update scoreboard for all players
 				gameLobby.getScoreboard().updateAllPlayerScoreboards();
+			}
+		}.runTaskLater(PLUGIN, 10);
+	}
+
+
+	private void shouldMinigameEnd(GameManager gameManager) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Check to see if the game should end.
+				if (gameManager.shouldMinigameEnd()) {
+
+					//Show warning in the logger.
+					Bukkit.getLogger().warning("[MPMGFramework] Ending game early. No players online!");
+					
+					//End the game!
+					gameManager.endGame(true);
+				}
 			}
 		}.runTaskLater(PLUGIN, 10);
 	}

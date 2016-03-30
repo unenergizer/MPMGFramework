@@ -147,8 +147,8 @@ public class GameArena {
 		//TODO: Show Bossbar Announcer
 
 		//Send spectator notification message.
-		String title = ChatColor.GREEN + "Hello, Spectator!";
-		String subtitle = ChatColor.GRAY + "Relax, another game will start soon!";
+		String title = Messages.GAME_ARENA_SPECTATOR_TITLE.toString();
+		String subtitle = Messages.GAME_ARENA_SPECTATOR_SUBTITLE.toString();
 		new FloatingMessage().sendFloatingMessage(player, title, subtitle);
 	}
 

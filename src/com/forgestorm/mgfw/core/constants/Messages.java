@@ -32,6 +32,8 @@ public enum Messages {
 	GAME_BAR_BOTTOM("&8&l&m---------------------------------------------"),
 	GAME_TIME_REMAINING_PLURAL("&eGame will start in &c%s &eseconds."),
 	GAME_TIME_REMAINING_SINGULAR("&eGame will start in &c1 &esecond."),
+	GAME_ARENA_SPECTATOR_TITLE("&aHello, Spectator!"),
+	GAME_ARENA_SPECTATOR_SUBTITLE("&7Relax, another game will start soon!"),
 	
 	//Scoreboard
 	SB_LOBBY_TITLE("&cmc&7.&cForgeStorm&7.&ccom"),
