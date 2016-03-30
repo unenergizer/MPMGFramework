@@ -331,15 +331,6 @@ public class GameArena {
 	}
 
 	/**
-	 * Teleports a player to the game arena.
-	 * @param player The player who will be teleported.
-	 */
-	public void tpToGameWorld(Player player, double x, double y, double z) {
-		//Teleport to game world
-		player.teleport(new Location(WORLD_DUPE.getWorld(), x, y, z));
-	}
-
-	/**
 	 * Returns and instance of the world duplicator.
 	 * @return An instance of the world duplicator.
 	 */

@@ -188,34 +188,6 @@ public class ArenaScoreboard {
 	}
 
 	/**
-	 * Removes a player scoreboard..
-	 * 
-	 * @param player The player that will have their scoreboard removed.
-	 */
-	public void removePlayer(Player player) {
-		//Give the player a new "blank" scoreboard.
-		player.setScoreboard(manager.getNewScoreboard());
-	}
-
-	/**
-	 * Update a players scoreboard.
-	 * @param player The player scoreboard we will update.
-	 */
-	public void updatePlayerScoreboard(Player player) {
-		removePlayer(player);
-		addPlayer(player);
-	}
-
-	/**
-	 * Update all players scoreboard.
-	 */
-	public void updateAllPlayerScoreboards() {
-		for (Player players: Bukkit.getOnlinePlayers()) {
-			updatePlayerScoreboard(players);
-		}
-	}
-
-	/**
 	 * Unregisters all the given objectives for the scoreboard.
 	 * @param board The board that will have all objectives removed form it.
 	 */

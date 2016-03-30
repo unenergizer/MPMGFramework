@@ -113,7 +113,7 @@ public class GameLobby {
 		tmt.sendHeaderAndFooter(player, header, footer);
 	}
 
-	public void showHiddenPlayers() {
+	void showHiddenPlayers() {
 		//Hide the spectator from other players.
 		for (Player spectators: Bukkit.getOnlinePlayers()) {
 
