@@ -28,6 +28,7 @@ public enum Messages {
 	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),
 	GAME_BAR_TEAM("&8&l&m----------------&r&8&l<[ &3&lTeam Select &8&l]>&8&l&m---------------"),
 	GAME_BAR_RULES("&8&l&m----------------&r&8&l<[ &e&lHow to Play &8&l]>&8&l&m---------------"),
+	GAME_BAR_SCORES("&8&l&m---------------&r&8&l<[ &e&lFinal Scores &8&l]>&8&l&m---------------"),
 	GAME_BAR_BOTTOM("&8&l&m---------------------------------------------"),
 	GAME_TIME_REMAINING_PLURAL("&eGame will start in &c%s &eseconds."),
 	GAME_TIME_REMAINING_SINGULAR("&eGame will start in &c1 &esecond."),

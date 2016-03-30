@@ -75,6 +75,9 @@ public class GameLobby {
 		player.getInventory().setLeggings(null);
 		player.getInventory().setBoots(null);
 
+		//Remove any fire.
+		player.setFireTicks(0);
+		
 		//Set gamemode.
 		player.setGameMode(GameMode.ADVENTURE);
 

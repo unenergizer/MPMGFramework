@@ -58,6 +58,9 @@ public class GameArena {
 		player.setAllowFlight(false);
 		player.setFlying(false);
 
+		//Remove any fire.
+		player.setFireTicks(0);
+		
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
 
@@ -85,8 +88,6 @@ public class GameArena {
 		for (Player players: Bukkit.getOnlinePlayers()) {
 			setupArenaPlayer(players);
 		}
-
-		//TODO: Now freeze the players so they can not move.
 	}
 
 	/**
@@ -104,6 +105,9 @@ public class GameArena {
 		player.getInventory().setChestplate(null);
 		player.getInventory().setLeggings(null);
 		player.getInventory().setBoots(null);
+		
+		//Remove any fire.
+		player.setFireTicks(0);
 
 		//Switch Gamemode
 		player.setGameMode(GameMode.ADVENTURE);
@@ -218,7 +222,7 @@ public class GameArena {
 
 		//Show the game rules.
 		Bukkit.broadcastMessage("");
-		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
+		Bukkit.broadcastMessage(Messages.GAME_BAR_SCORES.toString());
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(ChatColor.RED + "1st " + playerPlaces.get(0));
 		
