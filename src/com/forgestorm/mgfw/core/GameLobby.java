@@ -86,8 +86,9 @@ public class GameLobby {
 		player.setAllowFlight(false);
 		player.setFlying(false);
 
-		//Set collide entities false.
-		player.spigot().setCollidesWithEntities(true);
+		//Set collide entities true.
+		LivingEntity entity = (LivingEntity) player;
+		entity.setCollidable(true);
 
 		//Setup lobby player profiles (for server reloads).
 		if (!playerProfile.containsKey(player)) {

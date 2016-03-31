@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -133,7 +134,8 @@ public class GameArena {
 		player.setFlying(true);
 
 		//Set collide entities false.
-		player.spigot().setCollidesWithEntities(false);
+		LivingEntity entity = (LivingEntity) player;
+		entity.setCollidable(false);
 		
 		//Add the invisible potion effect to the player.
 		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 15));
@@ -166,6 +168,8 @@ public class GameArena {
 		String title = Messages.GAME_ARENA_SPECTATOR_TITLE.toString();
 		String subtitle = Messages.GAME_ARENA_SPECTATOR_SUBTITLE.toString();
 		new FloatingMessage().sendFloatingMessage(player, title, subtitle);
+		
+		//TODO:Give Spectator menu.
 	}
 	
 	/**
