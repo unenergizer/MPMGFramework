@@ -87,8 +87,7 @@ public class GameLobby {
 		player.setFlying(false);
 
 		//Set collide entities true.
-		LivingEntity entity = (LivingEntity) player;
-		entity.setCollidable(true);
+		player.setCollidable(true);
 
 		//Setup lobby player profiles (for server reloads).
 		if (!playerProfile.containsKey(player)) {

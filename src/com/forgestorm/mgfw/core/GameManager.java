@@ -199,7 +199,7 @@ public class GameManager {
 			public void run() {
 
 				//If the minimum number of players is met, lets do a countdown!
-				if (isMinimumPlayersMet()) {
+				if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
 					
 					//Show countdown in chat.
 					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 1) {
@@ -208,7 +208,7 @@ public class GameManager {
 						
 						for (Player players: Bukkit.getOnlinePlayers()) {
 							abt.sendActionbarMessage(players, message.replace("%s", Integer.toString(countdown)));
-							players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+							players.playSound(players.getLocation(), Sound.BLOCK_NOTE_PLING, 1f, 1f);
 						}
 					}
 					

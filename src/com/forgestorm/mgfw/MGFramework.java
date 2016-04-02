@@ -66,6 +66,7 @@ public class MGFramework extends JavaPlugin {
 		pm.registerEvents(new PlayerInteract(this), this);
 		pm.registerEvents(new EntityTargetLivingEntity(this), this);
 		pm.registerEvents(new FoodLevelChange(this), this);
+		//pm.registerEvents(new InventoryClick(this), this);
 		pm.registerEvents(new PlayerInteractEntity(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerMove(this), this);

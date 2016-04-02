@@ -12,7 +12,7 @@ import net.md_5.bungee.api.ChatColor;
 public class TipAnnouncer {
 
 	private final MGFramework PLUGIN;
-	private final int gameTipTime = 20 * 60 * 1;
+	private final int gameTipTime = 20 * 15;
 
 	private int tipDisplayed;
 	private boolean showTips;

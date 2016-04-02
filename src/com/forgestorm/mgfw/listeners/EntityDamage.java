@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -13,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.GameArena;
 import com.forgestorm.mgfw.core.GameLobby;
+import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class EntityDamage implements Listener {
@@ -23,7 +25,7 @@ public class EntityDamage implements Listener {
 		PLUGIN = plugin;
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onEntityDamage(EntityDamageEvent event) {
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
@@ -51,17 +53,30 @@ public class EntityDamage implements Listener {
 		} else {
 			//Check for spectator damage.
 			if (event.getEntity() instanceof Player) {
+			
+				GameState gameState = PLUGIN.getGameManager().getGameState();
 				Player player = (Player) event.getEntity();
+				
 				double playerHP = player.getHealth() - event.getFinalDamage();
+				
+				boolean isOverrideSpectator = PLUGIN.getMinigamePluginManager().getMinigameBase().isOverrideSpectator();
 				boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+				boolean isGameStarting = gameState.equals(GameState.GAME_STARTING);
+				boolean isShowingRules = gameState.equals(GameState.ARENA_SHOW_RULES);
+				boolean isGameRunning = gameState.equals(GameState.GAME_RUNNING);
 				
 				if (isSpectator) {
 					event.setCancelled(true);
 				} else {
 					
-					//The player is not a spectator.
-					//However, if they loose enough HP, lets make them a spectator.
-					if (playerHP <= 1) {
+					//Cancel any damage to the player if the rules are still being shown.
+					if (isGameStarting || isShowingRules) {
+						event.setCancelled(true);
+						
+					} else if (playerHP <= 1 && isGameRunning && !isOverrideSpectator) {
+						//The player is not a spectator.
+						//However, if they loose enough HP, lets make them a spectator.
+						
 						event.setCancelled(true);
 						GameArena gameArena = PLUGIN.getGameArena();
 						GameLobby gameLobby = PLUGIN.getGameLobby();

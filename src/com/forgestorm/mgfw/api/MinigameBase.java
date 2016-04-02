@@ -21,6 +21,12 @@ public abstract class MinigameBase {
 	public abstract void startGame();
 
 	/**
+	 * This will delegate if the minigame plugin will override the spectator spawning code.
+	 * @return Returns true if the plugin will overide the frameworks spectator code.
+	 */
+	public abstract boolean isOverrideSpectator();
+	
+	/**
 	 * Gets a list of minigame tips to show to the players while in the lobby world.
 	 * @return Returns an array list of strings.
 	 */

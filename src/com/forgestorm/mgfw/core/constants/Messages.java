@@ -52,7 +52,16 @@ public enum Messages {
 	SB_PLAYER_COUNT("&a%s / %f"),
 	SB_KIT("&lKit:"),
 	SB_TEAM("&lTeam:"),
-	SB_NEXT_GAME("&lNext Game:");
+	SB_NEXT_GAME("&lNext Game:"),
+	
+	//Menu Items
+	MENU_NAME_SPECTATOR("Spectator Menu"),
+	MENU_ITEM_SPECTATOR_NO_SPEED("No Speed"),
+	MENU_ITEM_SPECTATOR_SPEED_1("Speed 1"),
+	MENU_ITEM_SPECTATOR_SPEED_2("Speed 2"),
+	MENU_ITEM_SPECTATOR_SPEED_3("Speed 3"),
+	MENU_ITEM_SPECTATOR_SPEED_4("Speed 4"),
+	MENU_ITEM_SPECTATOR_TRACK_PLAYERS("Track Players");
 	
 	private String message;
 	

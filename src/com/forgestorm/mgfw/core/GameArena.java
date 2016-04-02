@@ -9,9 +9,10 @@ import java.util.concurrent.ConcurrentMap;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -22,8 +23,10 @@ import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.FloatingMessage;
 import com.forgestorm.mgfw.core.display.scoreboard.ArenaScoreboard;
+import com.forgestorm.mgfw.core.gui.SpectatorMenu;
 import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
+import com.forgestorm.mgfw.util.ItemBuilder;
 import com.forgestorm.mgfw.util.ScoresToPlaces;
 
 import net.md_5.bungee.api.ChatColor;
@@ -35,12 +38,14 @@ public class GameArena {
 
 	private HashMap<Player, Location> playerSpawns;
 	private BossBarAnnouncer spectatorBar;
+	private SpectatorMenu spectatorMenu;
 	private ArenaScoreboard scoreboard;
 
 	public GameArena(MGFramework plugin) {
 		PLUGIN = plugin;
 		WORLD_DUPE = new WorldDuplicator();
 		spectatorBar = new BossBarAnnouncer(Messages.BOSS_BAR_SPECTATOR_MESSAGE.toString());
+		spectatorMenu = new SpectatorMenu();
 		scoreboard = new ArenaScoreboard(PLUGIN);
 	}
 
@@ -98,9 +103,9 @@ public class GameArena {
 
 	/**
 	 * This will setup a spectator for a player.
-	 * @param player The player that will be setup as a spectator.
+	 * @param spectator The player that will be setup as a spectator.
 	 */
-	public void setupSpectator(Player player) {
+	public void setupSpectator(Player spectator) {
 		GameManager gameManager = PLUGIN.getGameManager();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 		
@@ -110,38 +115,37 @@ public class GameArena {
 		}
 		
 		//Heal the player
-		player.setHealth(20);
-		player.setFoodLevel(20);
+		spectator.setHealth(20);
+		spectator.setFoodLevel(20);
 
 		//Clear a players inventory
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
+		spectator.getInventory().clear();
+		spectator.getInventory().setHelmet(null);
+		spectator.getInventory().setChestplate(null);
+		spectator.getInventory().setLeggings(null);
+		spectator.getInventory().setBoots(null);
 		
 		//Remove any fire.
-		player.setFireTicks(0);
+		spectator.setFireTicks(0);
 		
 		//Teleport player to spectator spawn.
-		player.teleport(mpm.getMinigameTeams().getSpectatorSpawnLocation());
+		spectator.teleport(mpm.getMinigameTeams().getSpectatorSpawnLocation());
 
 		//Switch Gamemode
-		player.setGameMode(GameMode.ADVENTURE);
+		spectator.setGameMode(GameMode.ADVENTURE);
 
 		//Give the player flying.
-		player.setAllowFlight(true);
-		player.setFlying(true);
+		spectator.setAllowFlight(true);
+		spectator.setFlying(true);
 
 		//Set collide entities false.
-		LivingEntity entity = (LivingEntity) player;
-		entity.setCollidable(false);
+		spectator.setCollidable(false);
 		
 		//Add the invisible potion effect to the player.
-		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 15));
+		spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 15));
 
 		//Setup lobby scoreboard
-		scoreboard.addPlayer(player);
+		scoreboard.addPlayer(spectator);
 		
 		//Hide the spectator from other players.
 		for (Player spectators: Bukkit.getOnlinePlayers()) {
@@ -162,30 +166,32 @@ public class GameArena {
 		}
 		
 		//Show Bossbar Announcer
-		spectatorBar.showBossBar(player);
+		spectatorBar.showBossBar(spectator);
 		
 		//Send spectator notification message.
 		String title = Messages.GAME_ARENA_SPECTATOR_TITLE.toString();
 		String subtitle = Messages.GAME_ARENA_SPECTATOR_SUBTITLE.toString();
-		new FloatingMessage().sendFloatingMessage(player, title, subtitle);
+		new FloatingMessage().sendFloatingMessage(spectator, title, subtitle);
 		
-		//TODO:Give Spectator menu.
+		//Give Spectator menu.
+		ItemStack spectatorMenu = new ItemBuilder(Material.REDSTONE).setTitle("Spectator Menu").build();
+		spectator.getInventory().setItem(4, spectatorMenu);
 	}
 	
 	/**
 	 * Removes a spectator.
-	 * @param player The spectator we will remove.
+	 * @param spectator The spectator we will remove.
 	 */
-	private void removeSpectator(Player player) {
-		spectatorBar.removeBossBar(player);
+	private void removeSpectator(Player spectator) {
+		spectatorBar.removeBossBar(spectator);
 	}
 	
 	/**
 	 * Removes all the spectators.
 	 */
 	void removeAllSpectators() {
-		for (Player players: Bukkit.getOnlinePlayers()) {
-			removeSpectator(players);
+		for (Player spectators: Bukkit.getOnlinePlayers()) {
+			removeSpectator(spectators);
 		}
 	}
 
@@ -222,7 +228,7 @@ public class GameArena {
 					//Show players a countdown message.
 					for (Player players: Bukkit.getOnlinePlayers()) {
 						new FloatingMessage().sendFloatingMessage(players, title, "");
-						players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+						players.playSound(players.getLocation(), Sound.BLOCK_NOTE_PLING, 1f, 1f);
 					}
 				} else if (countdown == 1) {
 					String title = ChatColor.RED + Integer.toString(countdown);
@@ -230,7 +236,7 @@ public class GameArena {
 					//Show players a countdown message.
 					for (Player players: Bukkit.getOnlinePlayers()) {
 						new FloatingMessage().sendFloatingMessage(players, title, "");
-						players.playSound(players.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+						players.playSound(players.getLocation(), Sound.BLOCK_NOTE_PLING, 1f, 1f);
 					}
 				} else if (countdown == 0) {
 					cancel();
@@ -384,6 +390,10 @@ public class GameArena {
 	 */
 	public HashMap<Player, Location> getPlayerSpawns() {
 		return playerSpawns;
+	}
+
+	public SpectatorMenu getSpectatorMenu() {
+		return spectatorMenu;
 	}
 
 	/**
