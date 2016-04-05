@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -21,36 +20,27 @@ public class PlayerSpawner {
 	
 	/**
 	 * Spawns players in the arena world map at specified spawning locations.
-	 * @param concurrentMap The sorted map of teams and players to spawn.
+	 * @param sortedTeams The sorted map of teams and players to spawn.
 	 * @return Returns a HashMap that specifically ties a player to a spawn location. Used to preventing player movement during game rules countdown.
 	 */
-	public HashMap<Player, Location> spawnPlayers(ConcurrentMap<Integer, ArrayList<Player>> concurrentMap) {
-		MinigameTeams instance = PLUGIN.getMinigamePluginManager().getMinigameTeams();
-		ArrayList<ArrayList<Location>> playerTeamSpawnLocations = instance.getPlayerTeamSpawnLocations();
+	public HashMap<Player, Location> spawnPlayers(ConcurrentMap<Integer, ArrayList<Player>> sortedTeams) {
+		MinigameTeams minigameTeams = PLUGIN.getMinigamePluginManager().getMinigameTeams();
+		ArrayList<ArrayList<Location>> playerTeamSpawnLocations = minigameTeams.getPlayerTeamSpawnLocations();
 		HashMap<Player, Location> playerSpawns = new HashMap<Player, Location>();
-		int playersTeleported = 0;
 		
 		//Loop through the multidimensional array.
-		for (int team = 0; team < playerTeamSpawnLocations.size(); team++) {
+		for (int i = 0; i < sortedTeams.size(); i++) {
 			
-			//Loop through the spawn locations.
-			for (int location = 0; location < playerTeamSpawnLocations.get(team).size(); location++) {
+			//Loop through and spawn players.
+			for (int j = 0; j < sortedTeams.get(i).size(); j++) {
+				Player player = sortedTeams.get(i).get(j);
+				Location spawn = playerTeamSpawnLocations.get(i).get(j);
 				
-				//Loop through the BiMap keys.
-				for(Integer key: concurrentMap.keySet()) {
-					
-					//Spawn the player at a given location.
-					if(key == team && playersTeleported < Bukkit.getOnlinePlayers().size()) {
-						Location loc = playerTeamSpawnLocations.get(team).get(location);
-						Player player = concurrentMap.get(team).get(playersTeleported);
-						
-						player.teleport(loc);
-						
-						playerSpawns.put(player, loc);
-						
-						playersTeleported++;
-					}
-				}
+				//Teleport player.
+				player.teleport(spawn);
+				
+				//Save player spawn positions for later use.
+				playerSpawns.put(player, spawn);
 			}
 		}
 		return playerSpawns;

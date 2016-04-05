@@ -66,6 +66,7 @@ public class GameLobby {
 		}
 
 		//Heal the player
+		player.setMaxHealth(20);
 		player.setHealth(20);
 		player.setFoodLevel(20);
 
@@ -163,6 +164,9 @@ public class GameLobby {
 		//Remove player form teaming hashmaps.
 		teamSelector.removeQueuedPlayer(player);
 		teamSelector.removeSortedPlayer(player);
+		
+		//Update player queued positions.
+		teamSelector.updateQueuePositions();
 	}
 
 	/**

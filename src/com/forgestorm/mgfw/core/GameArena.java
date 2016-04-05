@@ -85,7 +85,7 @@ public class GameArena {
 	void setupAllArenaPlayers() {
 		//Spawn the players in the world.
 		PlayerSpawner spawner = new PlayerSpawner(PLUGIN);
-		ConcurrentMap<Integer, ArrayList<Player>> sortedTeam = PLUGIN.getGameManager().getTeamSelector().getSortedTeams();
+		ConcurrentMap<Integer, ArrayList<Player>> sortedTeams = PLUGIN.getGameManager().getTeamSelector().getSortedTeams();
 
 		//Clear the location of the playerSpawns HashMap
 		if (playerSpawns != null && !playerSpawns.isEmpty()) {
@@ -93,7 +93,7 @@ public class GameArena {
 		}
 
 		//Spawn players and record their spawn locations.
-		playerSpawns = spawner.spawnPlayers(sortedTeam);
+		playerSpawns = spawner.spawnPlayers(sortedTeams);
 
 		//Do some additional player setup.
 		for (Player players: Bukkit.getOnlinePlayers()) {

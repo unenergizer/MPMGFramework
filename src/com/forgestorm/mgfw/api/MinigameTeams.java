@@ -36,6 +36,12 @@ public abstract class MinigameTeams {
 	public abstract ArrayList<String> getTeamNames();
 	
 	/**
+	 * A list of minigame team names and sizes.
+	 * @return Returns a list of minigame team names and sizes.
+	 */
+	public abstract ArrayList<Integer> getTeamSizes();
+	
+	/**
 	 * A list of minigame team colors.
 	 * @return Returns a list of minigame team colors.
 	 */
@@ -61,14 +67,6 @@ public abstract class MinigameTeams {
 	 * @return Returns a list of minigame platform materials.
 	 */
 	public abstract ArrayList<Material> getTeamPlatformMaterials();
-	
-	/**
-	 * A list that defines the max number of players a team can have.
-	 * <p>
-	 * To mark a team for unlimited players use -1. Now teams must still be even.
-	 * @return Returns a list of team sizes.
-	 */
-	public abstract ArrayList<Integer> getMaxTeamSize();
 	
 	/**
 	 * A list of locations that will decide where a player will spawn in a minigame map.

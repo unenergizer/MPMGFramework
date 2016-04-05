@@ -14,7 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * @author PaulBGD from https://gist.github.com/PaulBGD/9831d28b1c7bdba0cddd
@@ -234,11 +234,11 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setPotion(PotionEffect potionEffect) {
+    public ItemBuilder setPotion(PotionEffectType poison) {
         if (this.mat != Material.POTION) {
             this.mat = Material.POTION;
         }
-        // this.potion = potion;
+        //this.potion = potion;
         return this;
     }
 

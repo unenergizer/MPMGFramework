@@ -1,5 +1,7 @@
 package com.forgestorm.mgfw.core.display;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -40,4 +42,22 @@ public class BossBarAnnouncer {
 	public void removeBossBar(Player player) {
 		bar.removePlayer(player);
 	}
+	
+	/**
+	 * Sets the progress of the current bar. From 0 - 1;
+	 * @param progress The progress of the current bar.
+	 */
+	public void setBossBarProgress(double progress) {
+		bar.setProgress(progress);
+	}
+	
+	/**
+	 * Sets a new title for the bar.
+	 * @param title The title of the bar.
+	 */
+	public void setBossBarTitle(String title) {
+		bar.setTitle(title);
+	}
+	
+	public List<Player> getBossBarViewers() { return bar.getPlayers(); }
 }

@@ -55,7 +55,7 @@ public class TeamSelector {
 	 */
 	public void assignAllPlayerTeams() {
 		if (Bukkit.getOnlinePlayers().size() > 0) {
-			int maxTeamSize = getMaxTeamSize();
+			ArrayList<String> teamNames = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames();
 			int peopleSorted = 0;
 			ArrayList<Player> bukkitPlayers = new ArrayList<Player>();
 
@@ -65,37 +65,65 @@ public class TeamSelector {
 			}
 
 			//Loop through the teams.
-			for (int i = 0; i < getNumberOfTeams(); i++) {
+			for (int i = 0; i < teamNames.size(); i++) {
 
 				//Add players to a team.
-				for(int j = 0; j < maxTeamSize; j++) {
-
-					int currentTeam = i;
+				for(int j = 0; j < getMaxTeamSize(i); j++) {
 
 					if (peopleSorted < Bukkit.getOnlinePlayers().size()) {
 						Player currentPerson = bukkitPlayers.get(peopleSorted);
 
-						setPlayerTeam(currentTeam, currentPerson);
+						setPlayerTeam(i, currentPerson);
 						peopleSorted++;
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets the number of teams for a paticular minigame.
 	 * @return
 	 */
 	private int getNumberOfTeams() {
-		return PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames().size();
+		return PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes().size();
 	}
 
 	/**
 	 * Gets the maximum size a of players a team can hold.
 	 * @return Return the size a team can hold.
 	 */
-	private int getMaxTeamSize() { return PLUGIN.getGameManager().getMaxPlayers() / getNumberOfTeams(); }	
+	private int getMaxTeamSize(int team) {
+		ArrayList<Integer> teams = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
+		int maxPlayers = PLUGIN.getGameManager().getMaxPlayers();
+
+		if (teams.get(team) != -1) {
+			//These teams have a predefined size limit.
+			return teams.get(team);
+
+		} else {
+			//For these unlimited sized teams, we need to figure out how many teams we have and 
+			// how many players need to go into them. We will try to make even teams.
+
+			int playersLeftOver = maxPlayers;
+			int teamsWithUnlimitedSlots = 0;
+
+			//Lets get the number of players needed to fill a "predefined size limit team."
+			for (int i = 0; i < teams.size(); i++) {
+
+				//Only return the predefined team sizes with player slots.
+				if (teams.get(i) != -1) {
+					playersLeftOver -= teams.get(i);
+				} else {
+					teamsWithUnlimitedSlots++;
+				}
+			}
+
+			//Lets make the unlimited team sizes even.
+			int teamSize = (int) Math.ceil((double)playersLeftOver / (double)teamsWithUnlimitedSlots);
+			return teamSize;
+		}
+	}	
 
 	/**
 	 * This will try and swap queued players teams if swapping is possible.
@@ -150,32 +178,35 @@ public class TeamSelector {
 	/**
 	 * Update queued status on certain events (player join, player quit, player change team.
 	 */
-	private void updateQueuePositions() {
+	public void updateQueuePositions() {
+		ArrayList<String> teamNames = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames();
 
 		//Loop through every team and update it.
-		for (int i = 0; i < getNumberOfTeams(); i++) {
-			int currentTeam = i;
-			int playersNeeded = getMaxTeamSize() - sortedTeams.get(currentTeam).size();
+		for (int i = 0; i < teamNames.size(); i++) {
+
+			int playersNeeded = 0;
+
+			if (sortedTeams.get(i) == null) {
+				playersNeeded = getMaxTeamSize(i);
+			} else {
+				playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
+			}
 
 			//If the team needs players, see if a player can be added from queue.
 			if (playersNeeded > 0) {
 
 				//This team could use a player. Lets see if a player exist in the queue.
-				if (queuedPlayers.get(currentTeam) != null && !queuedPlayers.get(currentTeam).isEmpty()) {
+				if (queuedPlayers.get(i) != null && !queuedPlayers.get(i).isEmpty()) {
 
 					//Queued players exists, now lets loop through them and add them to the sorted team.
 					for (int j = 0; j < playersNeeded; j++) {
-						Player player = queuedPlayers.get(currentTeam).poll();
-
-
-						//TODO: WARNING: here do isPlayerOnline check to make sure we are 
-						//not adding a player to a team if they quit the game!
+						Player player = queuedPlayers.get(i).poll();
 
 						//Remove player from current team.
 						removeSortedPlayer(player);
 
 						//Add player to the new team.
-						setPlayerTeam(currentTeam, player);
+						setPlayerTeam(i, player);
 					}
 				}
 			}
@@ -191,20 +222,45 @@ public class TeamSelector {
 	 * @param player The player who will be added to a team.
 	 */
 	public void addLatePlayer(Player player) {
-		for (int i = 0; i < getNumberOfTeams(); i++) {
+		ArrayList<Integer> teamSizes = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
 
-			int currentTeam = i;
-			
-			if(sortedTeams.get(currentTeam) != null) {
-				int playersNeeded = getMaxTeamSize() - sortedTeams.get(currentTeam).size();
+		//Assign player to a fixed size team.
+		for (int i = 0; i < teamSizes.size(); i++) {
+			int playersNeeded = 0;
 
-				//If the team needs players, see if a player can be added.
-				if (playersNeeded > 0) {
+			//If no teams have a fixed size, we will sort the player into a team that needs players.
+			if (teamSizes.get(i) != -1) {
 
-					setPlayerTeam(currentTeam, player);
+				if (sortedTeams.get(i) == null) {
+					playersNeeded = getMaxTeamSize(i);
+				} else {
+					playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
 				}
+
+				if(playersNeeded > 0) {
+					//If the team needs players, see if a player can be added.
+					setPlayerTeam(i, player);
+
+					return;
+				}
+			}
+		}
+
+		//Assign player to any team.
+		for (int i = 0; i < teamSizes.size(); i++) {
+			int playersNeeded = 0;
+
+			if (sortedTeams.get(i) == null) {
+				playersNeeded = getMaxTeamSize(i);
 			} else {
-				setPlayerTeam(currentTeam, player);
+				playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
+			}
+
+			if(playersNeeded > 0) {
+				//If the team needs players, see if a player can be added.
+				setPlayerTeam(i, player);
+
+				return;
 			}
 		}
 	}
@@ -215,11 +271,14 @@ public class TeamSelector {
 	 * @param player The player who is trying to switch teams.
 	 */
 	private void changePlayerTeam(int futureTeam, Player player) {
-
 		//If the player is already on the "futureTeam" then don't let them change their team.
 		if (getPlayerTeam(player) != futureTeam) {
-			int maxTeamSize = getMaxTeamSize();
-			int currentTeamSize = sortedTeams.get(futureTeam).size();
+			int maxTeamSize = getMaxTeamSize(futureTeam);
+			int currentTeamSize = 0;
+
+			if (sortedTeams.get(futureTeam) != null) {
+				currentTeamSize = sortedTeams.get(futureTeam).size();
+			}
 
 			//If the team has room, place the player in that team.
 			if (currentTeamSize < maxTeamSize) {
@@ -230,7 +289,19 @@ public class TeamSelector {
 				setPlayerTeam(futureTeam, player);
 
 			} else {
-				if (queuedPlayers.get(futureTeam) != null && queuedPlayers.get(futureTeam).contains(player)) {
+				if (queuedPlayers.get(futureTeam) != null && !queuedPlayers.get(futureTeam).contains(player)) {
+
+					//Remove from any existing queue if the player choose a different team.
+					if(isOnAnotherQueue(player)) {
+						removeQueuedPlayer(player);
+					}
+
+					//Their was no room. Put the player in a queue.
+					addQueuedPlayer(futureTeam, player);
+
+					player.sendMessage(Messages.TEAM_QUEUE_PLACED.toString());
+
+				} else if (queuedPlayers.get(futureTeam) == null) {
 
 					//Remove from any existing queue if the player choose a different team.
 					if(isOnAnotherQueue(player)) {
@@ -277,9 +348,6 @@ public class TeamSelector {
 		//Set the the players team.
 		changePlayerTeam(team, player);
 
-		//Update the lobby scoreboard.
-		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
-		
 		updateQueuePositions();
 	}
 
@@ -424,12 +492,20 @@ public class TeamSelector {
 	 * @param team The team the player has selected.
 	 */
 	private void setPlayerTeam(int team, Player player) {
+		ArrayList<String> teamNames = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames();
 		ArrayList<Player> currentValue = sortedTeams.get(team);
+
 		if (currentValue == null) {
 			currentValue = new ArrayList<Player>();
 			sortedTeams.put(team, currentValue);
 		}
 		currentValue.add(player);
+
+		//Send player a confirmation message.
+		player.sendMessage(ChatColor.GREEN + "You joined the \"" + teamNames.get(team) + ChatColor.GREEN + "\" team.");
+
+		//Update the lobby scoreboard.
+		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
 	}
 
 	/**
@@ -447,7 +523,6 @@ public class TeamSelector {
 		}
 	}
 
-	
 	/**
 	 * Gets the spawn locations of a team mob.
 	 * @return Returns a HashMap of a <Entity UUID, and a World Location>.
