@@ -37,7 +37,6 @@ public class PlayerMove implements Listener {
 			double moveToZ = event.getTo().getZ();
 			
 			//If the countdown has started, then let the player look around.
-			//if (!event.getFrom().toVector().equals(event.getTo().toVector()) && !isSpectator) {
 			if ((moveX != moveToX || moveZ != moveToZ) && !isSpectator) {
 	
 				HashMap<Player, Location> playerSpawns = gameArena.getPlayerSpawns();

@@ -9,6 +9,7 @@ import com.forgestorm.mgfw.core.GameArena;
 import com.forgestorm.mgfw.core.GameLobby;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.MinigamePluginManager;
+import com.forgestorm.mgfw.listeners.AsyncPlayerChat;
 import com.forgestorm.mgfw.listeners.BlockBreak;
 import com.forgestorm.mgfw.listeners.BlockCanBuild;
 import com.forgestorm.mgfw.listeners.BlockPlace;
@@ -57,7 +58,8 @@ public class MGFramework extends JavaPlugin {
 	 */
 	private void registerListeners() {
 		PluginManager pm = Bukkit.getPluginManager();
-		
+
+		pm.registerEvents(new AsyncPlayerChat(this), this);
 		pm.registerEvents(new BlockBreak(this), this);
 		pm.registerEvents(new BlockCanBuild(this), this);
 		pm.registerEvents(new BlockPlace(this), this);

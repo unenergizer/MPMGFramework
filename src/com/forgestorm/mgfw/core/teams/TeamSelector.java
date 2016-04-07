@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,8 +23,6 @@ import com.forgestorm.mgfw.core.teams.spawner.EntityFreezer;
 import com.forgestorm.mgfw.core.teams.spawner.EntitySpawner;
 import com.forgestorm.mgfw.core.teams.spawner.Spawner;
 import com.forgestorm.mgfw.util.PlatformBuilder;
-
-import net.md_5.bungee.api.ChatColor;
 
 /**
  * Spawns teams in the lobby.

@@ -2,12 +2,12 @@ package com.forgestorm.mgfw.api;
 
 import java.util.ArrayList;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import net.md_5.bungee.api.ChatColor;
 
 public abstract class MinigameTeams {
 	

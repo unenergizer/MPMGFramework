@@ -3,6 +3,7 @@ package com.forgestorm.mgfw.core.display.scoreboard;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -18,7 +19,6 @@ import com.forgestorm.mgfw.core.MinigamePluginManager;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.teams.TeamSelector;
 
-import net.md_5.bungee.api.ChatColor;
 
 public class LobbyScoreboard {
 
