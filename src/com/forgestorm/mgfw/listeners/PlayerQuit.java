@@ -30,7 +30,10 @@ public class PlayerQuit implements Listener {
 
 		//Remove the player from the players hashmap.
 		gameLobby.getPlayerProfile().remove(player);
-
+		
+		//Tell minigames a player quit.
+		PLUGIN.getMinigamePluginManager().getMinigameBase().onPlayerQuit(player);
+		
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (isRunning) {
 			

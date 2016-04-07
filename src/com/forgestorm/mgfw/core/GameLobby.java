@@ -84,6 +84,7 @@ public class GameLobby {
 		player.setGameMode(GameMode.ADVENTURE);
 
 		//Give the player flying.
+		player.setFlySpeed(.1f);
 		player.setAllowFlight(false);
 		player.setFlying(false);
 

@@ -2,6 +2,8 @@ package com.forgestorm.mgfw.api;
 
 import java.util.ArrayList;
 
+import org.bukkit.entity.Player;
+
 public abstract class MinigameBase {
 	private final String minigameName;
 	private final String arenaWorldName;
@@ -19,7 +21,17 @@ public abstract class MinigameBase {
 	 * Tell the minigame plugin to start execution.
 	 */
 	public abstract void startGame();
+	
+	/**
+	 * This will execute when a game should end.
+	 */
+	public abstract void endGame();
 
+	/**
+	 * This will execute when a player quits the server.
+	 */
+	public abstract void onPlayerQuit(Player player);
+	
 	/**
 	 * This will delegate if the minigame plugin will override the spectator spawning code.
 	 * @return Returns true if the plugin will overide the frameworks spectator code.

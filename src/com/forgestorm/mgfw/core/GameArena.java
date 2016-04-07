@@ -23,6 +23,7 @@ import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.FloatingMessage;
 import com.forgestorm.mgfw.core.display.scoreboard.ArenaScoreboard;
+import com.forgestorm.mgfw.core.gui.PlayerTracker;
 import com.forgestorm.mgfw.core.gui.SpectatorMenu;
 import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
@@ -37,15 +38,17 @@ public class GameArena {
 	private final WorldDuplicator WORLD_DUPE;
 
 	private HashMap<Player, Location> playerSpawns;
+	private HashMap<Player, SpectatorMenu> spectatorOptionsMenu;
+	private HashMap<Player, PlayerTracker> spectatorTrackerMenu;
 	private BossBarAnnouncer spectatorBar;
-	private SpectatorMenu spectatorMenu;
 	private ArenaScoreboard scoreboard;
 
 	public GameArena(MGFramework plugin) {
 		PLUGIN = plugin;
 		WORLD_DUPE = new WorldDuplicator();
+		spectatorOptionsMenu = new HashMap<Player, SpectatorMenu>();
+		spectatorTrackerMenu = new HashMap<Player, PlayerTracker>();
 		spectatorBar = new BossBarAnnouncer(Messages.BOSS_BAR_SPECTATOR_MESSAGE.toString());
-		spectatorMenu = new SpectatorMenu();
 		scoreboard = new ArenaScoreboard(PLUGIN);
 	}
 
@@ -115,7 +118,8 @@ public class GameArena {
 		}
 		
 		//Heal the player
-		spectator.setHealth(20);
+		spectator.setMaxHealth(2);
+		spectator.setHealth(2);
 		spectator.setFoodLevel(20);
 
 		//Clear a players inventory
@@ -173,9 +177,19 @@ public class GameArena {
 		String subtitle = Messages.GAME_ARENA_SPECTATOR_SUBTITLE.toString();
 		new FloatingMessage().sendFloatingMessage(spectator, title, subtitle);
 		
-		//Give Spectator menu.
-		ItemStack spectatorMenu = new ItemBuilder(Material.REDSTONE).setTitle("Spectator Menu").build();
-		spectator.getInventory().setItem(4, spectatorMenu);
+		//Give Spectator options menu item.
+		ItemStack spectatorMenuItem = new ItemBuilder(Material.REDSTONE).setTitle("Spectator Menu").build();
+		spectator.getInventory().setItem(4, spectatorMenuItem);
+		
+		//Assign the spectator a new spectator menu.
+		spectatorOptionsMenu.put(spectator, new SpectatorMenu(PLUGIN, spectator));
+		
+		//Give Spectator tracker menu item.
+		ItemStack spectatorTrackerItem = new ItemBuilder(Material.COMPASS).setTitle("Player Tracker").build();
+		spectator.getInventory().setItem(3, spectatorTrackerItem);
+		
+		//Assign the spectator a new spectator menu.
+		spectatorTrackerMenu.put(spectator, new PlayerTracker(PLUGIN, spectator));
 	}
 	
 	/**
@@ -183,7 +197,14 @@ public class GameArena {
 	 * @param spectator The spectator we will remove.
 	 */
 	private void removeSpectator(Player spectator) {
+		//Remove the spectator bar.
 		spectatorBar.removeBossBar(spectator);
+
+		//Remove the spectators "spectator menu."
+		spectatorOptionsMenu.remove(spectator);
+		
+		//Remove the spectators "player tracker menu."
+		spectatorTrackerMenu.remove(spectator);
 	}
 	
 	/**
@@ -392,8 +413,12 @@ public class GameArena {
 		return playerSpawns;
 	}
 
-	public SpectatorMenu getSpectatorMenu() {
-		return spectatorMenu;
+	public SpectatorMenu getSpectatorMenu(Player player) {
+		return spectatorOptionsMenu.get(player);
+	}
+
+	public PlayerTracker getSpectatorTrackerMenu(Player player) {
+		return spectatorTrackerMenu.get(player);
 	}
 
 	/**

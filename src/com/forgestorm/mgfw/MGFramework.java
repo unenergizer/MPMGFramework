@@ -17,6 +17,7 @@ import com.forgestorm.mgfw.listeners.EntityDamage;
 import com.forgestorm.mgfw.listeners.EntityDamageByEntity;
 import com.forgestorm.mgfw.listeners.EntityTargetLivingEntity;
 import com.forgestorm.mgfw.listeners.FoodLevelChange;
+import com.forgestorm.mgfw.listeners.InventoryClick;
 import com.forgestorm.mgfw.listeners.PlayerInteract;
 import com.forgestorm.mgfw.listeners.PlayerInteractEntity;
 import com.forgestorm.mgfw.listeners.PlayerJoin;
@@ -46,7 +47,7 @@ public class MGFramework extends JavaPlugin {
 		getCommand("admin").setExecutor(new Admin(this));
 	}
 
-	@Override 
+	@Override
 	public void onDisable() {
 		gameManager.endGame(false);
 	}
@@ -66,7 +67,7 @@ public class MGFramework extends JavaPlugin {
 		pm.registerEvents(new PlayerInteract(this), this);
 		pm.registerEvents(new EntityTargetLivingEntity(this), this);
 		pm.registerEvents(new FoodLevelChange(this), this);
-		//pm.registerEvents(new InventoryClick(this), this);
+		pm.registerEvents(new InventoryClick(this), this);
 		pm.registerEvents(new PlayerInteractEntity(this), this);
 		pm.registerEvents(new PlayerJoin(this), this);
 		pm.registerEvents(new PlayerMove(this), this);

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.util.ItemBuilder;
 
@@ -13,10 +14,14 @@ import net.md_5.bungee.api.ChatColor;
 
 public class SpectatorMenu {
 	
+	private final MGFramework PLUGIN;
+	private final Player PLAYER;
 	private Inventory options;
 	private ItemStack noSpeed, speed1, speed2, speed3, speed4, trackPlayers;
 	
-	public SpectatorMenu() {
+	public SpectatorMenu(MGFramework plugin, Player player) {
+		PLUGIN = plugin;
+		PLAYER = player;
 		makeMenuItems();
 		createMenu();
 	}
@@ -37,7 +42,7 @@ public class SpectatorMenu {
 		speed2 = new ItemBuilder(Material.POWERED_MINECART).setTitle(speed2Title).build();
 		speed3 = new ItemBuilder(Material.STORAGE_MINECART).setTitle(speed3Title).build();
 		speed4 = new ItemBuilder(Material.EXPLOSIVE_MINECART).setTitle(speed4Title).build();
-		trackPlayers = new ItemBuilder(Material.SKULL_ITEM).setTitle(trackPlayersTitle).build();
+		trackPlayers = new ItemBuilder(Material.COMPASS).setTitle(trackPlayersTitle).build();
 	}
 	
 	/**
@@ -45,7 +50,7 @@ public class SpectatorMenu {
 	 */
 	private void createMenu() {
 		String title = Messages.MENU_NAME_SPECTATOR.toString();
-		options = Bukkit.createInventory(null, 9 * 4, title);
+		options = Bukkit.createInventory(PLAYER, 9 * 4, title);
 		
 		//Row 1
 		options.setItem(11, noSpeed);
@@ -77,8 +82,6 @@ public class SpectatorMenu {
 	public boolean playerInteractMenu(Player player, String menuName, ItemStack item) {
 		String optionsMenu = Messages.MENU_NAME_SPECTATOR.toString();
 		
-		Bukkit.broadcastMessage("Event: " + menuName + " ->? " + ChatColor.GREEN + optionsMenu); 
-		
 		//If the menu clicked, is the spectator menu, continue.
 		if (menuName.equalsIgnoreCase(optionsMenu)) {
 			
@@ -104,8 +107,8 @@ public class SpectatorMenu {
 				
 				return true;
 			} else if (item.getType().equals(trackPlayers.getType())) {
-				//TODO: Open player tracking menu.
-				player.sendMessage(ChatColor.GREEN + "Opening the player tracking menu.");
+				
+				PLUGIN.getGameArena().getSpectatorTrackerMenu(player).openMenu(player);
 				return true;
 			}
 		}

@@ -55,6 +55,7 @@ public enum Messages {
 	SB_NEXT_GAME("&lNext Game:"),
 	
 	//Menu Items
+	MENU_NAME_TRACKER("Player Tracker"),
 	MENU_NAME_SPECTATOR("Spectator Menu"),
 	MENU_ITEM_SPECTATOR_NO_SPEED("No Speed"),
 	MENU_ITEM_SPECTATOR_SPEED_1("Speed 1"),
