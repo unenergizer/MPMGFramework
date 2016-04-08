@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ScoresToPlaces {
@@ -17,22 +18,36 @@ public class ScoresToPlaces {
 	public ArrayList<String> scoresToPlaces(HashMap<Player, Integer> scoreMap) {
 
 		ArrayList<String> places = new ArrayList<String>();
+		ArrayList<Player> sortedPlayer = new ArrayList<Player>();
 		
 		//Convert the scoreMap values into an array.
 		ArrayList<Integer> scoresList = new ArrayList<Integer>(scoreMap.values());
 		
+		Bukkit.broadcastMessage("BEFORE SORT: " + scoresList.toString());
+		
 		//Sort the array.
 		Collections.sort(scoresList);
+		
+		Bukkit.broadcastMessage("AFTER SORT: " + scoresList.toString());
+		
 		Collections.reverse(scoresList);
+		
+		Bukkit.broadcastMessage("AFTER REVERSE: " + scoresList.toString());
 		
 		//Get the player for the finished place.
 		for (int i = 0; i < scoresList.size(); i++) {
 			for (Entry<Player, Integer> entry : scoreMap.entrySet()) {
-				if (entry.getValue() == scoresList.get(i)) {
+				Player player = entry.getKey();
+				int score = entry.getValue();
+				
+				if (score == scoresList.get(i) && !sortedPlayer.contains(player)) {
 					places.add(entry.getKey().getName());
+					sortedPlayer.add(entry.getKey());
 				}
 			}
 		}
+		
+		Bukkit.broadcastMessage("FINAL SORT: " + places.toString());
 		
 		return places;
 	}
