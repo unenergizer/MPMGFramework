@@ -9,8 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 import com.forgestorm.mgfw.MGFramework;
-import com.forgestorm.mgfw.core.kits.KitSelector;
-import com.forgestorm.mgfw.core.teams.TeamSelector;
+import com.forgestorm.mgfw.selector.KitSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
 public class PlayerInteractEntity implements Listener {
 

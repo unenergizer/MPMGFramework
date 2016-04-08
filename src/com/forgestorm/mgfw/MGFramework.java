@@ -5,8 +5,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.forgestorm.mgfw.command.Admin;
-import com.forgestorm.mgfw.core.GameArena;
-import com.forgestorm.mgfw.core.GameLobby;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.MinigamePluginManager;
 import com.forgestorm.mgfw.listeners.AsyncPlayerChat;
@@ -29,16 +27,12 @@ import com.forgestorm.mgfw.listeners.WeatherChange;
 public class MGFramework extends JavaPlugin {
 
 	private MinigamePluginManager minigamePluginManager;
-	private GameLobby lobby;
-	private GameArena arena;
 	private GameManager gameManager;
 	
 	@Override
 	public void onEnable() {
 
 		minigamePluginManager = new MinigamePluginManager();
-		lobby = new GameLobby(this);
-		arena = new GameArena(this);
 		gameManager = new GameManager(this);
 
 		//Register Event listeners
@@ -91,23 +85,5 @@ public class MGFramework extends JavaPlugin {
 	 */
 	public MinigamePluginManager getMinigamePluginManager() {
 		return minigamePluginManager;
-	}
-
-
-	/**
-	 * Grabs the LobbyManager instance.
-	 * @return Returns a LobbyManager instance.
-	 */
-	public GameLobby getGameLobby() {
-		return lobby;
-	}
-
-
-	/**
-	 * Grabs the ArenaManager instance.
-	 * @return Returns a ArenaManager instance.
-	 */
-	public GameArena getGameArena() {
-		return arena;
 	}
 }

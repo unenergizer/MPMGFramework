@@ -24,7 +24,7 @@ public class PlayerQuit implements Listener {
 		event.setQuitMessage(null);
 
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameLobby gameLobby = PLUGIN.getGameLobby();
+		GameLobby gameLobby = gameManager.getGAME_LOBBY();
 		boolean isRunning = gameManager.isMinigameRunning();
 		Player player = event.getPlayer();
 

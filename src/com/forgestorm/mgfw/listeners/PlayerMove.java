@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.GameArena;
+import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.GameState;
 
 public class PlayerMove implements Listener {
@@ -22,13 +23,14 @@ public class PlayerMove implements Listener {
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
-		GameState gameState = PLUGIN.getGameManager().getGameState();
-		GameArena gameArena = PLUGIN.getGameArena();
+		GameManager gameManager = PLUGIN.getGameManager();
+		GameState gameState = gameManager.getGameState();
+		GameArena gameArena = gameManager.getGAME_ARENA();
 
 		//Stop the player from moving if the game is showing the rules.
 		if (gameState.equals(GameState.ARENA_SHOW_RULES)) {
 			Player player = event.getPlayer();
-			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+			boolean isSpectator = gameManager.getGAME_LOBBY().getPlayerProfile().get(player).isSpectator();
 			
 			double moveX = event.getFrom().getX();
 			double moveZ = event.getFrom().getZ();

@@ -1,4 +1,4 @@
-package com.forgestorm.mgfw.core.teams.spawner;
+package com.forgestorm.mgfw.spawner;
 
 import java.util.UUID;
 
@@ -8,13 +8,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.forgestorm.mgfw.core.teams.TeamSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
-public class EntitySpawner extends Spawner{
+public class TeamSpawner extends Spawner {
 	
 	private final TeamSelector teamSelector;
 	
-	public EntitySpawner(TeamSelector teamSelector) {
+	public TeamSpawner(TeamSelector teamSelector) {
 		this.teamSelector = teamSelector;
 	}
 	
@@ -22,27 +22,29 @@ public class EntitySpawner extends Spawner{
 	 * Spawns a team entity mob at a specified location.
 	 */
 	@Override
-	public void spawnEntity(String kitName, Location location, EntityType entityType) {
+	public void spawnEntity(int teamID, String teamName, Location location, EntityType entityType) {
 		//Spawn the entity.
 		LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
 		UUID uuid = entity.getUniqueId();
 		
-		entity.setCustomName(kitName);
+		entity.setCustomName(teamName);
 		entity.setCustomNameVisible(true);
 		entity.setRemoveWhenFarAway(false);
 		entity.setCanPickupItems(false);
+		entity.setCollidable(false);
 
 		//Add potion effects to lobby entity.
-		PotionEffect noWalk = new PotionEffect(PotionEffectType.SLOW, 60*60*20, 10);
-		PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP, 60*60*20, -10);
+		PotionEffect noWalk = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10);
+		PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -10);
 
 		entity.addPotionEffect(noWalk);
 		entity.addPotionEffect(noJump);
 		
-		//Add the kit selection entities UUID's to an array list.
+		//Add the team selection entities UUID's to an array list.
 		teamSelector.getTeamEntityUUID().add(uuid);
 		
-		//Add the location of the entity to the main kit class.
-		teamSelector.getTeamLocations().put(uuid, location);
+		//Add the team id and location of the main team classes.
+		//This is for holograms.
+		teamSelector.getTeamEntityLocations().put(teamID, location);
 	}
 }

@@ -108,7 +108,7 @@ public class SpectatorMenu {
 				return true;
 			} else if (item.getType().equals(trackPlayers.getType())) {
 				
-				PLUGIN.getGameArena().getSpectatorTrackerMenu(player).openMenu(player);
+				PLUGIN.getGameManager().getGAME_ARENA().getSpectatorTrackerMenu(player).openMenu(player);
 				return true;
 			}
 		}

@@ -22,11 +22,12 @@ import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.FloatingMessage;
+import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.core.display.scoreboard.ArenaScoreboard;
 import com.forgestorm.mgfw.core.gui.PlayerTracker;
 import com.forgestorm.mgfw.core.gui.SpectatorMenu;
-import com.forgestorm.mgfw.core.teams.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
+import com.forgestorm.mgfw.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.util.ItemBuilder;
 import com.forgestorm.mgfw.util.ScoresToPlaces;
 
@@ -74,6 +75,9 @@ public class GameArena {
 
 		//Remove any fire.
 		player.setFireTicks(0);
+		
+		//Set collide entities true.
+		player.setCollidable(true);
 		
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
@@ -153,20 +157,27 @@ public class GameArena {
 		
 		//Hide the spectator from other players.
 		for (Player spectators: Bukkit.getOnlinePlayers()) {
-			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(spectators).isSpectator();
+			GameLobby gameLobby = PLUGIN.getGameManager().getGAME_LOBBY();
+			boolean isSpectator = gameLobby.getPlayerProfile().get(spectators).isSpectator();
 			
 			//If this player is a spectator lets hide them from the other players.
 			if (isSpectator) {
 				
 				//Now loop through all players and hide them from spectators.
 				for(Player players: Bukkit.getOnlinePlayers()) {
-					boolean isSpectatorToo = PLUGIN.getGameLobby().getPlayerProfile().get(players).isSpectator();
+					boolean isSpectatorToo = gameLobby.getPlayerProfile().get(players).isSpectator();
 					
 					if (!isSpectatorToo) {
 						players.hidePlayer(spectators);
 					}
 				}
 			}
+			
+			//Send Tab Menu text
+			TabMenuText tmt = new TabMenuText();
+			String header = Messages.GAME_TAB_HEADRER.toString().replace("%s", spectator.getName());
+			String footer = Messages.GAME_TAB_FOOTER.toString();
+			tmt.sendHeaderAndFooter(spectator, header, footer);
 		}
 		
 		//Show Bossbar Announcer

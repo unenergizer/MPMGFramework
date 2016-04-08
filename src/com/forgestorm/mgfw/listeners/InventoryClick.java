@@ -28,12 +28,12 @@ public class InventoryClick implements Listener {
 
 		if (isRunning) {
 			Player player = (Player) event.getWhoClicked();
-			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+			boolean isSpectator = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile().get(player).isSpectator();
 			
 			//If the player is a spectator lets continue.
 			if (isSpectator && event.getClickedInventory() != null) {
 
-				GameArena gameArena = PLUGIN.getGameArena();
+				GameArena gameArena = PLUGIN.getGameManager().getGAME_ARENA();
 				SpectatorMenu optionsMenu = gameArena.getSpectatorMenu(player);
 				PlayerTracker trackerMenu = gameArena.getSpectatorTrackerMenu(player);
 

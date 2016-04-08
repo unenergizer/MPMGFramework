@@ -1,4 +1,4 @@
-package com.forgestorm.mgfw.core.teams;
+package com.forgestorm.mgfw.selector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +18,10 @@ import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameTeams;
+import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.teams.spawner.EntityFreezer;
-import com.forgestorm.mgfw.core.teams.spawner.EntitySpawner;
-import com.forgestorm.mgfw.core.teams.spawner.Spawner;
+import com.forgestorm.mgfw.core.display.Hologram;
+import com.forgestorm.mgfw.spawner.TeamSpawner;
 import com.forgestorm.mgfw.util.PlatformBuilder;
 
 /**
@@ -31,57 +31,198 @@ import com.forgestorm.mgfw.util.PlatformBuilder;
 public class TeamSelector {
 
 	private final MGFramework PLUGIN;
+	private final GameManager GAME_MANAGER;
 
 	private PlatformBuilder platformSpawner;
-	private Spawner entitySpawner;
-	private EntityFreezer entityFreezer;
+	private TeamSpawner entitySpawner;
 	private ConcurrentMap<Integer, ArrayList<Player>> sortedTeams;
 	private ConcurrentMap<Integer, Queue<Player>> queuedPlayers;
-	private HashMap<UUID, Location> teamLocations;
+	private HashMap<Integer, Location> teamHologramLocations;
+	private ArrayList<Hologram> holograms;
 	private ArrayList<UUID> teamEntityUUID;
 
-	public TeamSelector(MGFramework plugin) {
+	public TeamSelector(MGFramework plugin, GameManager gameManager) {
 		PLUGIN = plugin;
+		GAME_MANAGER = gameManager;
 		platformSpawner = new PlatformBuilder();
 		sortedTeams = new ConcurrentHashMap<Integer, ArrayList<Player>>(); //<Team, Player>
 		queuedPlayers = new ConcurrentHashMap<Integer, Queue<Player>>(); //<Team, Queued Player>
-		teamLocations = new HashMap<UUID, Location>();
+		teamHologramLocations = new HashMap<Integer, Location>();
+		holograms = new ArrayList<Hologram>();
 		teamEntityUUID = new ArrayList<UUID>();
+	}
+
+	/**
+	 * Called when a player interacts with a team.
+	 * @param name The NPC the player interacted with. 
+	 */
+	public void teamInteract(int team, Player player) {
+		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
+
+		//Set player a confirmation message.
+		player.sendMessage("");
+		player.sendMessage(Messages.GAME_BAR_TEAM.toString());
+		player.sendMessage("");
+		player.sendMessage(minigameTeam.getTeamNames().get(team) + ChatColor.DARK_GRAY + ":");
+		player.sendMessage("");
+		player.sendMessage(minigameTeam.getTeamDescriptions().get(team));
+		player.sendMessage("");
+		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
+		player.sendMessage("");
+
+		//Play a confirmation sound.
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
+
+		//Set the the players team.
+		changePlayerTeam(team, player);
+
+		//Update queued team positions.
+		updateQueuePositions();
+
+		//Update holograms.
+		createHolograms();
+
+		//Check if game needs to start.
+		if (GAME_MANAGER.shouldMinigameStart()) {
+			GAME_MANAGER.startCountdown();
+		}
+	}
+
+	/**
+	 * This will create holograms that go over team entities.
+	 * These holograms display the player counts for each team.
+	 */
+	public void createHolograms() {
+
+		//Remove any existing holograms.
+		if (!holograms.isEmpty()) {
+			for (int i = 0; i < holograms.size(); i++) {
+				holograms.get(i).removeHolograms();
+			}
+
+			//Clear current holograms array.
+			holograms.clear();
+		}
+
+		//Generate new holograms.
+		for (Entry<Integer, Location> entry: teamHologramLocations.entrySet()) {
+			ArrayList<String> hologramText = new ArrayList<String>();
+			int team = entry.getKey();
+			int currentTeamSize = 0;
+			int queuedCount = 0;
+			int maxTeamSize = getMaxTeamSize(team);
+			Location location = entry.getValue();
+			Location hologramLocation = new Location(location.getWorld(), location.getX(), location.getY() + .7, location.getZ());
+
+			//Get the number of players on a team.
+			if (sortedTeams.get(team) != null) {
+				currentTeamSize = sortedTeams.get(team).size();
+			}
+			
+			//Get number of queued players.
+			if (queuedPlayers.get(team) != null) {
+				queuedCount = queuedPlayers.get(team).size();
+			}
+			
+			hologramText.add(ChatColor.BOLD + "Players: " + Integer.toString(currentTeamSize) + " / " + maxTeamSize);
+			hologramText.add(ChatColor.BOLD + "Queued Players: " + queuedCount);
+			
+			//Create the holograms.
+			Hologram hologram = new Hologram();
+			hologram.createHologram(hologramText, hologramLocation);
+			holograms.add(hologram);
+		}
+	}
+
+	/**
+	 * This is a conditional test to make sure all teams have players.
+	 * @return Returns true if all teams have players.
+	 */
+	public boolean allTeamsHavePlayers() {
+		boolean allTeamsHavePlayers = true;
+
+		for (Entry<Integer, ArrayList<Player>> entry: sortedTeams.entrySet()) {
+			ArrayList<Player> value = entry.getValue();
+
+			if (value.isEmpty() && value.size() < 1) {
+				allTeamsHavePlayers = false;
+				return false;
+			}
+		}
+
+		if (allTeamsHavePlayers) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
 	 * This will assing all the players on the server a team.
 	 */
 	public void assignAllPlayerTeams() {
-		if (Bukkit.getOnlinePlayers().size() > 0) {
-			ArrayList<String> teamNames = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames();
-			int peopleSorted = 0;
-			ArrayList<Player> bukkitPlayers = new ArrayList<Player>();
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			addPlayer(players);
+		}
+	}
 
-			//TODO: Remove this hack.
-			for (Player players: Bukkit.getOnlinePlayers()) {
-				bukkitPlayers.add(players);
+	/**
+	 * Adds a late player to a game team.
+	 * 
+	 * @param player The player who will be added to a team.
+	 */
+	public void addPlayer(Player player) {
+		ArrayList<Integer> teamSizes = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
+
+		//Assign player to a fixed size team.
+		for (int i = 0; i < teamSizes.size(); i++) {
+			int playersNeeded = 0;
+
+			//If no teams have a fixed size, we will sort the player into a team that needs players.
+			if (teamSizes.get(i) != -1) {
+
+				if (sortedTeams.get(i) == null) {
+					playersNeeded = getMaxTeamSize(i);
+				} else {
+					playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
+				}
+
+				if(playersNeeded > 0) {
+					//If the team needs players, see if a player can be added.
+					setPlayerTeam(i, player);
+
+					//Spawn entity holograms.
+					createHolograms();
+
+					return;
+				}
+			}
+		}
+
+		//Assign player to any team.
+		for (int i = 0; i < teamSizes.size(); i++) {
+			int playersNeeded = 0;
+
+			if (sortedTeams.get(i) == null) {
+				playersNeeded = getMaxTeamSize(i);
+			} else {
+				playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
 			}
 
-			//Loop through the teams.
-			for (int i = 0; i < teamNames.size(); i++) {
+			if(playersNeeded > 0) {
+				//If the team needs players, see if a player can be added.
+				setPlayerTeam(i, player);
 
-				//Add players to a team.
-				for(int j = 0; j < getMaxTeamSize(i); j++) {
+				//Spawn entity holograms.
+				createHolograms();
 
-					if (peopleSorted < Bukkit.getOnlinePlayers().size()) {
-						Player currentPerson = bukkitPlayers.get(peopleSorted);
-
-						setPlayerTeam(i, currentPerson);
-						peopleSorted++;
-					}
-				}
+				return;
 			}
 		}
 	}
 
 	/**
-	 * Gets the number of teams for a paticular minigame.
+	 * Gets the number of teams for a particular minigame.
 	 * @return
 	 */
 	private int getNumberOfTeams() {
@@ -94,7 +235,7 @@ public class TeamSelector {
 	 */
 	private int getMaxTeamSize(int team) {
 		ArrayList<Integer> teams = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
-		int maxPlayers = PLUGIN.getGameManager().getMaxPlayers();
+		int maxPlayers = GAME_MANAGER.getMaxPlayers();
 
 		if (teams.get(team) != -1) {
 			//These teams have a predefined size limit.
@@ -216,55 +357,6 @@ public class TeamSelector {
 	}
 
 	/**
-	 * Adds a late player to a game team.
-	 * 
-	 * @param player The player who will be added to a team.
-	 */
-	public void addLatePlayer(Player player) {
-		ArrayList<Integer> teamSizes = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
-
-		//Assign player to a fixed size team.
-		for (int i = 0; i < teamSizes.size(); i++) {
-			int playersNeeded = 0;
-
-			//If no teams have a fixed size, we will sort the player into a team that needs players.
-			if (teamSizes.get(i) != -1) {
-
-				if (sortedTeams.get(i) == null) {
-					playersNeeded = getMaxTeamSize(i);
-				} else {
-					playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
-				}
-
-				if(playersNeeded > 0) {
-					//If the team needs players, see if a player can be added.
-					setPlayerTeam(i, player);
-
-					return;
-				}
-			}
-		}
-
-		//Assign player to any team.
-		for (int i = 0; i < teamSizes.size(); i++) {
-			int playersNeeded = 0;
-
-			if (sortedTeams.get(i) == null) {
-				playersNeeded = getMaxTeamSize(i);
-			} else {
-				playersNeeded = getMaxTeamSize(i) - sortedTeams.get(i).size();
-			}
-
-			if(playersNeeded > 0) {
-				//If the team needs players, see if a player can be added.
-				setPlayerTeam(i, player);
-
-				return;
-			}
-		}
-	}
-
-	/**
 	 * Changes a players team from the current one to another.
 	 * @param futureTeam The team the player wants to switch to.
 	 * @param player The player who is trying to switch teams.
@@ -324,51 +416,17 @@ public class TeamSelector {
 	}
 
 	/**
-	 * Called when a player interacts with a team.
-	 * @param name The NPC the player interacted with. 
-	 */
-	public void teamInteract(int team, Player player) {
-		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
-
-		//Set player a confirmation message.
-		player.sendMessage("");
-		player.sendMessage(Messages.GAME_BAR_TEAM.toString());
-		player.sendMessage("");
-		player.sendMessage(minigameTeam.getTeamNames().get(team) + ChatColor.DARK_GRAY + ":");
-		player.sendMessage("");
-		player.sendMessage(minigameTeam.getTeamDescriptions().get(team));
-		player.sendMessage("");
-		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
-		player.sendMessage("");
-
-		//Play a confirmation sound.
-		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
-
-		//Set the the players team.
-		changePlayerTeam(team, player);
-
-		updateQueuePositions();
-	}
-
-	/**
 	 * Spawns the teams in the game lobby.
 	 */
-	public void spawnTeams() {
+	public void spawnTeamsEntities() {
 		MinigameTeams team = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 
 		//Spawn platform for NPC's to stand on.
 		platformSpawner.setPlatforms(team.getTeamPlatformLocations(), team.getTeamPlatformMaterials());
 
-		//TODO: Spawn NPC
-
 		//Spawn a bukkit/spigot entity.
-		entitySpawner = new EntitySpawner(this);
+		entitySpawner = new TeamSpawner(this);
 		entitySpawner.setEntities(team.getTeamPlatformLocations(), team.getTeamNames(), team.getEntityTypes());
-
-		//Start entity freezing.
-		setEntityFreezer(new EntityFreezer(PLUGIN, this));
-		entityFreezer.teleportEntity();
-
 	}
 
 	/**
@@ -385,29 +443,9 @@ public class TeamSelector {
 		//Empty the team entity
 		teamEntityUUID.clear();
 
-		//Stop entity freezing.
-		entityFreezer.setTpEntity(false);
-		setEntityFreezer(null);
-
 		//Remove HashMap players.
 		sortedTeams.clear();
 		queuedPlayers.clear();
-	}
-
-	/**
-	 * Gets an instance of the EntityFreezer class.
-	 * @return Returns an instance of the EntityFreezer class.
-	 */
-	public EntityFreezer getEntityFreezer() {
-		return entityFreezer;
-	}
-
-	/**
-	 * Sets the entity freezer instance.  Typically set to null to "reset" it for the next game.
-	 * @param entityFreezer The entity freezer object we want to set.
-	 */
-	public void setEntityFreezer(EntityFreezer entityFreezer) {
-		this.entityFreezer = entityFreezer;
 	}
 
 	/**
@@ -504,7 +542,7 @@ public class TeamSelector {
 		player.sendMessage(ChatColor.GREEN + "You joined the \"" + teamNames.get(team) + ChatColor.GREEN + "\" team.");
 
 		//Update the lobby scoreboard.
-		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
+		GAME_MANAGER.getGAME_LOBBY().getScoreboard().updatePlayerScoreboard(player);
 	}
 
 	/**
@@ -524,10 +562,10 @@ public class TeamSelector {
 
 	/**
 	 * Gets the spawn locations of a team mob.
-	 * @return Returns a HashMap of a <Entity UUID, and a World Location>.
+	 * @return Returns a HashMap of a <Integer team ID, and a World Location>.
 	 */
-	public HashMap<UUID, Location> getTeamLocations() {
-		return teamLocations;
+	public HashMap<Integer, Location> getTeamEntityLocations() {
+		return teamHologramLocations;
 	}
 
 	/**

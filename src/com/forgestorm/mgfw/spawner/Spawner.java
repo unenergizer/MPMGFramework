@@ -1,4 +1,4 @@
-package com.forgestorm.mgfw.core.kits.spawner;
+package com.forgestorm.mgfw.spawner;
 
 import java.util.ArrayList;
 
@@ -15,7 +15,7 @@ public abstract class Spawner {
 	 * @param centerLocation The centered location of the kit platform.
 	 * @param entityType The type of entity to spawn in the world.
 	 */
-	public abstract void spawnEntity(String string, Location centerLocation, EntityType entityType);
+	public abstract void spawnEntity(int teamID, String string, Location centerLocation, EntityType entityType);
 	
 	/**
 	 * This will set the Entity on the kit platform.
@@ -25,13 +25,12 @@ public abstract class Spawner {
 	 * @param entities A list of entities to spawn.
 	 */
 	public void setEntities(ArrayList<ArrayList<Location>> platformLocation, ArrayList<String> names, ArrayList<EntityType> entities) {
-
 		for (int i = 0; i < platformLocation.size(); i++) {
 			Location loc1 = platformLocation.get(i).get(0);
 			Location loc2 = platformLocation.get(i).get(1);
 
 			//Spawn an entity at the center location.
-			spawnEntity(names.get(i), getCenterLocation(loc1, loc2), entities.get(i));
+			spawnEntity(i, names.get(i), getCenterLocation(loc1, loc2), entities.get(i));
 		}
 	}
 

@@ -10,6 +10,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.forgestorm.mgfw.MGFramework;
+import com.forgestorm.mgfw.core.GameArena;
+import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class PlayerInteract implements Listener {
@@ -22,10 +24,12 @@ public class PlayerInteract implements Listener {
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event){
-		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
+		GameManager gameManager = PLUGIN.getGameManager();
+		GameArena gameArena = gameManager.getGAME_ARENA();
+		boolean isRunning = gameManager.isMinigameRunning();
 
 		if (isRunning) {
-			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameLobby().getPlayerProfile();
+			HashMap<Player, PlayerProfile> playerProfile = gameManager.getGAME_LOBBY().getPlayerProfile();
 			Player player = (Player) event.getPlayer();
 			
 			//If the player is a spectator, lets cancel the event.
@@ -34,9 +38,9 @@ public class PlayerInteract implements Listener {
 				if ((event.getAction().equals(Action.RIGHT_CLICK_AIR)) || (event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 					if (event.getItem() != null) {
 						if (event.getItem().getType().equals(Material.REDSTONE)) {
-							PLUGIN.getGameArena().getSpectatorMenu(player).openMenu(player);
+							gameArena.getSpectatorMenu(player).openMenu(player);
 						} else if (event.getItem().getType().equals(Material.COMPASS)) {
-							PLUGIN.getGameArena().getSpectatorTrackerMenu(player).openMenu(player);
+							gameArena.getSpectatorTrackerMenu(player).openMenu(player);
 						}
 					}
 				}

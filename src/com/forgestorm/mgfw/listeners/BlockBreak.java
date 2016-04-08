@@ -23,7 +23,7 @@ public class BlockBreak implements Listener {
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
 		if (isRunning) {
-			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameLobby().getPlayerProfile();
+			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile();
 			Player player = (Player) event.getPlayer();
 
 			//If the player is a spectator, lets cancel the event.

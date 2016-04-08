@@ -19,6 +19,6 @@ public class ScoreboardUpdater {
 	 * @param scoreMap
 	 */
 	public void sendScoreboardUpdates(HashMap<Player, Integer> scoreMap) {
-		PLUGIN.getGameArena().getScoreboard().setScores(scoreMap);
+		PLUGIN.getGameManager().getGAME_ARENA().getScoreboard().setScores(scoreMap);
 	}
 }

@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.GameArena;
 import com.forgestorm.mgfw.core.GameLobby;
+import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 
@@ -30,7 +31,7 @@ public class EntityDamage implements Listener {
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
 		if (!isRunning) {
-			GameLobby lobby = PLUGIN.getGameLobby();
+			GameLobby lobby = PLUGIN.getGameManager().getGAME_LOBBY();
 			String lobbyWorld = lobby.getLobbyWorldName();
 
 			//Check to see if the entity was a player entity.
@@ -53,14 +54,15 @@ public class EntityDamage implements Listener {
 		} else {
 			//Check for spectator damage.
 			if (event.getEntity() instanceof Player) {
-			
-				GameState gameState = PLUGIN.getGameManager().getGameState();
+				GameManager gameManager = PLUGIN.getGameManager();
+				GameLobby gameLobby = gameManager.getGAME_LOBBY();
+				GameState gameState = gameManager.getGameState();
 				Player player = (Player) event.getEntity();
 				
 				double playerHP = player.getHealth() - event.getFinalDamage();
 				
 				boolean isOverrideSpectator = PLUGIN.getMinigamePluginManager().getMinigameBase().isOverrideSpectator();
-				boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+				boolean isSpectator = gameLobby.getPlayerProfile().get(player).isSpectator();
 				boolean isGameStarting = gameState.equals(GameState.GAME_STARTING);
 				boolean isShowingRules = gameState.equals(GameState.ARENA_SHOW_RULES);
 				boolean isGameRunning = gameState.equals(GameState.GAME_RUNNING);
@@ -78,8 +80,7 @@ public class EntityDamage implements Listener {
 						//However, if they loose enough HP, lets make them a spectator.
 						
 						event.setCancelled(true);
-						GameArena gameArena = PLUGIN.getGameArena();
-						GameLobby gameLobby = PLUGIN.getGameLobby();
+						GameArena gameArena = gameManager.getGAME_ARENA();
 						HashMap<Player, PlayerProfile> playerProfile = gameLobby.getPlayerProfile();
 						
 						//Get the players profile and set them to spectator.

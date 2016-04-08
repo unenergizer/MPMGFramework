@@ -12,8 +12,8 @@ import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.ActionBarText;
 import com.forgestorm.mgfw.core.display.TipAnnouncer;
-import com.forgestorm.mgfw.core.kits.KitSelector;
-import com.forgestorm.mgfw.core.teams.TeamSelector;
+import com.forgestorm.mgfw.selector.KitSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
 public class GameManager {
 
@@ -25,16 +25,16 @@ public class GameManager {
 
 	private GameState gameState;
 	private TipAnnouncer tips;
-	private int gamesPlayed;
-	private int minPlayers = 2;
-	private int maxPlayers = 16;
+	private int gamesPlayed, minPlayers, maxPlayers;
 
 	public GameManager(MGFramework plugin) {
 		PLUGIN = plugin;
-		GAME_ARENA = PLUGIN.getGameArena();
-		GAME_LOBBY = PLUGIN.getGameLobby();
-		KIT_SELECTOR = new KitSelector(PLUGIN);
-		TEAM_SELECTOR = new TeamSelector(PLUGIN);
+		minPlayers = 2;
+		maxPlayers = 16;
+		GAME_ARENA = new GameArena(PLUGIN);
+		GAME_LOBBY = new GameLobby(PLUGIN);
+		KIT_SELECTOR = new KitSelector(PLUGIN, this);
+		TEAM_SELECTOR = new TeamSelector(PLUGIN, this);
 		tips = new TipAnnouncer(PLUGIN);
 
 		//On first load, lets begin with setting up the game.
@@ -64,7 +64,7 @@ public class GameManager {
 	 * This will setup our game lobby.
 	 */
 	private void setupLobby() {
-		
+
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
 
@@ -73,17 +73,18 @@ public class GameManager {
 
 		//Setup the lobby scoreboard.
 		GAME_LOBBY.getScoreboard().createScoreboard();
-		
+
 		//Setup lobby kits.
-		KIT_SELECTOR.spawnKits();
+		KIT_SELECTOR.spawnKitEntities();
 
 		//Setup lobby teams.
-		TEAM_SELECTOR.spawnTeams();
+		TEAM_SELECTOR.spawnTeamsEntities();
+		TEAM_SELECTOR.createHolograms();
 		TEAM_SELECTOR.assignAllPlayerTeams();
 
 		//Setup all the players currently in the lobby.
 		GAME_LOBBY.setupAllLobbyPlayers();
-		
+
 		//Unhide players
 		GAME_LOBBY.showHiddenPlayers();
 
@@ -113,7 +114,7 @@ public class GameManager {
 
 		//Destroy the lobby scoreboard.
 		GAME_LOBBY.getScoreboard().destroyScoreboard();
-		
+
 		//Setup the lobby scoreboard.
 		GAME_ARENA.getScoreboard().createScoreboard();
 
@@ -122,10 +123,10 @@ public class GameManager {
 
 		//Setup all of the arena players.
 		GAME_ARENA.setupAllArenaPlayers();
-		
+
 		//Show game description and rules.
 		GAME_ARENA.showGameRules();
-		
+
 		//Let the plugin know to start the game.
 		PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
 
@@ -140,10 +141,8 @@ public class GameManager {
 	 * @param setupNextGame Set to true, to load the next game.
 	 */
 	public void endGame(boolean setupNextGame) {
-		GameArena GAME_ARENA = PLUGIN.getGameArena();
-		GameLobby GAME_LOBBY = PLUGIN.getGameLobby();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
-		
+
 		gameState = GameState.GAME_ENDING;
 
 		//If players are still online, lets show them the game scores.
@@ -161,10 +160,10 @@ public class GameManager {
 
 		//Destroy the lobby scoreboard.
 		GAME_ARENA.getScoreboard().destroyScoreboard();
-		
+
 		//Remove spectators
 		GAME_ARENA.removeAllSpectators();
-		
+
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
 
@@ -197,39 +196,58 @@ public class GameManager {
 
 			@Override
 			public void run() {
+				boolean allTeamsHavePlayers = getTeamSelector().allTeamsHavePlayers();
 
-				//If the minimum number of players is met, lets do a countdown!
-				if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
-					
-					//Show countdown in chat.
-					if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 1) {
-						ActionBarText abt = new ActionBarText();
-						String message = Messages.GAME_TIME_REMAINING_PLURAL.toString();
-						
-						for (Player players: Bukkit.getOnlinePlayers()) {
-							abt.sendActionbarMessage(players, message.replace("%s", Integer.toString(countdown)));
-							players.playSound(players.getLocation(), Sound.BLOCK_NOTE_PLING, 1f, 1f);
+				if (allTeamsHavePlayers) {
+					//If the minimum number of players is met, lets do a countdown!
+					if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
+
+						//Show countdown in chat.
+						if (countdown == 30 || countdown == 20 || countdown == 10 || countdown <= 5 && countdown > 1) {
+							ActionBarText abt = new ActionBarText();
+							String message = Messages.GAME_TIME_REMAINING_PLURAL.toString();
+
+							for (Player players: Bukkit.getOnlinePlayers()) {
+								abt.sendActionbarMessage(players, message.replace("%s", Integer.toString(countdown)));
+								players.playSound(players.getLocation(), Sound.BLOCK_NOTE_PLING, 1f, 1f);
+							}
 						}
-					}
-					
-					//Show the 1 second left countdown message.
-					if (countdown == 1) {
+
+						//Show the 1 second left countdown message.
+						if (countdown == 1) {
+							cancel();
+
+							ActionBarText abt = new ActionBarText();
+							String message = Messages.GAME_TIME_REMAINING_SINGULAR.toString();
+
+							for (Player players: Bukkit.getOnlinePlayers()) {
+								abt.sendActionbarMessage(players, message);
+								players.playSound(players.getLocation(), Sound.BLOCK_NOTE_HARP, 1f, 1f);
+							}
+
+							//Do one last check to make sure the game should start.
+							if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
+								startGame();
+							}
+						}
+					} else { //Not enough players! Someone left, so let's cancel the countdown and reset everything.
 						cancel();
 
+						//Set game state.
+						gameState = GameState.LOBBY_WAITING;
+
+						//Show action bar message.
 						ActionBarText abt = new ActionBarText();
-						String message = Messages.GAME_TIME_REMAINING_SINGULAR.toString();
+						String message = Messages.GAME_COUNTDOWN_NOT_ENOUGH_PLAYERS.toString();
 
 						for (Player players: Bukkit.getOnlinePlayers()) {
+							//Show message
 							abt.sendActionbarMessage(players, message);
-							players.playSound(players.getLocation(), Sound.BLOCK_NOTE_HARP, 1f, 1f);
-						}
-
-						//Do one last check to make sure the game should start.
-						if (isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_COUNTDOWN)) {
-							startGame();
+							//Play notification sound.
+							players.playSound(players.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 						}
 					}
-				} else { //Not enough players! Someone left, so let's cancel the countdown and reset everything.
+				} else {
 					cancel();
 
 					//Set game state.
@@ -237,7 +255,7 @@ public class GameManager {
 
 					//Show action bar message.
 					ActionBarText abt = new ActionBarText();
-					String message = Messages.GAME_COUNTDOWN_NOT_ENOUGH_PLAYERS.toString();
+					String message = Messages.GAME_COUNTDOWN_ALL_TEAMS_NEED_PLAYERS.toString();
 
 					for (Player players: Bukkit.getOnlinePlayers()) {
 						//Show message
@@ -249,9 +267,9 @@ public class GameManager {
 
 				countdown--;
 			}
-		}.runTaskTimer(PLUGIN, 0, 20);
+		}.runTaskTimer(PLUGIN, 20, 20);
 	}
-	
+
 	/**
 	 * This will show the end game results, then toggle the endGame(true) method.
 	 */
@@ -277,7 +295,8 @@ public class GameManager {
 	 * @return True if the game should start.
 	 */
 	public boolean shouldMinigameStart() {
-		return isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_WAITING);
+		boolean allTeamsHavePlayers = getTeamSelector().allTeamsHavePlayers();
+		return isMinimumPlayersMet() && gameState.equals(GameState.LOBBY_WAITING) && allTeamsHavePlayers;
 	}
 
 	/**
@@ -287,16 +306,16 @@ public class GameManager {
 	public boolean shouldMinigameEnd() {
 		int playersOnline = Bukkit.getOnlinePlayers().size();
 		int spectatorsOnline = 0;
-		
+
 		//Get spectator count.
 		for (Player players: Bukkit.getOnlinePlayers()) {
-			boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(players).isSpectator();
-			
+			boolean isSpectator = GAME_LOBBY.getPlayerProfile().get(players).isSpectator();
+
 			if (isSpectator) {
 				spectatorsOnline++;
 			}
 		}
-		
+
 		//Test if game should end.
 		if (playersOnline == 0 || playersOnline == spectatorsOnline) {
 			return true;
@@ -390,7 +409,7 @@ public class GameManager {
 	 * Gets the maximum number of players this game arcade can support.
 	 * @return Retuns the maximum number of players the game arcade can hold.
 	 */
-	public int getMaxPlayers() {
+	public Integer getMaxPlayers() {
 		return maxPlayers;
 	}
 
@@ -400,5 +419,13 @@ public class GameManager {
 	 */
 	public void setMaxPlayers(int maxPlayers) {
 		this.maxPlayers = maxPlayers;
+	}
+
+	public GameArena getGAME_ARENA() {
+		return GAME_ARENA;
+	}
+
+	public GameLobby getGAME_LOBBY() {
+		return GAME_LOBBY;
 	}
 }

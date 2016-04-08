@@ -16,7 +16,7 @@ import org.bukkit.scoreboard.Team;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameTeams;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.teams.TeamSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
 
 public class ArenaScoreboard {
@@ -107,7 +107,7 @@ public class ArenaScoreboard {
 	 * @param player The player what will be placed on a team.
 	 */
 	private void setPlayerTeam(Player player) {
-		boolean isSpectator = PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator();
+		boolean isSpectator = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile().get(player).isSpectator();
 
 		if (!isSpectator) {
 			TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
@@ -182,7 +182,7 @@ public class ArenaScoreboard {
 
 		//Setup player's scoreboard.
 		//TODO: Clean this up.
-		if (PLUGIN.getGameLobby().getPlayerProfile().get(player).isSpectator()) {
+		if (PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile().get(player).isSpectator()) {
 			setScores(lastScoreMapSent);
 		}
 	}

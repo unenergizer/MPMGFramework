@@ -30,8 +30,8 @@ public class PlayerJoin implements Listener {
 
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameArena gameArena = PLUGIN.getGameArena();
-		GameLobby gameLobby = PLUGIN.getGameLobby();
+		GameArena gameArena = gameManager.getGAME_ARENA();
+		GameLobby gameLobby = gameManager.getGAME_LOBBY();
 		Location lobbySpawn = gameLobby.getLobbySpawn();
 		HashMap<Player, PlayerProfile> playerProfile = gameLobby.getPlayerProfile();
 		GameState gameState = gameManager.getGameState();
@@ -49,6 +49,7 @@ public class PlayerJoin implements Listener {
 			//Setup the player as a spectator.
 			gameArena.setupSpectator(player);
 		} else {
+			
 			//Teleport the player to the lobby.
 			teleport(player, lobbySpawn);
 			

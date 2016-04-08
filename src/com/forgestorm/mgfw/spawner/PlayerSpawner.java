@@ -1,4 +1,4 @@
-package com.forgestorm.mgfw.core.teams.spawner;
+package com.forgestorm.mgfw.spawner;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -35,7 +35,7 @@ public class PlayerTracker {
 	 * Lets make all the menu items for our spectator menu.
 	 */
 	private void makeMenuItems() {
-		HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameLobby().getPlayerProfile();
+		HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile();
 		int headCount = 0;
 
 		//TODO: Fix this, its not pretty.

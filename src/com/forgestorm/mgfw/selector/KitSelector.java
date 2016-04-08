@@ -1,20 +1,18 @@
-package com.forgestorm.mgfw.core.kits;
+package com.forgestorm.mgfw.selector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameKits;
+import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.kits.spawner.EntityFreezer;
-import com.forgestorm.mgfw.core.kits.spawner.EntitySpawner;
-import com.forgestorm.mgfw.core.kits.spawner.Spawner;
+import com.forgestorm.mgfw.spawner.KitSpawner;
 import com.forgestorm.mgfw.util.PlatformBuilder;
 
 import net.md_5.bungee.api.ChatColor;
@@ -26,19 +24,18 @@ import net.md_5.bungee.api.ChatColor;
 public class KitSelector {
 
 	private final MGFramework PLUGIN;
+	private final GameManager GAME_MANAGER;
 
 	private PlatformBuilder platformSpawner;
-	private Spawner entitySpawner;
-	private EntityFreezer entityFreezer;
+	private KitSpawner entitySpawner;
 	private HashMap<UUID, Integer> playerKit;
-	private HashMap<UUID, Location> kitLocations;
 	private ArrayList<UUID> kitEntityUUID;
 
-	public KitSelector(MGFramework plugin) {
+	public KitSelector(MGFramework plugin, GameManager gameManager) {
 		PLUGIN = plugin;
+		GAME_MANAGER = gameManager;
 		platformSpawner = new PlatformBuilder();
 		playerKit = new HashMap<UUID, Integer>();
-		kitLocations = new HashMap<UUID, Location>();
 		kitEntityUUID = new ArrayList<UUID>();
 	}
 
@@ -68,7 +65,7 @@ public class KitSelector {
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
 		
 		//Update the lobby scoreboard.
-		PLUGIN.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
+		GAME_MANAGER.getGAME_LOBBY().getScoreboard().updatePlayerScoreboard(player);
 	}
 	
 	/**
@@ -86,7 +83,7 @@ public class KitSelector {
 	/**
 	 * Spawns the kits in the game lobby.
 	 */
-	public void spawnKits() {
+	public void spawnKitEntities() {
 		MinigameKits kit = PLUGIN.getMinigamePluginManager().getMinigameKit();
 
 		//Spawn platform for NPC's to stand on.
@@ -95,13 +92,8 @@ public class KitSelector {
 		//TODO: Spawn NPC
 
 		//Spawn a bukkit/spigot entity.
-		entitySpawner = new EntitySpawner(this);
-		entitySpawner.setEntities(kit.getKitPlatformLocations(), kit.getKitNames(), kit.getEntityTypes());
-		
-		//Start entity freezing.
-		setEntityFreezer(new EntityFreezer(PLUGIN, this));
-		entityFreezer.teleportEntity();
-		
+		entitySpawner = new KitSpawner(this);
+		entitySpawner.setEntities(kit.getKitPlatformLocations(), kit.getKitNames(), kit.getEntityTypes());	
 	}
 
 	/**
@@ -117,26 +109,6 @@ public class KitSelector {
 		
 		//Empty the kit entity
 		kitEntityUUID.clear();
-		
-		//Stop entity freezing.
-		entityFreezer.setTpEntity(false);
-		setEntityFreezer(null);
-	}
-
-	/**
-	 * Gets an instance of the EntityFreezer class.
-	 * @return Returns an instance of the EntityFreezer class.
-	 */
-	public EntityFreezer getEntityFreezer() {
-		return entityFreezer;
-	}
-	
-	/**
-	 * Sets the entity freezer instance.  Typically set to null to "reset" it for the next game.
-	 * @param entityFreezer The entity freezer object we want to set.
-	 */
-	public void setEntityFreezer(EntityFreezer entityFreezer) {
-		this.entityFreezer = entityFreezer;
 	}
 
 	/**
@@ -153,14 +125,6 @@ public class KitSelector {
 			//Return first kit.
 			return 0;
 		}
-	}
-	
-	/**
-	 * Gets the spawn locations of a kit mob.
-	 * @return Returns a HashMap of a <Entity UUID, and a World Location>.
-	 */
-	public HashMap<UUID, Location> getKitLocations() {
-		return kitLocations;
 	}
 
 	/**

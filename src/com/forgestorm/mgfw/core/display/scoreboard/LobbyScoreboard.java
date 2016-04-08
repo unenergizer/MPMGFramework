@@ -17,7 +17,7 @@ import com.forgestorm.mgfw.api.MinigameTeams;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.MinigamePluginManager;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.teams.TeamSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
 
 public class LobbyScoreboard {
@@ -81,8 +81,9 @@ public class LobbyScoreboard {
 		Scoreboard board = lobbyScoreboard;
 		
 		//Unregister all current objectives on the scoreboard.
-		unregisterObjectives(board);
-				
+		//unregisterObjectives(board);
+		unregisterObjective(player);	
+		
 		//Set the board objective.
 		Objective objective = lobbyScoreboard.registerNewObjective(player.getName(), "dummy");
 		
@@ -232,8 +233,14 @@ public class LobbyScoreboard {
 	 * @param player The player that will have their scoreboard removed.
 	 */
 	public void removePlayer(Player player) {
+		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
+		int playerTeam = teamSelector.getPlayerTeam(player);
+		
 		//Give the player a new "blank" scoreboard.
 		player.setScoreboard(manager.getNewScoreboard());
+		
+		//Remove the player from the 
+		teams.get(playerTeam).removeEntry(player.getName());	
 	}
 
 	/**
@@ -251,6 +258,22 @@ public class LobbyScoreboard {
 	public void updateAllPlayerScoreboards() {
 		for (Player players: Bukkit.getOnlinePlayers()) {
 			updatePlayerScoreboard(players);
+		}
+	}
+
+	/**
+	 * Unregisters all the given objectives for the scoreboard.
+	 * @param board The board that will have all objectives removed form it.
+	 */
+	private void unregisterObjective(Player player) {
+		//Check to make sure the board objectives are not null.
+		if (player.getScoreboard() != null) {
+			
+			//Unregister the players objective.
+			if (player.getScoreboard().getObjective(player.getName()) != null) {
+				player.getScoreboard().getObjective(player.getName()).unregister();
+			}
+			
 		}
 	}
 

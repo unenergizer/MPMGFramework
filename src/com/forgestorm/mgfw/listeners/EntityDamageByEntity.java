@@ -11,9 +11,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.forgestorm.mgfw.MGFramework;
-import com.forgestorm.mgfw.core.kits.KitSelector;
-import com.forgestorm.mgfw.core.teams.TeamSelector;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
+import com.forgestorm.mgfw.selector.KitSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
 public class EntityDamageByEntity implements Listener {
 
@@ -61,7 +61,7 @@ public class EntityDamageByEntity implements Listener {
 				}
 			}
 		} else { //Test for spectator damage.
-			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameLobby().getPlayerProfile();
+			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile();
 
 			//Lets check for and prevent spectator vs player damage.
 			//Check to see if the entity was a player entity.

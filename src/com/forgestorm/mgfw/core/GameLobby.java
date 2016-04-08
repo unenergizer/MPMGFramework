@@ -16,9 +16,9 @@ import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
 import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.core.display.scoreboard.LobbyScoreboard;
-import com.forgestorm.mgfw.core.kits.KitSelector;
-import com.forgestorm.mgfw.core.teams.TeamSelector;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
+import com.forgestorm.mgfw.selector.KitSelector;
+import com.forgestorm.mgfw.selector.TeamSelector;
 
 public class GameLobby {
 
@@ -62,7 +62,7 @@ public class GameLobby {
 
 		//Assigning the player to a team.
 		if (teamSelector.getPlayerTeam(player) == null) {
-			teamSelector.addLatePlayer(player);
+			teamSelector.addPlayer(player);
 		}
 
 		//Heal the player
@@ -89,7 +89,7 @@ public class GameLobby {
 		player.setFlying(false);
 
 		//Set collide entities true.
-		player.setCollidable(true);
+		player.setCollidable(false);
 
 		//Setup lobby player profiles (for server reloads).
 		if (!playerProfile.containsKey(player)) {
@@ -110,7 +110,7 @@ public class GameLobby {
 
 		//Send Tab Menu text
 		TabMenuText tmt = new TabMenuText();
-		String header = Messages.GAME_TAB_HEADRER.toString();
+		String header = Messages.GAME_TAB_HEADRER.toString().replace("%s", player.getName());
 		String footer = Messages.GAME_TAB_FOOTER.toString();
 		tmt.sendHeaderAndFooter(player, header, footer);
 	}
