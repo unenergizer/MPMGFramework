@@ -1,17 +1,14 @@
 package com.forgestorm.mgfw.api;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.forgestorm.mgfw.MGFramework;
 
 public class GetMinigameKits {
 	
-	private MGFramework PLUGIN;
-	
-	public GetMinigameKits(MGFramework plugin) {
-		PLUGIN = plugin;
-	}
-	
+	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("MPMG-Framework");
+
 	/**
 	 * This is used to get the kit a player is using.
 	 * @param player The player who we are getting kit info for.
