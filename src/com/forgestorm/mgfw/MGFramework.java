@@ -1,6 +1,10 @@
 package com.forgestorm.mgfw;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,11 +27,16 @@ import com.forgestorm.mgfw.listeners.PlayerJoin;
 import com.forgestorm.mgfw.listeners.PlayerMove;
 import com.forgestorm.mgfw.listeners.PlayerQuit;
 import com.forgestorm.mgfw.listeners.WeatherChange;
+import com.forgestorm.mgfw.profiles.PlayerProfile;
 
+import lombok.Getter;
+
+@Getter
 public class MGFramework extends JavaPlugin {
 
 	private MinigamePluginManager minigamePluginManager;
 	private GameManager gameManager;
+	private HashMap<UUID, PlayerProfile> profiles = new HashMap<>();
 	
 	@Override
 	public void onEnable() {
@@ -70,20 +79,12 @@ public class MGFramework extends JavaPlugin {
 		pm.registerEvents(new PlayerQuit(this), this);
 		pm.registerEvents(new WeatherChange(this), this);
 	}
-
-	/**
-	 * Grabs the GameManager instance.
-	 * @return Returns a GameManager instance.
-	 */
-	public GameManager getGameManager() {
-		return gameManager;
+	
+	public PlayerProfile getProfile(Player player) {
+		return profiles.get(player.getUniqueId());
 	}
 
-	/**
-	 * Grabs the MinigamePluginManager instance.
-	 * @return Returns a MinigamePluginManager instance.
-	 */
-	public MinigamePluginManager getMinigamePluginManager() {
-		return minigamePluginManager;
-	}
+    public PlayerProfile getRemovedProfile(Player player) {
+        return profiles.remove(player.getUniqueId());
+    }
 }

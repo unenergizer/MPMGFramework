@@ -1,7 +1,5 @@
 package com.forgestorm.mgfw.listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +10,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.GameArena;
 import com.forgestorm.mgfw.core.GameManager;
-import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class PlayerInteract implements Listener {
 
@@ -25,15 +22,15 @@ public class PlayerInteract implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event){
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameArena gameArena = gameManager.getGAME_ARENA();
+		GameArena gameArena = gameManager.getGameArena();
 		boolean isRunning = gameManager.isMinigameRunning();
 
 		if (isRunning) {
-			HashMap<Player, PlayerProfile> playerProfile = gameManager.getGAME_LOBBY().getPlayerProfile();
 			Player player = (Player) event.getPlayer();
+			boolean isSpectator = PLUGIN.getProfile(player).isSpectator();
 			
 			//If the player is a spectator, lets cancel the event.
-			if(playerProfile.get(player).isSpectator()){
+			if(isSpectator){
 				
 				if ((event.getAction().equals(Action.RIGHT_CLICK_AIR)) || (event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 					if (event.getItem() != null) {

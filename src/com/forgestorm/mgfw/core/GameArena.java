@@ -13,23 +13,22 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
-import com.forgestorm.mgfw.core.display.FloatingMessage;
-import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.core.display.scoreboard.ArenaScoreboard;
 import com.forgestorm.mgfw.core.gui.PlayerTracker;
 import com.forgestorm.mgfw.core.gui.SpectatorMenu;
+import com.forgestorm.mgfw.core.player.ArenaPlayer;
+import com.forgestorm.mgfw.core.player.SpectatorPlayer;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
 import com.forgestorm.mgfw.spawner.PlayerSpawner;
 import com.forgestorm.mgfw.util.ItemBuilder;
 import com.forgestorm.mgfw.util.ScoresToPlaces;
+import com.forgestorm.servercore.core.display.BossBarAnnouncer;
+import com.forgestorm.servercore.core.display.FloatingMessage;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -58,27 +57,8 @@ public class GameArena {
 	 * @param player The player who will be setup for the game arena.
 	 */
 	private void setupArenaPlayer(Player player) {
-		//Heal the player
-		player.setHealth(20);
-		player.setFoodLevel(20);
+		new ArenaPlayer(player, GameMode.ADVENTURE, true, false);
 
-		//Clear a players inventory
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
-
-		//Give the player flying.
-		player.setAllowFlight(false);
-		player.setFlying(false);
-
-		//Remove any fire.
-		player.setFireTicks(0);
-		
-		//Set collide entities true.
-		player.setCollidable(true);
-		
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
 
@@ -115,94 +95,61 @@ public class GameArena {
 	public void setupSpectator(Player spectator) {
 		GameManager gameManager = PLUGIN.getGameManager();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
-		
+
 		//Check if the minigame should end.
 		if (gameManager.shouldMinigameEnd()) {
 			gameManager.endGame(true);
 		}
-		
-		//Heal the player
-		spectator.setMaxHealth(2);
-		spectator.setHealth(2);
-		spectator.setFoodLevel(20);
 
-		//Clear a players inventory
-		spectator.getInventory().clear();
-		spectator.getInventory().setHelmet(null);
-		spectator.getInventory().setChestplate(null);
-		spectator.getInventory().setLeggings(null);
-		spectator.getInventory().setBoots(null);
-		
-		//Remove any fire.
-		spectator.setFireTicks(0);
-		
+		new SpectatorPlayer(spectator, GameMode.ADVENTURE, false, true);
+
+		hideSpectators();
+
 		//Teleport player to spectator spawn.
 		spectator.teleport(mpm.getMinigameTeams().getSpectatorSpawnLocation());
 
-		//Switch Gamemode
-		spectator.setGameMode(GameMode.ADVENTURE);
-
-		//Give the player flying.
-		spectator.setAllowFlight(true);
-		spectator.setFlying(true);
-
-		//Set collide entities false.
-		spectator.setCollidable(false);
-		
-		//Add the invisible potion effect to the player.
-		spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 15));
-
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(spectator);
-		
-		//Hide the spectator from other players.
+
+		//Show Bossbar Announcer
+		spectatorBar.showBossBar(spectator);
+
+		//Give Spectator options menu item.
+		ItemStack spectatorMenuItem = new ItemBuilder(Material.REDSTONE).setTitle("Spectator Menu").build();
+		spectator.getInventory().setItem(4, spectatorMenuItem);
+
+		//Assign the spectator a new spectator menu.
+		spectatorOptionsMenu.put(spectator, new SpectatorMenu(PLUGIN, spectator));
+
+		//Give Spectator tracker menu item.
+		ItemStack spectatorTrackerItem = new ItemBuilder(Material.COMPASS).setTitle("Player Tracker").build();
+		spectator.getInventory().setItem(3, spectatorTrackerItem);
+
+		//Assign the spectator a new spectator menu.
+		spectatorTrackerMenu.put(spectator, new PlayerTracker(PLUGIN, spectator));
+	}
+
+	private void hideSpectators() {
+
 		for (Player spectators: Bukkit.getOnlinePlayers()) {
-			GameLobby gameLobby = PLUGIN.getGameManager().getGAME_LOBBY();
-			boolean isSpectator = gameLobby.getPlayerProfile().get(spectators).isSpectator();
-			
+			Bukkit.broadcastMessage(spectators.getName());
+			boolean isSpectator = PLUGIN.getProfile(spectators).isSpectator();
+
 			//If this player is a spectator lets hide them from the other players.
 			if (isSpectator) {
-				
+
 				//Now loop through all players and hide them from spectators.
 				for(Player players: Bukkit.getOnlinePlayers()) {
-					boolean isSpectatorToo = gameLobby.getPlayerProfile().get(players).isSpectator();
-					
+					boolean isSpectatorToo = PLUGIN.getProfile(players).isSpectator();
+
 					if (!isSpectatorToo) {
 						players.hidePlayer(spectators);
 					}
 				}
 			}
-			
-			//Send Tab Menu text
-			TabMenuText tmt = new TabMenuText();
-			String header = Messages.GAME_TAB_HEADRER.toString().replace("%s", spectator.getName());
-			String footer = Messages.GAME_TAB_FOOTER.toString();
-			tmt.sendHeaderAndFooter(spectator, header, footer);
 		}
-		
-		//Show Bossbar Announcer
-		spectatorBar.showBossBar(spectator);
-		
-		//Send spectator notification message.
-		String title = Messages.GAME_ARENA_SPECTATOR_TITLE.toString();
-		String subtitle = Messages.GAME_ARENA_SPECTATOR_SUBTITLE.toString();
-		new FloatingMessage().sendFloatingMessage(spectator, title, subtitle);
-		
-		//Give Spectator options menu item.
-		ItemStack spectatorMenuItem = new ItemBuilder(Material.REDSTONE).setTitle("Spectator Menu").build();
-		spectator.getInventory().setItem(4, spectatorMenuItem);
-		
-		//Assign the spectator a new spectator menu.
-		spectatorOptionsMenu.put(spectator, new SpectatorMenu(PLUGIN, spectator));
-		
-		//Give Spectator tracker menu item.
-		ItemStack spectatorTrackerItem = new ItemBuilder(Material.COMPASS).setTitle("Player Tracker").build();
-		spectator.getInventory().setItem(3, spectatorTrackerItem);
-		
-		//Assign the spectator a new spectator menu.
-		spectatorTrackerMenu.put(spectator, new PlayerTracker(PLUGIN, spectator));
 	}
-	
+
 	/**
 	 * Removes a spectator.
 	 * @param spectator The spectator we will remove.
@@ -213,11 +160,11 @@ public class GameArena {
 
 		//Remove the spectators "spectator menu."
 		spectatorOptionsMenu.remove(spectator);
-		
+
 		//Remove the spectators "player tracker menu."
 		spectatorTrackerMenu.remove(spectator);
 	}
-	
+
 	/**
 	 * Removes all the spectators.
 	 */
@@ -234,17 +181,17 @@ public class GameArena {
 		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
 		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_RULES);
 		ArrayList<String> gameRules = PLUGIN.getMinigamePluginManager().getMinigameBase().getGameRules();
-		
+
 		//Show the game rules.
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_RULES.toString());
 		Bukkit.broadcastMessage("");
-		
+
 		//Loop through and show the game rules.
 		for (int i = 0; i < gameRules.size(); i++) {
 			Bukkit.broadcastMessage(ChatColor.GREEN + gameRules.get(i));
 		}
-		
+
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
 
@@ -303,15 +250,15 @@ public class GameArena {
 		Bukkit.broadcastMessage(Messages.GAME_BAR_SCORES.toString());
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(ChatColor.RED + "1st " + playerPlaces.get(0));
-		
+
 		if (playerPlaces.size() >= 2) {
 			Bukkit.broadcastMessage(ChatColor.YELLOW + "2nd " + playerPlaces.get(1));
 		}
-		
+
 		if (playerPlaces.size() >= 3) {
 			Bukkit.broadcastMessage(ChatColor.GREEN + "3rd " + playerPlaces.get(2));
 		}
-		
+
 		Bukkit.broadcastMessage("");
 
 		//Show players how they scored.
@@ -323,7 +270,7 @@ public class GameArena {
 				}
 			}
 		}
-		
+
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
 
@@ -377,10 +324,10 @@ public class GameArena {
 
 			//Stop natural spawning of entities.
 			WORLD_DUPE.stopEntitySpawns();
-			
+
 			//Cleanup any map entities.
 			WORLD_DUPE.clearEntities();
-			
+
 		} else {
 			Bukkit.getServer().getLogger().info("[MPMG-Framework] World var not null? We will not load the next world.");
 		}

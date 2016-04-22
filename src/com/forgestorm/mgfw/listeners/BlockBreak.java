@@ -1,14 +1,11 @@
 package com.forgestorm.mgfw.listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import com.forgestorm.mgfw.MGFramework;
-import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 public class BlockBreak implements Listener {
 
@@ -23,11 +20,11 @@ public class BlockBreak implements Listener {
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
 		if (isRunning) {
-			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile();
 			Player player = (Player) event.getPlayer();
+			boolean isSpectator = PLUGIN.getProfile(player).isSpectator();
 
 			//If the player is a spectator, lets cancel the event.
-			if(playerProfile.get(player).isSpectator()){
+			if(isSpectator){
 				event.setCancelled(true);
 			}
 		}

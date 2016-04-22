@@ -25,12 +25,12 @@ public class PlayerMove implements Listener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		GameManager gameManager = PLUGIN.getGameManager();
 		GameState gameState = gameManager.getGameState();
-		GameArena gameArena = gameManager.getGAME_ARENA();
+		GameArena gameArena = gameManager.getGameArena();
 
 		//Stop the player from moving if the game is showing the rules.
 		if (gameState.equals(GameState.ARENA_SHOW_RULES)) {
 			Player player = event.getPlayer();
-			boolean isSpectator = gameManager.getGAME_LOBBY().getPlayerProfile().get(player).isSpectator();
+			boolean isSpectator = PLUGIN.getProfile(player).isSpectator();
 			
 			double moveX = event.getFrom().getX();
 			double moveZ = event.getFrom().getZ();
@@ -38,13 +38,19 @@ public class PlayerMove implements Listener {
 			double moveToX = event.getTo().getX();
 			double moveToZ = event.getTo().getZ();
 			
+			float pitch = event.getTo().getPitch();
+			float yaw = event.getTo().getYaw();
+			
 			//If the countdown has started, then let the player look around.
 			if ((moveX != moveToX || moveZ != moveToZ) && !isSpectator) {
 	
 				HashMap<Player, Location> playerSpawns = gameArena.getPlayerSpawns();
+				Location location = playerSpawns.get(player);
+				location.setPitch(pitch);
+				location.setYaw(yaw);
 				
 				//Teleport player back to their arena spawn location.
-				player.teleport(playerSpawns.get(player));
+				player.teleport(location);
 			}
 		}
 	}

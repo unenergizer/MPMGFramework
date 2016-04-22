@@ -1,7 +1,5 @@
 package com.forgestorm.mgfw.listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -31,7 +29,7 @@ public class EntityDamage implements Listener {
 		boolean isRunning = PLUGIN.getGameManager().isMinigameRunning();
 
 		if (!isRunning) {
-			GameLobby lobby = PLUGIN.getGameManager().getGAME_LOBBY();
+			GameLobby lobby = PLUGIN.getGameManager().getGameLobby();
 			String lobbyWorld = lobby.getLobbyWorldName();
 
 			//Check to see if the entity was a player entity.
@@ -55,14 +53,14 @@ public class EntityDamage implements Listener {
 			//Check for spectator damage.
 			if (event.getEntity() instanceof Player) {
 				GameManager gameManager = PLUGIN.getGameManager();
-				GameLobby gameLobby = gameManager.getGAME_LOBBY();
 				GameState gameState = gameManager.getGameState();
 				Player player = (Player) event.getEntity();
+				PlayerProfile profile = PLUGIN.getProfile(player);
 				
 				double playerHP = player.getHealth() - event.getFinalDamage();
 				
 				boolean isOverrideSpectator = PLUGIN.getMinigamePluginManager().getMinigameBase().isOverrideSpectator();
-				boolean isSpectator = gameLobby.getPlayerProfile().get(player).isSpectator();
+				boolean isSpectator = profile.isSpectator();
 				boolean isGameStarting = gameState.equals(GameState.GAME_STARTING);
 				boolean isShowingRules = gameState.equals(GameState.ARENA_SHOW_RULES);
 				boolean isGameRunning = gameState.equals(GameState.GAME_RUNNING);
@@ -80,11 +78,10 @@ public class EntityDamage implements Listener {
 						//However, if they loose enough HP, lets make them a spectator.
 						
 						event.setCancelled(true);
-						GameArena gameArena = gameManager.getGAME_ARENA();
-						HashMap<Player, PlayerProfile> playerProfile = gameLobby.getPlayerProfile();
-						
+						GameArena gameArena = gameManager.getGameArena();
+
 						//Get the players profile and set them to spectator.
-						playerProfile.get(player).setSpectator(true);
+						profile.setSpectator(true);
 						
 						//Setup the player as a spectator.
 						gameArena.setupSpectator(player);

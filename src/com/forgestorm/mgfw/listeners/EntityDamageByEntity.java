@@ -1,7 +1,6 @@
 package com.forgestorm.mgfw.listeners;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -61,40 +60,35 @@ public class EntityDamageByEntity implements Listener {
 				}
 			}
 		} else { //Test for spectator damage.
-			HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile();
-
 			//Lets check for and prevent spectator vs player damage.
 			//Check to see if the entity was a player entity.
 			if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
 				Player damager = (Player) event.getDamager();
 				Player defender = (Player) event.getEntity();
+				PlayerProfile damagerProfile = PLUGIN.getProfile(damager);
+				PlayerProfile defenderProfile = PLUGIN.getProfile(defender);
 
-				//Make sure we have the player in the PlayerProfile HashMap.
-				if (playerProfile.containsKey(damager) || playerProfile.containsKey(defender)) {
 
-					//Check if the damager was a spectator.
-					if(playerProfile.get(damager).isSpectator() || playerProfile.get(defender).isSpectator()) {
+				//Check if the damager was a spectator.
+				if(damagerProfile.isSpectator() || defenderProfile.isSpectator()) {
 
-						//Cancel the damage if the player was a spectator.
-						event.setCancelled(true);
-					}
+					//Cancel the damage if the player was a spectator.
+					event.setCancelled(true);
 				}
+
 			} else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
 				//Lets check for and prevent spectator vs entity damage.
 				//Check to see if the entity was a player entity.
-
 				Player damager = (Player) event.getDamager();
+				PlayerProfile damagerProfile = PLUGIN.getProfile(damager);
 
-				//Make sure we have the player in the PlayerProfile HashMap.
-				if (playerProfile.containsKey(damager)) {
+				//Check if the damager was a spectator.
+				if(damagerProfile.isSpectator()) {
 
-					//Check if the damager was a spectator.
-					if(playerProfile.get(damager).isSpectator()) {
-
-						//Cancel the damage if the player was a spectator.
-						event.setCancelled(true);
-					}
+					//Cancel the damage if the player was a spectator.
+					event.setCancelled(true);
 				}
+
 			}
 		}
 	}

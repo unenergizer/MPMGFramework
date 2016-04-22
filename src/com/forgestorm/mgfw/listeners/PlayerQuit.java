@@ -24,12 +24,12 @@ public class PlayerQuit implements Listener {
 		event.setQuitMessage(null);
 
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameLobby gameLobby = gameManager.getGAME_LOBBY();
+		GameLobby gameLobby = gameManager.getGameLobby();
 		boolean isRunning = gameManager.isMinigameRunning();
 		Player player = event.getPlayer();
 
 		//Remove the player from the players hashmap.
-		gameLobby.getPlayerProfile().remove(player);
+		PLUGIN.getRemovedProfile(player);
 		
 		//Tell minigames a player quit.
 		PLUGIN.getMinigamePluginManager().getMinigameBase().onPlayerQuit(player);

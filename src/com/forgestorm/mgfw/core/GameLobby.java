@@ -1,7 +1,5 @@
 package com.forgestorm.mgfw.core;
 
-import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -9,16 +7,15 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.display.BossBarAnnouncer;
-import com.forgestorm.mgfw.core.display.TabMenuText;
 import com.forgestorm.mgfw.core.display.scoreboard.LobbyScoreboard;
+import com.forgestorm.mgfw.core.player.LobbyPlayer;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 import com.forgestorm.mgfw.selector.KitSelector;
 import com.forgestorm.mgfw.selector.TeamSelector;
+import com.forgestorm.servercore.core.display.BossBarAnnouncer;
 
 public class GameLobby {
 
@@ -26,7 +23,6 @@ public class GameLobby {
 	private final String LOBBY_WORLD_NAME;
 	private final Location LOBBY_SPAWN;
 
-	private HashMap<Player, PlayerProfile> playerProfile;
 	private BossBarAnnouncer bar;
 	private LobbyScoreboard scoreboard;
 
@@ -35,7 +31,6 @@ public class GameLobby {
 		LOBBY_WORLD_NAME = "mg-lobby";
 		LOBBY_SPAWN = new Location(Bukkit.getWorld(LOBBY_WORLD_NAME), 0.5, 76, 0.5);
 
-		playerProfile = new HashMap<Player, PlayerProfile>();
 		bar = new BossBarAnnouncer(Messages.BOSS_BAR_LOBBY_MESSAGE.toString());
 		scoreboard = new LobbyScoreboard(PLUGIN);
 	}
@@ -55,6 +50,7 @@ public class GameLobby {
 	 * @param player The player to setup in the lobby.
 	 */
 	public void setupLobbyPlayer(Player player) {
+		PlayerProfile playerProfile = PLUGIN.getProfile(player);
 		TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
 
 		//Get all players and teleport them to the lobby world.	
@@ -64,55 +60,17 @@ public class GameLobby {
 		if (teamSelector.getPlayerTeam(player) == null) {
 			teamSelector.addPlayer(player);
 		}
-
-		//Heal the player
-		player.setMaxHealth(20);
-		player.setHealth(20);
-		player.setFoodLevel(20);
-
-		//Clear a players inventory
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
-
-		//Remove any fire.
-		player.setFireTicks(0);
 		
-		//Set gamemode.
-		player.setGameMode(GameMode.ADVENTURE);
-
-		//Give the player flying.
-		player.setFlySpeed(.1f);
-		player.setAllowFlight(false);
-		player.setFlying(false);
-
-		//Set collide entities true.
-		player.setCollidable(false);
-
-		//Setup lobby player profiles (for server reloads).
-		if (!playerProfile.containsKey(player)) {
-			playerProfile.put(player, new PlayerProfile(player));
-		}
-
+		new LobbyPlayer(player, GameMode.ADVENTURE, false, false);
+		
 		//Set the player as a spectator.
-		playerProfile.get(player).setSpectator(false);
-		
-		//Clear potion effects.
-		player.removePotionEffect(PotionEffectType.INVISIBILITY);
+		playerProfile.setSpectator(false);
 
 		//Setup lobby scoreboard
 		scoreboard.addPlayer(player);
 
 		//Send the player the boss bar.
 		bar.showBossBar(player);
-
-		//Send Tab Menu text
-		TabMenuText tmt = new TabMenuText();
-		String header = Messages.GAME_TAB_HEADRER.toString().replace("%s", player.getName());
-		String footer = Messages.GAME_TAB_FOOTER.toString();
-		tmt.sendHeaderAndFooter(player, header, footer);
 	}
 
 	void showHiddenPlayers() {
@@ -220,14 +178,6 @@ public class GameLobby {
 	 */
 	public String getLobbyWorldName() {
 		return LOBBY_WORLD_NAME;
-	}
-
-	/**
-	 * Gets the specified player's profile.
-	 * @return Retuns an inscance of the players profile.
-	 */
-	public HashMap<Player, PlayerProfile> getPlayerProfile() {
-		return playerProfile;
 	}
 
 	/**

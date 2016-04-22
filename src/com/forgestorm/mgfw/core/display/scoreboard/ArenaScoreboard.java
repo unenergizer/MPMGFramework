@@ -107,7 +107,7 @@ public class ArenaScoreboard {
 	 * @param player The player what will be placed on a team.
 	 */
 	private void setPlayerTeam(Player player) {
-		boolean isSpectator = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile().get(player).isSpectator();
+		boolean isSpectator = PLUGIN.getProfile(player).isSpectator();
 
 		if (!isSpectator) {
 			TeamSelector teamSelector = PLUGIN.getGameManager().getTeamSelector();
@@ -182,7 +182,7 @@ public class ArenaScoreboard {
 
 		//Setup player's scoreboard.
 		//TODO: Clean this up.
-		if (PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile().get(player).isSpectator()) {
+		if (PLUGIN.getProfile(player).isSpectator()) {
 			setScores(lastScoreMapSent);
 		}
 	}

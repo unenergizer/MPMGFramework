@@ -4,6 +4,11 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class PlayerProfile {
 	
 	private UUID uuid;
@@ -14,21 +19,5 @@ public class PlayerProfile {
 		uuid = player.getUniqueId();
 		name = player.getDisplayName();
 		isSpectator = false;
-	}
-
-	public UUID getUuid() {
-		return uuid;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public boolean isSpectator() {
-		return isSpectator;
-	}
-
-	public void setSpectator(boolean isSpectator) {
-		this.isSpectator = isSpectator;
 	}
 }

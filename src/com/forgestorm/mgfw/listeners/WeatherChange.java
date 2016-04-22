@@ -18,7 +18,7 @@ public class WeatherChange implements Listener {
 	@EventHandler
 	public void onChange(WeatherChangeEvent event) {
 
-		String lobbyWorld = PLUGIN.getGameManager().getGAME_LOBBY().getLobbyWorldName();
+		String lobbyWorld = PLUGIN.getGameManager().getGameLobby().getLobbyWorldName();
 
 		//Lets cancel weather change events in the minigame lobby.
 		if (event.getWorld().equals(Bukkit.getWorld(lobbyWorld))) {

@@ -29,7 +29,7 @@ public class Admin implements CommandExecutor {
 		}
 
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameLobby gameLobby = gameManager.getGAME_LOBBY();
+		GameLobby gameLobby = gameManager.getGameLobby();
 		
 		if (args.length == 1) {
 			switch (args[0].toLowerCase()) {

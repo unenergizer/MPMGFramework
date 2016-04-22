@@ -1,7 +1,5 @@
 package com.forgestorm.mgfw.listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,21 +28,19 @@ public class PlayerJoin implements Listener {
 
 		Player player = event.getPlayer();
 		GameManager gameManager = PLUGIN.getGameManager();
-		GameArena gameArena = gameManager.getGAME_ARENA();
-		GameLobby gameLobby = gameManager.getGAME_LOBBY();
+		GameArena gameArena = gameManager.getGameArena();
+		GameLobby gameLobby = gameManager.getGameLobby();
 		Location lobbySpawn = gameLobby.getLobbySpawn();
-		HashMap<Player, PlayerProfile> playerProfile = gameLobby.getPlayerProfile();
 		GameState gameState = gameManager.getGameState();
 		
-		//Setup lobby player profiles.
-		if (!playerProfile.containsKey(player)) {
-			playerProfile.put(player, new PlayerProfile(player));
-		}
+		//Get the players profile!
+		final PlayerProfile PROFILE = new PlayerProfile(player);
+        PLUGIN.getProfiles().put(player.getUniqueId(), PROFILE);
 		
 		//Test if the game is running.  If it is, teleport the player to the game world.
 		if (gameManager.isMinigameRunning()) {
 			
-			playerProfile.get(player).setSpectator(true);
+			PLUGIN.getProfile(player).setSpectator(true);
 			
 			//Setup the player as a spectator.
 			gameArena.setupSpectator(player);

@@ -25,8 +25,6 @@ public enum Messages {
 	//Game display messages
 	GAME_COUNTDOWN_NOT_ENOUGH_PLAYERS("&cCountdown canceled! Not enough players!"),
 	GAME_COUNTDOWN_ALL_TEAMS_NEED_PLAYERS("&cCountdown canceled! All teams need players!"),
-	GAME_TAB_HEADRER("\n&8&m-------------------------------\n&r%s&7, thanks for playing on\n \n&r&6&l»  ForgeStorm  «&r\n&8&m-------------------------------&r\n "),
-	GAME_TAB_FOOTER("\n&8&m-------------------------------\n&bNews&7, &aForum&7, &eTeamSpeak&7, &dShop &6@\n&r\n&r&9http://www.ForgeStorm.com\n&8&m-------------------------------"),
 	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),
 	GAME_BAR_TEAM("&8&l&m----------------&r&8&l<[ &3&lTeam Select &8&l]>&8&l&m---------------"),
 	GAME_BAR_RULES("&8&l&m----------------&r&8&l<[ &e&lHow to Play &8&l]>&8&l&m---------------"),

@@ -45,6 +45,6 @@ public class TeamSpawner extends Spawner {
 		
 		//Add the team id and location of the main team classes.
 		//This is for holograms.
-		teamSelector.getTeamEntityLocations().put(teamID, location);
+		teamSelector.getTeamHologramLocations().put(teamID, location);
 	}
 }

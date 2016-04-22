@@ -65,7 +65,7 @@ public class KitSelector {
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
 		
 		//Update the lobby scoreboard.
-		GAME_MANAGER.getGAME_LOBBY().getScoreboard().updatePlayerScoreboard(player);
+		GAME_MANAGER.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
 	}
 	
 	/**

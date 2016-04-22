@@ -20,14 +20,17 @@ import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameTeams;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.display.Hologram;
 import com.forgestorm.mgfw.spawner.TeamSpawner;
 import com.forgestorm.mgfw.util.PlatformBuilder;
+import com.forgestorm.servercore.core.display.Hologram;
+
+import lombok.Getter;
 
 /**
  * Spawns teams in the lobby.
  * The maximum number of teams is 7.
  */
+@Getter
 public class TeamSelector {
 
 	private final MGFramework PLUGIN;
@@ -44,7 +47,6 @@ public class TeamSelector {
 	public TeamSelector(MGFramework plugin, GameManager gameManager) {
 		PLUGIN = plugin;
 		GAME_MANAGER = gameManager;
-		platformSpawner = new PlatformBuilder();
 		sortedTeams = new ConcurrentHashMap<Integer, ArrayList<Player>>(); //<Team, Player>
 		queuedPlayers = new ConcurrentHashMap<Integer, Queue<Player>>(); //<Team, Queued Player>
 		teamHologramLocations = new HashMap<Integer, Location>();
@@ -422,6 +424,7 @@ public class TeamSelector {
 		MinigameTeams team = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 
 		//Spawn platform for NPC's to stand on.
+		platformSpawner = new PlatformBuilder();
 		platformSpawner.setPlatforms(team.getTeamPlatformLocations(), team.getTeamPlatformMaterials());
 
 		//Spawn a bukkit/spigot entity.
@@ -442,6 +445,7 @@ public class TeamSelector {
 
 		//Empty the team entity
 		teamEntityUUID.clear();
+		teamHologramLocations.clear();
 
 		//Remove HashMap players.
 		sortedTeams.clear();
@@ -542,7 +546,7 @@ public class TeamSelector {
 		player.sendMessage(ChatColor.GREEN + "You joined the \"" + teamNames.get(team) + ChatColor.GREEN + "\" team.");
 
 		//Update the lobby scoreboard.
-		GAME_MANAGER.getGAME_LOBBY().getScoreboard().updatePlayerScoreboard(player);
+		GAME_MANAGER.getGameLobby().getScoreboard().updatePlayerScoreboard(player);
 	}
 
 	/**
@@ -558,29 +562,5 @@ public class TeamSelector {
 				break;
 			}
 		}
-	}
-
-	/**
-	 * Gets the spawn locations of a team mob.
-	 * @return Returns a HashMap of a <Integer team ID, and a World Location>.
-	 */
-	public HashMap<Integer, Location> getTeamEntityLocations() {
-		return teamHologramLocations;
-	}
-
-	/**
-	 * Returns an instance of the TeamEntityUUID variable.
-	 * @return Returns an instance of the TeamEntityUUID variable.
-	 */
-	public ArrayList<UUID> getTeamEntityUUID() {
-		return teamEntityUUID;
-	}
-
-	/**
-	 * Gets an instance of the sortedTeams HashMap.
-	 * @return Returns a <Team Integer, and a ArrayList<of Players in a team>.
-	 */
-	public ConcurrentMap<Integer, ArrayList<Player>> getSortedTeams() {
-		return sortedTeams;
 	}
 }

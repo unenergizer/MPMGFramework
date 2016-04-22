@@ -10,32 +10,35 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.GameState;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.core.display.ActionBarText;
 import com.forgestorm.mgfw.core.display.TipAnnouncer;
 import com.forgestorm.mgfw.selector.KitSelector;
 import com.forgestorm.mgfw.selector.TeamSelector;
+import com.forgestorm.servercore.core.display.ActionBarText;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public class GameManager {
 
 	private final MGFramework PLUGIN;
-	private final GameArena GAME_ARENA;
-	private final GameLobby GAME_LOBBY;
-	private final KitSelector KIT_SELECTOR;
-	private final TeamSelector TEAM_SELECTOR;
-
-	private GameState gameState;
+	
+	private GameArena gameArena;
+	private GameLobby gameLobby;	
+	private KitSelector kitSelector;
+	private TeamSelector teamSelector;
 	private TipAnnouncer tips;
+	
+	@Setter
+	private GameState gameState;
+	
+	@Setter
 	private int gamesPlayed, minPlayers, maxPlayers;
 
 	public GameManager(MGFramework plugin) {
 		PLUGIN = plugin;
 		minPlayers = 2;
 		maxPlayers = 16;
-		GAME_ARENA = new GameArena(PLUGIN);
-		GAME_LOBBY = new GameLobby(PLUGIN);
-		KIT_SELECTOR = new KitSelector(PLUGIN, this);
-		TEAM_SELECTOR = new TeamSelector(PLUGIN, this);
-		tips = new TipAnnouncer(PLUGIN);
 
 		//On first load, lets begin with setting up the game.
 		setupGame();
@@ -52,9 +55,12 @@ public class GameManager {
 
 		//Load game plugin.
 		mpm.loadNextGamePlugin();
-
+		
+		//Create new Game Arena
+		gameArena = new GameArena(PLUGIN);
+		
 		//Load game world.
-		GAME_ARENA.loadGameWorld();
+		gameArena.loadGameWorld();
 
 		//Setup game lobby.
 		setupLobby();
@@ -67,28 +73,34 @@ public class GameManager {
 
 		//Set game state.
 		gameState = GameState.SETUP_LOBBY;
+		
+		gameLobby = new GameLobby(PLUGIN);
 
 		//Setup lobby world
-		GAME_LOBBY.loadLobbyWorld();
+		gameLobby.loadLobbyWorld();
 
 		//Setup the lobby scoreboard.
-		GAME_LOBBY.getScoreboard().createScoreboard();
-
+		gameLobby.getScoreboard().createScoreboard();
+		
+		kitSelector = new KitSelector(PLUGIN, this);
+		
 		//Setup lobby kits.
-		KIT_SELECTOR.spawnKitEntities();
+		kitSelector.spawnKitEntities();
 
 		//Setup lobby teams.
-		TEAM_SELECTOR.spawnTeamsEntities();
-		TEAM_SELECTOR.createHolograms();
-		TEAM_SELECTOR.assignAllPlayerTeams();
+		teamSelector = new TeamSelector(PLUGIN, this);
+		teamSelector.spawnTeamsEntities();
+		teamSelector.createHolograms();
+		teamSelector.assignAllPlayerTeams();
 
 		//Setup all the players currently in the lobby.
-		GAME_LOBBY.setupAllLobbyPlayers();
+		gameLobby.setupAllLobbyPlayers();
 
 		//Unhide players
-		GAME_LOBBY.showHiddenPlayers();
+		gameLobby.showHiddenPlayers();
 
 		//Setup rotating game tips.
+		tips = new TipAnnouncer(PLUGIN);
 		tips.startTipMessages(PLUGIN.getMinigamePluginManager().getMinigameBase().getTips());
 
 		//Set game state.
@@ -110,22 +122,22 @@ public class GameManager {
 		gameState = GameState.GAME_STARTING;
 
 		//Remove lobby players
-		GAME_LOBBY.removeAllLobbyPlayers();
+		gameLobby.removeAllLobbyPlayers();
 
 		//Destroy the lobby scoreboard.
-		GAME_LOBBY.getScoreboard().destroyScoreboard();
+		gameLobby.getScoreboard().destroyScoreboard();
 
 		//Setup the lobby scoreboard.
-		GAME_ARENA.getScoreboard().createScoreboard();
+		gameArena.getScoreboard().createScoreboard();
 
 		//Stop game tips from displaying.
 		tips.setShowTips(false);
 
 		//Setup all of the arena players.
-		GAME_ARENA.setupAllArenaPlayers();
+		gameArena.setupAllArenaPlayers();
 
 		//Show game description and rules.
-		GAME_ARENA.showGameRules();
+		gameArena.showGameRules();
 
 		//Let the plugin know to start the game.
 		PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
@@ -153,25 +165,25 @@ public class GameManager {
 		//TODO: Save Scores (MySQL)
 
 		//Remove the kits from the lobby world.
-		KIT_SELECTOR.removeKits();
+		kitSelector.removeKits();
 
 		//Remove the teams from the lobby world.
-		TEAM_SELECTOR.removeTeams();
+		teamSelector.removeTeams();
 
 		//Destroy the lobby scoreboard.
-		GAME_ARENA.getScoreboard().destroyScoreboard();
+		//gameArena.getScoreboard().destroyScoreboard();
 
 		//Remove spectators
-		GAME_ARENA.removeAllSpectators();
+		gameArena.removeAllSpectators();
 
 		//Unload the game plugin.
 		mpm.disableCurrentGamePlugin();
 
 		//Pull the players out of the arena map so it can be unloaded.
-		GAME_LOBBY.tpAllToLobbySpawn();
+		gameLobby.tpAllToLobbySpawn();
 
 		//Unload the game world.
-		GAME_ARENA.unloadGameWorld();
+		gameArena.unloadGameWorld();
 
 		//Increment the number of games played.
 		// gamesPlayed++; ???
@@ -278,7 +290,7 @@ public class GameManager {
 		//This method will envoke the endGame(true) method of this class.
 		//Make sure we only show the scores if the game is running. This is an "/admin endgame" command bug fix.
 		if (gameState.equals(GameState.GAME_RUNNING)) {
-			GAME_ARENA.showGameScores(scoreMap);
+			gameArena.showGameScores(scoreMap);
 		}
 	}
 
@@ -309,7 +321,7 @@ public class GameManager {
 
 		//Get spectator count.
 		for (Player players: Bukkit.getOnlinePlayers()) {
-			boolean isSpectator = GAME_LOBBY.getPlayerProfile().get(players).isSpectator();
+			boolean isSpectator = PLUGIN.getProfile(players).isSpectator();
 
 			if (isSpectator) {
 				spectatorsOnline++;
@@ -339,93 +351,5 @@ public class GameManager {
 		default:
 			return false;
 		}
-	}
-
-	/**
-	 * Gets an instance of the KitSelector class.
-	 * @return Returns an instance of the KitSelector class.
-	 */
-	public KitSelector getKitSelector() {
-		return KIT_SELECTOR;
-	}
-
-	/**
-	 * Gets an instance of the KitSelector class.
-	 * @return Returns an instance of the KitSelector class.
-	 */
-	public TeamSelector getTeamSelector() {
-		return TEAM_SELECTOR;
-	}
-
-	/**
-	 * Gets the current state of the game manager.
-	 * @return The state of the game manager.
-	 */
-	public GameState getGameState() {
-		return gameState;
-	}
-
-	/**
-	 * Sets the state of the game manager.
-	 * @param state The GameState enum to set.
-	 */
-	public void setGameState(GameState state) {
-		this.gameState = state;
-	}
-
-	/**
-	 * Gets the number of game rounds that have been played.
-	 * @return Returns the number of game rounds that have been played.
-	 */
-	public int getGamesPlayed() {
-		return gamesPlayed;
-	}
-
-	/**
-	 * This will set the number of game rounds that have been played.
-	 * @param gamesPlayed The amount of game rounds to set.
-	 */
-	public void setGamesPlayed(int gamesPlayed) {
-		this.gamesPlayed = gamesPlayed;
-	}
-
-	/**
-	 * Gets the minimal amount of players allowed to start a minigame.
-	 * @return Returns the minimal amount of players to start a minigame.
-	 */
-	public int getMinPlayers() {
-		return minPlayers;
-	}
-
-	/**
-	 * Sets the minimum amount of players needed to start a minigame.
-	 * @param minPlayers The amount of players needed to start a minigame.
-	 */
-	public void setMinPlayers(int minPlayers) {
-		this.minPlayers = minPlayers;
-	}
-
-	/**
-	 * Gets the maximum number of players this game arcade can support.
-	 * @return Retuns the maximum number of players the game arcade can hold.
-	 */
-	public Integer getMaxPlayers() {
-		return maxPlayers;
-	}
-
-	/**
-	 * Sets the maximum amount of players allowed to join the server.
-	 * @param maxPlayers The maximum amount of players allowed on the server.
-	 */
-	public void setMaxPlayers(int maxPlayers) {
-		this.maxPlayers = maxPlayers;
-	}
-
-	public GameArena getGAME_ARENA() {
-		return GAME_ARENA;
-	}
-
-	public GameLobby getGAME_LOBBY() {
-		return GAME_LOBBY;
 	}
 }

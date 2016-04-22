@@ -281,7 +281,7 @@ public class LobbyScoreboard {
 	 * Unregisters all the given objectives for the scoreboard.
 	 * @param board The board that will have all objectives removed form it.
 	 */
-	private void unregisterObjectives(Scoreboard board) {
+	public void unregisterObjectives(Scoreboard board) {
 		//Check to make sure the board objectives are not null.
 		if (board != null) {
 			//Loop through all objectives and unregister them.

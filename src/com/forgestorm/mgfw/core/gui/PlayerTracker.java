@@ -1,7 +1,6 @@
 package com.forgestorm.mgfw.core.gui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,7 +12,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.Messages;
-import com.forgestorm.mgfw.profiles.PlayerProfile;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -35,7 +33,6 @@ public class PlayerTracker {
 	 * Lets make all the menu items for our spectator menu.
 	 */
 	private void makeMenuItems() {
-		HashMap<Player, PlayerProfile> playerProfile = PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile();
 		int headCount = 0;
 
 		//TODO: Fix this, its not pretty.
@@ -44,8 +41,9 @@ public class PlayerTracker {
 		}
 
 		for (Player players: Bukkit.getOnlinePlayers()) {
-
-			if (!playerProfile.get(players).isSpectator()) {
+			boolean isSpectator = PLUGIN.getProfile(players).isSpectator();
+			
+			if (!isSpectator) {
 				ItemStack skull = createPlayerSkull(players);
 				playerHeads.add(skull);
 				tracker.setItem(headCount, skull);

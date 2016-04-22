@@ -29,7 +29,7 @@ public class AsyncPlayerChat implements Listener {
 		}
 		
 		//Get players team color for chat messages.
-		if(!PLUGIN.getGameManager().getGAME_LOBBY().getPlayerProfile().get(player).isSpectator()){
+		if(!PLUGIN.getProfile(player).isSpectator()){
 			MinigameTeams minigameTeams = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 			
 			int playerTeam = PLUGIN.getGameManager().getTeamSelector().getPlayerTeam(player);
