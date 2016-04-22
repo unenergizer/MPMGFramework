@@ -8,6 +8,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameTeams;
+import com.forgestorm.servercore.api.ProfileAPI;
+import com.forgestorm.servercore.profile.Profile;
 
 public class AsyncPlayerChat implements Listener {
 
@@ -18,23 +20,28 @@ public class AsyncPlayerChat implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent event){
+	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
+		Profile profile = new ProfileAPI(player).getProfile();
 		String prefix = ChatColor.RESET + "";
 		ChatColor messageColor = ChatColor.WHITE;
 		
 		//Add any prefix.
-		if (event.getPlayer().isOp()) {
-			prefix = prefix.concat(ChatColor.RED + "" + ChatColor.BOLD + "OP ");
+		if (profile.isAdmin()) {
+			prefix = prefix.concat(ChatColor.RED + "" + ChatColor.BOLD + "ADMIN ");
+		}
+
+		//Add any prefix.
+		if (profile.isModerator()) {
+			prefix = prefix.concat(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "MOD ");
 		}
 		
 		//Get players team color for chat messages.
-		if(!PLUGIN.getProfile(player).isSpectator()){
+		if(!PLUGIN.getProfile(player).isSpectator()) {
 			MinigameTeams minigameTeams = PLUGIN.getMinigamePluginManager().getMinigameTeams();
 			
 			int playerTeam = PLUGIN.getGameManager().getTeamSelector().getPlayerTeam(player);
 			messageColor = minigameTeams.getTeamColors().get(playerTeam);
-			//prefix.concat(minigameTeams.getTeamNames().get(playerTeam) + " ");
 		} else  {
 			//Sectator messages will be gray.
 			prefix = prefix.concat(ChatColor.DARK_GRAY + "[Spectator] ");

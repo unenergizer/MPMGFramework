@@ -7,7 +7,7 @@ import com.forgestorm.mgfw.MGFramework;
 
 public class GetMinigameKits {
 	
-	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("MPMG-Framework");
+	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("FSMG-Framework");
 
 	/**
 	 * This is used to get the kit a player is using.

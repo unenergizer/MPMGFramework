@@ -9,7 +9,7 @@ import com.forgestorm.mgfw.MGFramework;
 
 public class ScoreboardUpdater {
 
-	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("MPMG-Framework");
+	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("FSMG-Framework");
 
 	/**
 	 * This will send the ArenaScoreboard the list of player scores.

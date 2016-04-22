@@ -9,7 +9,7 @@ import com.forgestorm.mgfw.MGFramework;
 
 public class EndGame {
 	
-	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("MPMG-Framework");
+	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("FSMG-Framework");
 	
 	/**
 	 * This will toggle the end of the game in the framework.

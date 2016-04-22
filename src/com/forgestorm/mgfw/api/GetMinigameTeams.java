@@ -10,7 +10,7 @@ import com.forgestorm.mgfw.MGFramework;
 
 public class GetMinigameTeams {
 	
-	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("MPMG-Framework");
+	private final MGFramework PLUGIN = (MGFramework) Bukkit.getPluginManager().getPlugin("FSMG-Framework");
 	
 	/**
 	 * This will return a list of sorted teams to the minigame plugins.
