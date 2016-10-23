@@ -8,6 +8,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.GameArena;
@@ -44,8 +47,24 @@ public class EntityDamage implements Listener {
 
 					//If the player falls into the void, tp them to the lobby spawn.
 					if (event.getCause().equals(DamageCause.VOID)) {
-						lobby.tpToLobbySpawn(player);
-						player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
+						
+						//Run on the next tick to prevent teleport bug.
+						new BukkitRunnable() {
+						    public void run() {
+						    	
+						    	//Teleport the player.
+						    	lobby.tpToLobbySpawn(player);
+						        player.setFallDistance(0F);
+
+								//Play sound
+								player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
+								
+								//Give player potion effect.
+								player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1 * 20, 100));
+								
+						        cancel();
+						    }
+						}.runTaskLater(PLUGIN, 1L);
 					}
 				}
 			}

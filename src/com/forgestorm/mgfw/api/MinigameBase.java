@@ -18,7 +18,12 @@ public abstract class MinigameBase {
 	}
 	
 	/**
-	 * Tell the minigame plugin to start execution.
+	 * Tell the minigame plugin to initialize any needed variables.
+	 */
+	public abstract void initialize();
+	
+	/**
+	 * Tell the minigame plugin to start game play.
 	 */
 	public abstract void startGame();
 	

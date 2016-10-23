@@ -3,6 +3,8 @@ package com.forgestorm.mgfw.core.display;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgestorm.mgfw.MGFramework;
@@ -12,7 +14,7 @@ import net.md_5.bungee.api.ChatColor;
 public class TipAnnouncer {
 
 	private final MGFramework PLUGIN;
-	private final int gameTipTime = 20 * 15;
+	private final int gameTipTime = 20 * 30;
 
 	private int tipDisplayed;
 	private boolean showTips;
@@ -40,12 +42,11 @@ public class TipAnnouncer {
 					String gameTip = tips.get(tipDisplayed);
 
 					//Show the tip.
-					Bukkit.broadcastMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "TIP" 
+					sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Tip" 
 							+ ChatColor.YELLOW + " #"
 							+ Integer.toString(tipDisplayed + 1)
 							+ ChatColor.DARK_GRAY + ChatColor.BOLD + ": " 
-							+ ChatColor.WHITE + gameTip  
-							+ ChatColor.DARK_GRAY + ".");
+							+ ChatColor.WHITE + gameTip);
 
 					//Setup to display the next tip.
 					if ((tipDisplayed + 1) == numberOfTips) {
@@ -61,6 +62,16 @@ public class TipAnnouncer {
 				}
 			}
 		}.runTaskTimerAsynchronously(PLUGIN, 0, gameTipTime);
+	}
+	
+	public void sendMessage(String message) {
+		for (Player players: Bukkit.getOnlinePlayers()) {
+			//Send Message
+			players.sendMessage(message);
+			
+			//Play Sound
+        	players.playSound(players.getEyeLocation(), Sound.UI_BUTTON_CLICK, .5F, .2f);
+		}
 	}
 	
 	/**

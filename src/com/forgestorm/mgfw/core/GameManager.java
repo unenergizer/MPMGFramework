@@ -82,9 +82,8 @@ public class GameManager {
 		//Setup the lobby scoreboard.
 		gameLobby.getScoreboard().createScoreboard();
 		
-		kitSelector = new KitSelector(PLUGIN, this);
-		
 		//Setup lobby kits.
+		kitSelector = new KitSelector(PLUGIN, this);
 		kitSelector.spawnKitEntities();
 
 		//Setup lobby teams.
@@ -136,15 +135,14 @@ public class GameManager {
 		//Setup all of the arena players.
 		gameArena.setupAllArenaPlayers();
 
+		//Initialize game variables.
+		PLUGIN.getMinigamePluginManager().getMinigameBase().initialize();
+		
 		//Show game description and rules.
 		gameArena.showGameRules();
 
 		//Let the plugin know to start the game.
-		PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
-
-		//Start the async check to see if the game is over.
-		//pollForGameOver();
-
+		//PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
 	}
 
 	/**
@@ -157,11 +155,8 @@ public class GameManager {
 
 		gameState = GameState.GAME_ENDING;
 
-		//If players are still online, lets show them the game scores.
-		if (Bukkit.getOnlinePlayers().size() > 0) {
-			//TODO: Show scores & MOVE TO GAME ARENA
-		}
-
+		PLUGIN.getMinigamePluginManager().getMinigameBase().endGame();
+		
 		//TODO: Save Scores (MySQL)
 
 		//Remove the kits from the lobby world.
@@ -329,7 +324,7 @@ public class GameManager {
 		}
 
 		//Test if game should end.
-		if (playersOnline == 0 || playersOnline == spectatorsOnline) {
+		if (playersOnline - spectatorsOnline <= 1) {
 			return true;
 		} else {
 			return false;
@@ -342,11 +337,9 @@ public class GameManager {
 	 */
 	public boolean isMinigameRunning() {
 		switch (getGameState()) {
-		case ARENA_SHOW_RULES:
 		case ARENA_SHOW_SCORES:
 		case GAME_ENDING:
 		case GAME_RUNNING:
-		case GAME_STARTING:
 			return true;
 		default:
 			return false;

@@ -13,6 +13,7 @@ import com.forgestorm.mgfw.api.MinigameKits;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.spawner.KitSpawner;
+import com.forgestorm.mgfw.util.CenterChatText;
 import com.forgestorm.mgfw.util.PlatformBuilder;
 
 import net.md_5.bungee.api.ChatColor;
@@ -46,7 +47,17 @@ public class KitSelector {
 	public void kitInteract(Player player, int kit) {
 		MinigameKits minigameKit = PLUGIN.getMinigamePluginManager().getMinigameKit();
 		UUID uuid = player.getUniqueId();
+		CenterChatText cct = new CenterChatText();
+		String kitName = minigameKit.getKitNames().get(kit);
+		ArrayList<String> desc = minigameKit.getKitDescriptions().get(kit);
+		boolean sameKit = isClickingSameKit(kit, player);
+		String sameKitMessage = "";
 		
+		//If the player has intereacted with a team they are on, add a little message to the description.
+		if (sameKit) {
+			sameKitMessage = " " + Messages.KIT_ALREADY_HAVE_KIT.toString();
+		}
+
 		//Set the the players kit.
 		playerKit.put(uuid, kit);
 		
@@ -54,9 +65,14 @@ public class KitSelector {
 		player.sendMessage("");
 		player.sendMessage(Messages.GAME_BAR_KIT.toString());
 		player.sendMessage("");
-		player.sendMessage(minigameKit.getKitNames().get(kit) + ChatColor.DARK_GRAY + ":");
+		player.sendMessage(cct.centerMessage(ChatColor.GRAY + "Kit: " + kitName + sameKitMessage));
 		player.sendMessage("");
-		player.sendMessage(ChatColor.BLUE + minigameKit.getKitDescriptions().get(kit));
+		
+		for (int i = 0; i < desc.size(); i++) {
+			String message = cct.centerMessage(ChatColor.YELLOW + desc.get(i));
+			player.sendMessage(message);
+		}
+		
 		player.sendMessage("");
 		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
 		player.sendMessage("");
@@ -109,6 +125,20 @@ public class KitSelector {
 		
 		//Empty the kit entity
 		kitEntityUUID.clear();
+	}
+	
+	/**
+	 * This will test if the player is clicking a kit they already have.
+	 * @param futureKit The kit the player clicked on.
+	 * @param player The player who clicked the kit.
+	 * @return Returns a boolean true, if the kit is the same.
+	 */
+	private boolean isClickingSameKit(int futureKit, Player player) {
+		if (getPlayerKit(player) == futureKit) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

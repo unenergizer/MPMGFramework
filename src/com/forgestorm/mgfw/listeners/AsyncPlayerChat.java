@@ -9,32 +9,21 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.api.MinigameTeams;
 import com.forgestorm.servercore.api.ProfileAPI;
-import com.forgestorm.servercore.profile.Profile;
 
 public class AsyncPlayerChat implements Listener {
 
 	private final MGFramework PLUGIN;
 	
-	public AsyncPlayerChat(MGFramework plugin){
+	public AsyncPlayerChat(MGFramework plugin) {
 		PLUGIN = plugin;
 	}
 	
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		Profile profile = new ProfileAPI(player).getProfile();
-		String prefix = ChatColor.RESET + "";
+		String prefix = new ProfileAPI(player).getProfile().getPrefix();
 		ChatColor messageColor = ChatColor.WHITE;
 		
-		//Add any prefix.
-		if (profile.isAdmin()) {
-			prefix = prefix.concat(ChatColor.RED + "" + ChatColor.BOLD + "ADMIN ");
-		}
-
-		//Add any prefix.
-		if (profile.isModerator()) {
-			prefix = prefix.concat(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "MOD ");
-		}
 		
 		//Get players team color for chat messages.
 		if(!PLUGIN.getProfile(player).isSpectator()) {

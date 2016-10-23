@@ -3,10 +3,12 @@ package com.forgestorm.mgfw.core;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.forgestorm.mgfw.MGFramework;
 import com.forgestorm.mgfw.core.constants.Messages;
@@ -15,7 +17,10 @@ import com.forgestorm.mgfw.core.player.LobbyPlayer;
 import com.forgestorm.mgfw.profiles.PlayerProfile;
 import com.forgestorm.mgfw.selector.KitSelector;
 import com.forgestorm.mgfw.selector.TeamSelector;
+import com.forgestorm.mgfw.util.ItemBuilder;
 import com.forgestorm.servercore.core.display.BossBarAnnouncer;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class GameLobby {
 
@@ -71,6 +76,10 @@ public class GameLobby {
 
 		//Send the player the boss bar.
 		bar.showBossBar(player);
+		
+		//Give Spectator tracker menu item.
+		ItemStack spectatorServerExit = new ItemBuilder(Material.WATCH).setTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "Back To Lobby").build();
+		player.getInventory().setItem(8, spectatorServerExit);
 	}
 
 	void showHiddenPlayers() {

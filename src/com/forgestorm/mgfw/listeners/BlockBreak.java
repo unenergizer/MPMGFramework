@@ -27,6 +27,8 @@ public class BlockBreak implements Listener {
 			if(isSpectator){
 				event.setCancelled(true);
 			}
+		} else {
+			event.setCancelled(true);
 		}
 
 	}

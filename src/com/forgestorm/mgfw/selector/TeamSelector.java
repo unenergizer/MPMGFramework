@@ -21,6 +21,7 @@ import com.forgestorm.mgfw.api.MinigameTeams;
 import com.forgestorm.mgfw.core.GameManager;
 import com.forgestorm.mgfw.core.constants.Messages;
 import com.forgestorm.mgfw.spawner.TeamSpawner;
+import com.forgestorm.mgfw.util.CenterChatText;
 import com.forgestorm.mgfw.util.PlatformBuilder;
 import com.forgestorm.servercore.core.display.Hologram;
 
@@ -38,12 +39,13 @@ public class TeamSelector {
 
 	private PlatformBuilder platformSpawner;
 	private TeamSpawner entitySpawner;
+	private CenterChatText cct = new CenterChatText();
 	private ConcurrentMap<Integer, ArrayList<Player>> sortedTeams;
 	private ConcurrentMap<Integer, Queue<Player>> queuedPlayers;
 	private HashMap<Integer, Location> teamHologramLocations;
 	private ArrayList<Hologram> holograms;
 	private ArrayList<UUID> teamEntityUUID;
-
+	
 	public TeamSelector(MGFramework plugin, GameManager gameManager) {
 		PLUGIN = plugin;
 		GAME_MANAGER = gameManager;
@@ -59,19 +61,33 @@ public class TeamSelector {
 	 * @param name The NPC the player interacted with. 
 	 */
 	public void teamInteract(int team, Player player) {
-		MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
+		final MinigameTeams minigameTeam = PLUGIN.getMinigamePluginManager().getMinigameTeams();
+		final String teamName =  minigameTeam.getTeamNames().get(team);
+		final ArrayList<String> desc = minigameTeam.getTeamDescriptions().get(team);
+		boolean sameTeam = isJoiningSameTeam(team, player);
+		String sameTeamMessage = "";
+		
+		//If the player has interacted with a team they are on, add a little message to the description.
+		if (sameTeam) {
+			sameTeamMessage = " " + Messages.TEAM_ALREADY_ON_TEAM.toString();
+		}
 
 		//Set player a confirmation message.
 		player.sendMessage("");
 		player.sendMessage(Messages.GAME_BAR_TEAM.toString());
 		player.sendMessage("");
-		player.sendMessage(minigameTeam.getTeamNames().get(team) + ChatColor.DARK_GRAY + ":");
+		player.sendMessage(cct.centerMessage(ChatColor.GRAY + "Team: " + teamName + sameTeamMessage));
 		player.sendMessage("");
-		player.sendMessage(minigameTeam.getTeamDescriptions().get(team));
+
+		for (int i = 0; i < desc.size(); i++) {
+			String message = cct.centerMessage(ChatColor.YELLOW + desc.get(i));
+			player.sendMessage(message);
+		}
+		
 		player.sendMessage("");
 		player.sendMessage(Messages.GAME_BAR_BOTTOM.toString());
 		player.sendMessage("");
-
+		
 		//Play a confirmation sound.
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, .5f, .6f);
 
@@ -107,14 +123,14 @@ public class TeamSelector {
 		}
 
 		//Generate new holograms.
-		for (Entry<Integer, Location> entry: teamHologramLocations.entrySet()) {
+		for (Entry<Integer, Location> entry : teamHologramLocations.entrySet()) {
 			ArrayList<String> hologramText = new ArrayList<String>();
 			int team = entry.getKey();
 			int currentTeamSize = 0;
 			int queuedCount = 0;
 			int maxTeamSize = getMaxTeamSize(team);
-			Location location = entry.getValue();
-			Location hologramLocation = new Location(location.getWorld(), location.getX(), location.getY() + .7, location.getZ());
+			final Location location = entry.getValue();
+			final Location hologramLocation = new Location(location.getWorld(), location.getX(), location.getY() + .7, location.getZ());
 
 			//Get the number of players on a team.
 			if (sortedTeams.get(team) != null) {
@@ -143,7 +159,7 @@ public class TeamSelector {
 	public boolean allTeamsHavePlayers() {
 		boolean allTeamsHavePlayers = true;
 
-		for (Entry<Integer, ArrayList<Player>> entry: sortedTeams.entrySet()) {
+		for (Entry<Integer, ArrayList<Player>> entry : sortedTeams.entrySet()) {
 			ArrayList<Player> value = entry.getValue();
 
 			if (value.isEmpty() && value.size() < 1) {
@@ -174,7 +190,7 @@ public class TeamSelector {
 	 * @param player The player who will be added to a team.
 	 */
 	public void addPlayer(Player player) {
-		ArrayList<Integer> teamSizes = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
+		final ArrayList<Integer> teamSizes = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
 
 		//Assign player to a fixed size team.
 		for (int i = 0; i < teamSizes.size(); i++) {
@@ -235,7 +251,7 @@ public class TeamSelector {
 	 * Gets the maximum size a of players a team can hold.
 	 * @return Return the size a team can hold.
 	 */
-	private int getMaxTeamSize(int team) {
+	private int getMaxTeamSize(final int team) {
 		ArrayList<Integer> teams = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamSizes();
 		int maxPlayers = GAME_MANAGER.getMaxPlayers();
 
@@ -262,7 +278,7 @@ public class TeamSelector {
 			}
 
 			//Lets make the unlimited team sizes even.
-			int teamSize = (int) Math.ceil((double)playersLeftOver / (double)teamsWithUnlimitedSlots);
+			int teamSize = (int) Math.ceil(playersLeftOver / (double)teamsWithUnlimitedSlots);
 			return teamSize;
 		}
 	}	
@@ -275,7 +291,7 @@ public class TeamSelector {
 		//Lets loop through all the teams.
 		for (int i = 0; i < getNumberOfTeams(); i++) {
 			int currentTeam = i;
-			ArrayList<Player> currentTeamPlayers = sortedTeams.get(currentTeam);
+			final ArrayList<Player> currentTeamPlayers = sortedTeams.get(currentTeam);
 
 			//See if any players are queued for this team.
 			//If none want to join this team, then their is no need to continue.
@@ -321,7 +337,7 @@ public class TeamSelector {
 	 * Update queued status on certain events (player join, player quit, player change team.
 	 */
 	public void updateQueuePositions() {
-		ArrayList<String> teamNames = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames();
+		final ArrayList<String> teamNames = PLUGIN.getMinigamePluginManager().getMinigameTeams().getTeamNames();
 
 		//Loop through every team and update it.
 		for (int i = 0; i < teamNames.size(); i++) {
@@ -357,15 +373,29 @@ public class TeamSelector {
 		//Test to see if players can swap teams.
 		swapTeamMembers();
 	}
+	
+	/**
+	 * This will test if the player is trying to join a team they are already on.
+	 * @param futureTeam The team the player wants to join.
+	 * @param player The player who is joining the team.
+	 * @return Returns a boolean true, if the team is the same.
+	 */
+	private boolean isJoiningSameTeam(final int futureTeam, final Player player) {
+		if (getPlayerTeam(player) == futureTeam) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Changes a players team from the current one to another.
 	 * @param futureTeam The team the player wants to switch to.
 	 * @param player The player who is trying to switch teams.
 	 */
-	private void changePlayerTeam(int futureTeam, Player player) {
+	private void changePlayerTeam(final int futureTeam, Player player) {
 		//If the player is already on the "futureTeam" then don't let them change their team.
-		if (getPlayerTeam(player) != futureTeam) {
+		if (!isJoiningSameTeam(futureTeam, player)) {
 			int maxTeamSize = getMaxTeamSize(futureTeam);
 			int currentTeamSize = 0;
 
@@ -406,14 +436,8 @@ public class TeamSelector {
 
 					player.sendMessage(Messages.TEAM_QUEUE_PLACED.toString());
 
-				} else {
-					player.sendMessage(Messages.TEAM_QUEUE_ALREADY_PLACED.toString());
-					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 				}
 			}
-		} else {
-			player.sendMessage(Messages.TEAM_ALREADY_ON_TEAM.toString());
-			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 1F, .5F);
 		}
 	}
 

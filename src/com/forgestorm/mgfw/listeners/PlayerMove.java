@@ -41,7 +41,7 @@ public class PlayerMove implements Listener {
 			float pitch = event.getTo().getPitch();
 			float yaw = event.getTo().getYaw();
 			
-			//If the countdown has started, then let the player look around.
+			//If the countdown has started, then let the player look around and jump, but not walk/run.
 			if ((moveX != moveToX || moveZ != moveToZ) && !isSpectator) {
 	
 				HashMap<Player, Location> playerSpawns = gameArena.getPlayerSpawns();

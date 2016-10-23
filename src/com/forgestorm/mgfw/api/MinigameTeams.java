@@ -51,7 +51,7 @@ public abstract class MinigameTeams {
 	 * A list of minigame team descriptions.
 	 * @return Returns a list of minigame team descriptions.
 	 */
-	public abstract ArrayList<String> getTeamDescriptions();
+	public abstract ArrayList<ArrayList<String>> getTeamDescriptions();
 	
 	/**
 	 * A list of minigame platform locations.

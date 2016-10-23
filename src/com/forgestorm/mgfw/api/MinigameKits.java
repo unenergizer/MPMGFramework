@@ -37,7 +37,7 @@ public abstract class MinigameKits {
 	 * A list of minigame kit descriptions.
 	 * @return Returns a list of minigame kit descriptions.
 	 */
-	public abstract ArrayList<String> getKitDescriptions();
+	public abstract ArrayList<ArrayList<String>> getKitDescriptions();
 	
 	/**
 	 * A list of minigame platform locations.

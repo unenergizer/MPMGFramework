@@ -24,7 +24,9 @@ import com.forgestorm.mgfw.core.gui.SpectatorMenu;
 import com.forgestorm.mgfw.core.player.ArenaPlayer;
 import com.forgestorm.mgfw.core.player.SpectatorPlayer;
 import com.forgestorm.mgfw.core.worlds.WorldDuplicator;
+import com.forgestorm.mgfw.profiles.PlayerProfile;
 import com.forgestorm.mgfw.spawner.PlayerSpawner;
+import com.forgestorm.mgfw.util.CenterChatText;
 import com.forgestorm.mgfw.util.ItemBuilder;
 import com.forgestorm.mgfw.util.ScoresToPlaces;
 import com.forgestorm.servercore.core.display.BossBarAnnouncer;
@@ -93,6 +95,7 @@ public class GameArena {
 	 * @param spectator The player that will be setup as a spectator.
 	 */
 	public void setupSpectator(Player spectator) {
+		PlayerProfile profile = PLUGIN.getProfile(spectator);
 		GameManager gameManager = PLUGIN.getGameManager();
 		MinigamePluginManager mpm = PLUGIN.getMinigamePluginManager();
 
@@ -100,7 +103,11 @@ public class GameArena {
 		if (gameManager.shouldMinigameEnd()) {
 			gameManager.endGame(true);
 		}
-
+		
+		//Set to spectator on profile.
+		profile.setSpectator(true);
+		
+		//Do spectator setup.
 		new SpectatorPlayer(spectator, GameMode.ADVENTURE, false, true);
 
 		hideSpectators();
@@ -108,31 +115,34 @@ public class GameArena {
 		//Teleport player to spectator spawn.
 		spectator.teleport(mpm.getMinigameTeams().getSpectatorSpawnLocation());
 
-		//Setup lobby scoreboard
+		//Setup arena scoreboard
 		scoreboard.addPlayer(spectator);
 
 		//Show Bossbar Announcer
 		spectatorBar.showBossBar(spectator);
 
-		//Give Spectator options menu item.
-		ItemStack spectatorMenuItem = new ItemBuilder(Material.REDSTONE).setTitle("Spectator Menu").build();
-		spectator.getInventory().setItem(4, spectatorMenuItem);
-
 		//Assign the spectator a new spectator menu.
 		spectatorOptionsMenu.put(spectator, new SpectatorMenu(PLUGIN, spectator));
 
 		//Give Spectator tracker menu item.
-		ItemStack spectatorTrackerItem = new ItemBuilder(Material.COMPASS).setTitle("Player Tracker").build();
-		spectator.getInventory().setItem(3, spectatorTrackerItem);
+		ItemStack spectatorTrackerItem = new ItemBuilder(Material.COMPASS).setTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "Player Tracker").build();
+		spectator.getInventory().setItem(4, spectatorTrackerItem);
+
+		//Give Spectator options menu item.
+		ItemStack spectatorMenuItem = new ItemBuilder(Material.REDSTONE).setTitle(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Spectator Menu").build();
+		spectator.getInventory().setItem(5, spectatorMenuItem);
 
 		//Assign the spectator a new spectator menu.
 		spectatorTrackerMenu.put(spectator, new PlayerTracker(PLUGIN, spectator));
+		
+		//Give Spectator tracker menu item.
+		ItemStack spectatorServerExit = new ItemBuilder(Material.WATCH).setTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "Back To Lobby").build();
+		spectator.getInventory().setItem(8, spectatorServerExit);
 	}
 
 	private void hideSpectators() {
 
 		for (Player spectators: Bukkit.getOnlinePlayers()) {
-			Bukkit.broadcastMessage(spectators.getName());
 			boolean isSpectator = PLUGIN.getProfile(spectators).isSpectator();
 
 			//If this player is a spectator lets hide them from the other players.
@@ -184,12 +194,13 @@ public class GameArena {
 
 		//Show the game rules.
 		Bukkit.broadcastMessage("");
+		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_RULES.toString());
 		Bukkit.broadcastMessage("");
 
 		//Loop through and show the game rules.
 		for (int i = 0; i < gameRules.size(); i++) {
-			Bukkit.broadcastMessage(ChatColor.GREEN + gameRules.get(i));
+			Bukkit.broadcastMessage(new CenterChatText().centerMessage(ChatColor.YELLOW + gameRules.get(i)));
 		}
 
 		Bukkit.broadcastMessage("");
@@ -229,6 +240,9 @@ public class GameArena {
 
 					//Change the game state.
 					PLUGIN.getGameManager().setGameState(GameState.GAME_RUNNING);
+					
+					//Let the plugin know to start the game.
+					PLUGIN.getMinigamePluginManager().getMinigameBase().startGame();
 				}
 
 				countdown--;
@@ -242,38 +256,41 @@ public class GameArena {
 	void showGameScores(HashMap<Player, Integer> scoreMap) {
 		//Set the current game state. Used in PlayerMoveEvent listener (PlayerMove) to stop players from moving.
 		PLUGIN.getGameManager().setGameState(GameState.ARENA_SHOW_SCORES);
-
+		
+		CenterChatText cct = new CenterChatText();
 		ArrayList<String> playerPlaces = new ScoresToPlaces().scoresToPlaces(scoreMap);
-
+		
 		//Show the game rules.
+		Bukkit.broadcastMessage("");
+		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_SCORES.toString());
 		Bukkit.broadcastMessage("");
-		Bukkit.broadcastMessage(ChatColor.RED + "1st " + playerPlaces.get(0));
+		Bukkit.broadcastMessage(cct.centerMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "1st " + ChatColor.GREEN + playerPlaces.get(0)));
 
 		if (playerPlaces.size() >= 2) {
-			Bukkit.broadcastMessage(ChatColor.YELLOW + "2nd " + playerPlaces.get(1));
+			Bukkit.broadcastMessage(cct.centerMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "2nd " + ChatColor.AQUA + playerPlaces.get(1)));
 		}
 
 		if (playerPlaces.size() >= 3) {
-			Bukkit.broadcastMessage(ChatColor.GREEN + "3rd " + playerPlaces.get(2));
+			Bukkit.broadcastMessage(cct.centerMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "3rd " + ChatColor.LIGHT_PURPLE + playerPlaces.get(2)));
 		}
-
-		Bukkit.broadcastMessage("");
 
 		//Show players how they scored.
 		for (int i = 0; i < playerPlaces.size(); i++) {
 			for (Player players: Bukkit.getOnlinePlayers()) {
 				if (playerPlaces.get(i).equals(players.getName()) && i > 2) {
 					int place = i + 1;
-					players.sendMessage(ChatColor.LIGHT_PURPLE + "You placed " + place + "th place.");	
+					Bukkit.broadcastMessage("");
+					players.sendMessage(new CenterChatText().centerMessage(ChatColor.RED + "You placed " + place + "th place."));	
 				}
 			}
 		}
 
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(Messages.GAME_BAR_BOTTOM.toString());
-
+		Bukkit.broadcastMessage("");
+		
 		new BukkitRunnable() {
 			int countdown = 8;
 

@@ -31,7 +31,8 @@ public class PlayerInteractEntity implements Listener {
 			UUID uuid = event.getRightClicked().getUniqueId();
 			ArrayList<UUID> kitUUID = kitSelector.getKitEntityUUID();
 			ArrayList<UUID> teamUUID = teamSelector.getTeamEntityUUID();
-
+			
+			//Check for kit selection interactions.
 			for(int i = 0; i < kitUUID.size(); i++) {
 				if (uuid.equals(kitUUID.get(i))) {
 					//Toggle interact
@@ -40,6 +41,7 @@ public class PlayerInteractEntity implements Listener {
 				}
 			}
 
+			//Check for team selection interaction.
 			for(int i = 0; i < teamUUID.size(); i++) {
 				if (uuid.equals(teamUUID.get(i))) {
 					//Toggle interact

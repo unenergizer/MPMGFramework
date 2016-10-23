@@ -1,9 +1,12 @@
 package com.forgestorm.mgfw.core.constants;
 
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 
 public enum Messages {
-
+	
+	//Console Messages
+	FSMG("[FSMG-Framework]"), //TODO: Implement this
+	
 	//Debug messages
 	BOSS_BAR_LOBBY_MESSAGE("&bThanks for playing on &amc&7.&aForgeStorm&7.&acom&b!"),
 	BOSS_BAR_SPECTATOR_MESSAGE("&bYou are a spectator! &amc&7.&aForgeStorm&7.&acom&b!"),
@@ -19,21 +22,31 @@ public enum Messages {
 	//Team Messages
 	TEAM_QUEUE_PLACED("&eYou were placed in a queue to join this team."),
 	TEAM_QUEUE_ALREADY_PLACED("&cYou are already queued for this team!"),
-	TEAM_ALREADY_ON_TEAM("&eYou are already on this team."),
+	TEAM_ALREADY_ON_TEAM("&7(you are on this team)"),
 	TEAM_DROPPED_FROM_QUEUE("&cYou have been removed from the %s &cqueue."),
+	
+	//Kit Messages
+	KIT_ALREADY_HAVE_KIT("&7(you are using this kit)"),
 	
 	//Game display messages
 	GAME_COUNTDOWN_NOT_ENOUGH_PLAYERS("&cCountdown canceled! Not enough players!"),
 	GAME_COUNTDOWN_ALL_TEAMS_NEED_PLAYERS("&cCountdown canceled! All teams need players!"),
-	GAME_BAR_KIT("&8&l&m-----------------&r&8&l<[ &6&lKit Select &8&l]>&8&l&m---------------"),
-	GAME_BAR_TEAM("&8&l&m----------------&r&8&l<[ &3&lTeam Select &8&l]>&8&l&m---------------"),
-	GAME_BAR_RULES("&8&l&m----------------&r&8&l<[ &e&lHow to Play &8&l]>&8&l&m---------------"),
-	GAME_BAR_SCORES("&8&l&m---------------&r&8&l<[ &e&lFinal Scores &8&l]>&8&l&m---------------"),
+	GAME_BAR_KIT("&8&l&m----------------&r&l &l &l &6&lKit Select&l &l &l &8&l&m----------------"),
+	GAME_BAR_TEAM("&8&l&m---------------&r&l &l &l &3&lTeam Select&l &l &l &8&l&m----------------"),
+	GAME_BAR_RULES("&8&l&m---------------&r&l &l &l &a&lHow to Play&l &l &l &8&l&m----------------"),
+	GAME_BAR_SCORES("&8&l&m---------------&r&l &l &l &e&lFinal Scores&l &l &l &8&l&m---------------"),
 	GAME_BAR_BOTTOM("&8&l&m---------------------------------------------"),
 	GAME_TIME_REMAINING_PLURAL("&eGame will start in &c%s &eseconds."),
 	GAME_TIME_REMAINING_SINGULAR("&eGame will start in &c1 &esecond."),
 	GAME_ARENA_SPECTATOR_TITLE("&aHello, Spectator!"),
 	GAME_ARENA_SPECTATOR_SUBTITLE("&7Relax, another game will start soon!"),
+	
+	//Join and Quit Messages
+	PLAYER_JOIN_LOBBY("&a+ &8[&7%s&8/&7%f&8] %e"),
+	PLAYER_QUIT_LOBBY("&c- &8[&7%s&8/&7%f&8] %e"),
+	PLAYER_QUIT_GAME("&8[&cQuit&8] %s"),
+	SPECTATOR_JOIN("&8[&7Spectator Join&8] %s"),
+	SPECTATOR_QUIT("&8[&7Spectator Quit&8] %s"),
 	
 	//Scoreboard
 	SB_LOBBY_TITLE("&cmc&7.&cForgeStorm&7.&ccom"),
